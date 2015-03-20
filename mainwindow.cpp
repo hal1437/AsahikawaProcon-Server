@@ -6,6 +6,13 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->startup = new StartupDialog(this);
+
+    if(this->startup->exec()){
+
+    }else{
+        exit(0);
+    }
 }
 
 MainWindow::~MainWindow()
