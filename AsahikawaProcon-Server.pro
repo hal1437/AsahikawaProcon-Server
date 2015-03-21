@@ -16,10 +16,18 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    startupdialog.cpp
+    startupdialog.cpp \
+    GameSystem.cpp \
+    TcpClient.cpp \
+    BaseClient.cpp \
+    ComClient.cpp
 
 HEADERS  += mainwindow.h \
-    startupdialog.h
+    startupdialog.h \
+    GameSystem.h \
+    TcpClient.h \
+    BaseClient.h \
+    ComClient.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui

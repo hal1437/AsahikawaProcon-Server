@@ -1,0 +1,32 @@
+#ifndef CLIENT_H
+#define CLIENT_H
+
+#include <QObject>
+#include "GameSystem.h"
+
+class Client : public QObject
+{
+    Q_OBJECT
+    //クライアント純粋仮想クラス
+public:
+    QString Name;//クラアント名
+    
+public:
+    //GetReadyを要求するメソッド
+    virtual void WaitGetReady()=0;
+    
+    //GetReadyに対する周辺情報のレスポンス
+    virtual GameSystem::METHOD GetReadyResponse(GameSystem::AroundData data)=0;
+    
+    //Methodに対する周辺情報のレスポンス
+    virtual bool MethodResponse(GameSystem::AroundData data)=0;
+    
+    explicit Client(QObject *parent = 0);
+    virtual ~Client();
+
+signals:
+
+public slots:
+};
+
+#endif // CLIENT_H

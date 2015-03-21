@@ -2,6 +2,7 @@
 #define STARTUPDIALOG_H
 
 #include <QDialog>
+#include "TcpClient.h"
 
 namespace Ui {
 class StartupDialog;
@@ -17,6 +18,23 @@ public:
 
 private:
     Ui::StartupDialog *ui;
+    bool hot_standby;
+    bool cool_standby;
+    BaseClient* hot_client;
+    BaseClient* cool_client;
+
+public:
+
+    void SetHotStandby (bool state);
+    void SetCoolStandby(bool state);
+
+public slots:
+
+    void HotConnectionToggled(bool state);
+    void HotComboBoxChenged(QString text);
+
+    void CoolConnectionToggled(bool state);
+    void CoolComboBoxChenged(QString text);
 };
 
 #endif // STARTUPDIALOG_H
