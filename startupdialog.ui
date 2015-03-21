@@ -65,6 +65,9 @@
             <property name="fieldGrowthPolicy">
              <enum>QFormLayout::FieldsStayAtSizeHint</enum>
             </property>
+            <property name="verticalSpacing">
+             <number>2</number>
+            </property>
             <item row="0" column="0">
              <widget class="QLabel" name="label">
               <property name="text">
@@ -79,14 +82,14 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
                <string>ポート番号：</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
+            <item row="3" column="1">
              <widget class="QSpinBox" name="CoolPortSpinBox">
               <property name="minimum">
                <number>1024</number>
@@ -108,6 +111,20 @@
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="CoolNameLabel">
+              <property name="text">
+               <string>不明</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>IP：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="CoolIPLabel">
               <property name="text">
                <string>不明</string>
               </property>
@@ -229,7 +246,7 @@
         <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
-           <widget class="QLabel" name="label_8">
+           <widget class="QLabel" name="LocalIPLabel">
             <property name="text">
              <string>192.168.1.1</string>
             </property>
@@ -256,7 +273,7 @@
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLabel" name="label_10">
+           <widget class="QLabel" name="GrobalIPLabel">
             <property name="text">
              <string>1.1.1.1</string>
             </property>
@@ -328,6 +345,12 @@
             <property name="fieldGrowthPolicy">
              <enum>QFormLayout::FieldsStayAtSizeHint</enum>
             </property>
+            <property name="horizontalSpacing">
+             <number>-1</number>
+            </property>
+            <property name="verticalSpacing">
+             <number>2</number>
+            </property>
             <item row="0" column="0">
              <widget class="QLabel" name="label_5">
               <property name="text">
@@ -342,14 +365,14 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
+            <item row="3" column="0">
              <widget class="QLabel" name="label_7">
               <property name="text">
                <string>ポート番号：</string>
               </property>
              </widget>
             </item>
-            <item row="2" column="1">
+            <item row="3" column="1">
              <widget class="QSpinBox" name="HotPortSpinBox">
               <property name="minimum">
                <number>1024</number>
@@ -371,6 +394,20 @@
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="HotNameLabel">
+              <property name="text">
+               <string>不明</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_8">
+              <property name="text">
+               <string>IP：</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="1">
+             <widget class="QLabel" name="HotIPLabel">
               <property name="text">
                <string>不明</string>
               </property>

@@ -16,7 +16,6 @@ private:
     const int Port;             //開放ポート
     QTcpServer*  server;        //TCPサーバー
     QTcpSocket*  client;        //TCPクライアント
-    QDataStream  stream;        //データストリーム
 public:
 
     virtual bool WaitGetReady();
@@ -35,10 +34,13 @@ public:
 
 signals:
     void Connected   (int port); //接続
-    void Disconnected(int port); //切断
+    void ReturnTeamName(QString name); //チーム名
 
 private slots:
-    void NewConnect();//新規接続
+    void NewConnect (); //新規接続
+
+public slots:
+    QString GetTeamName();//チーム名取得
 };
 
 #endif // TCPCLIENT_H

@@ -12,7 +12,7 @@ public:
     virtual bool WaitEndSharp(GameSystem::AroundData data);
 
 
-    ComClient();
+    explicit ComClient(QObject *parent = 0);
     ~ComClient();
 };
 

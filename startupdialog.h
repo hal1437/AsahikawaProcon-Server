@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include "TcpClient.h"
+#include "ComClient.h"
 
 namespace Ui {
 class StartupDialog;
@@ -25,8 +26,6 @@ private:
 
 public:
 
-    void SetHotStandby (bool state);
-    void SetCoolStandby(bool state);
 
 public slots:
 
@@ -35,6 +34,10 @@ public slots:
 
     void CoolConnectionToggled(bool state);
     void CoolComboBoxChenged(QString text);
+
+    void SetHotStandby (bool state);
+    void SetCoolStandby(bool state);
+
 };
 
 #endif // STARTUPDIALOG_H

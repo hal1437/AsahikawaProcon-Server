@@ -10,6 +10,7 @@ class BaseClient : public QObject
     //クライアント純粋仮想クラス
 public:
     QString Name;//クラアント名
+    QString IP;  //IP
 
 public:
     //GetReadyを要求するメソッド
@@ -27,7 +28,7 @@ public:
 signals:
 
     //準備完了シグナル
-    void Ready();
+    void Ready(bool state);
 
 public slots:
 };

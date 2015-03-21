@@ -1,16 +1,15 @@
 #include "TcpClient.h"
 
 bool TCPClient::WaitGetReady(){
-    QDataStream stream(client);
     //ターン開始文字列
-    stream << QString("@\r\n");
+    client->write(QString("@\r\n").toUtf8());
 
     //レスポンス待ち
     if(this->client->waitForReadyRead(this->TIMEOUT)){
         //レスポンスあり
 
         QString response;
-        stream   >> response;
+        response = client->readAll();
         qDebug() << response;
         return (response == "gr\r\n");
     }else{
@@ -21,18 +20,16 @@ bool TCPClient::WaitGetReady(){
     }
 
 }
-
 GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
-    QDataStream stream(client);
     //周辺情報文字列
-    stream << data.toString() << "\r\n";
+    client->write(QString(data.toString() + "\r\n").toUtf8());
 
     //レスポンス待ち
     if(this->client->waitForReadyRead(this->TIMEOUT)){
         //レスポンスあり
 
         QString response;
-        stream   >> response;
+        response = client->readAll();
         qDebug() << response;
         return GameSystem::Method::fromString(response);
     }else{
@@ -46,16 +43,15 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
 
 }
 bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
-    QDataStream stream(client);
     //周辺情報文字列
-    stream << data.toString() << "\r\n";
+    client->write(QString(data.toString() + "\r\n").toUtf8());
 
     //レスポンス待ち
     if(this->client->waitForReadyRead(this->TIMEOUT)){
         //レスポンスあり
 
         QString response;
-        stream   >> response;
+        response = client->readAll();
         qDebug() << response;
         return (response == "#\r\n");
     }else{
@@ -73,14 +69,27 @@ bool TCPClient::OpenSocket(){
 }
 bool TCPClient::CloseSocket(){
     this->server->close();
+    emit Ready(false);
 }
 bool TCPClient::isConnecting(){
     return this->server->isListening();
 }
 void TCPClient::NewConnect(){
     this->client = this->server->nextPendingConnection();
+    connect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
+    this->IP = client->localAddress().toString();
     emit Connected(this->Port);
-    emit Ready();
+}
+
+QString TCPClient::GetTeamName(){
+    if(this->Name == ""){
+        this->Name = client->readAll();
+        disconnect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
+        emit ReturnTeamName(this->Name);
+        emit Ready(true);
+    }else{
+        return this->Name;
+    }
 }
 
 TCPClient::TCPClient(int port,QObject *parent) :
