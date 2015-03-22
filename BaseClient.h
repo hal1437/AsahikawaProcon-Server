@@ -15,10 +15,8 @@ public:
 public:
     //GetReadyを要求するメソッド
     virtual bool WaitGetReady()=0;
-
     //GetReadyに対する周辺情報のレスポンス
     virtual GameSystem::Method WaitReturnMethod(GameSystem::AroundData data)=0;
-
     //Methodに対する周辺情報のレスポンスを送信し、#が来るまで待つ
     virtual bool WaitEndSharp(GameSystem::AroundData data)=0;
 
@@ -26,11 +24,12 @@ public:
     virtual ~BaseClient();
 
 signals:
-
-    //準備完了シグナル
-    void Ready(bool state);
-
+    void Connected();                   //接続
+    void ReturnTeamName(QString name);  //チーム名
+    void Ready(bool state);             //準備完了シグナル
+    void Disconnected();                //切断
 public slots:
+
 };
 
 #endif // CLIENT_H

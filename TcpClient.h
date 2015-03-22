@@ -33,11 +33,10 @@ public:
     virtual ~TCPClient();
 
 signals:
-    void Connected   (int port); //接続
-    void ReturnTeamName(QString name); //チーム名
 
 private slots:
     void NewConnect (); //新規接続
+    void DisConnect (); //切断
 
 public slots:
     QString GetTeamName();//チーム名取得

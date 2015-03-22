@@ -26,17 +26,22 @@ private:
 
 public:
 
-
 public slots:
-
-    void HotConnectionToggled(bool state);
-    void HotComboBoxChenged(QString text);
-
-    void CoolConnectionToggled(bool state);
-    void CoolComboBoxChenged(QString text);
 
     void SetHotStandby (bool state);
     void SetCoolStandby(bool state);
+
+    void HotConnected  ();
+    void CoolConnected ();
+
+    void HotDisConnected  ();
+    void CoolDisConnected ();
+
+    void HotConnectionToggled (bool state);
+    void CoolConnectionToggled(bool state);
+
+    void HotComboBoxChenged (QString text);
+    void CoolComboBoxChenged(QString text);
 
 };
 

@@ -76,9 +76,16 @@ bool TCPClient::isConnecting(){
 }
 void TCPClient::NewConnect(){
     this->client = this->server->nextPendingConnection();
+    this->IP     = this->client->localAddress().toString();
     connect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
-    this->IP = client->localAddress().toString();
-    emit Connected(this->Port);
+    connect(this->client,SIGNAL(disconnected()),this,SLOT(DisConnect()));
+    emit Connected();
+}
+void TCPClient::DisConnect(){
+    emit Disconnected();
+    this->client = nullptr;
+    this->IP   = "";
+    this->Name = "";
 }
 
 QString TCPClient::GetTeamName(){
@@ -87,9 +94,9 @@ QString TCPClient::GetTeamName(){
         disconnect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
         emit ReturnTeamName(this->Name);
         emit Ready(true);
-    }else{
         return this->Name;
     }
+    return this->Name;
 }
 
 TCPClient::TCPClient(int port,QObject *parent) :
