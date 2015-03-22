@@ -22,19 +22,12 @@ QString GameSystem::AroundData::toString(){
     QString str;
     str.append('0' + static_cast<int>(this->connect));
     for(int i=0;i<9;i++){
-        str.append('0' + static_cast<int>(this->data[i]));
+        if(i==5)str.append('0');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::NOTHING)str.append('0');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::HOT)    str.append('1');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::COOL)   str.append('1');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::BLOCK)  str.append('2');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::ITEM)   str.append('3');
     }
     return str;
 }
-
-
-GameSystem::GameSystem()
-{
-
-}
-
-GameSystem::~GameSystem()
-{
-
-}
-

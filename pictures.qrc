@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/Pictures">
+        <file>block1.jpg</file>
+        <file>cool1.jpg</file>
+        <file>floor1.jpg</file>
+        <file>hot1.jpg</file>
+        <file>item1.jpg</file>
+    </qresource>
+</RCC>

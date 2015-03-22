@@ -1,6 +1,136 @@
 #include "startupdialog.h"
 #include "ui_startupdialog.h"
 #include <QNetworkInterface>
+#include <QDesktopServices>
+
+
+StartupDialog::StartupDialog(QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::StartupDialog),
+    map_standby(false),
+    hot_standby(false),
+    cool_standby(false)
+{
+    //マップ初期化
+    map.resize(GameSystem::MAP_HEIGHT);
+    for(auto& v : map)v = QVector<GameSystem::MAP_OBJECT >(GameSystem::MAP_WIDTH,GameSystem::MAP_OBJECT ::BLOCK);
+
+    //UI初期化
+    ui->setupUi(this);
+
+    //クライアント初期化
+    this->cool_client = new TCPClient(2009);
+    this->hot_client  = new TCPClient(2010);
+
+    //ローカルIPの探索
+    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
+        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
+            this->ui->LocalIPLabel->setText(address.toString());
+    }
+
+    //シグナル・スロットの接続
+    connect(this->hot_client ,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
+    connect(this->hot_client ,SIGNAL(Ready(bool))   ,this,SLOT(SetHotStandby(bool)));
+    connect(this->hot_client ,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
+    connect(this->cool_client,SIGNAL(Connected())   ,this,SLOT(CoolConnected()));
+    connect(this->cool_client,SIGNAL(Ready(bool))   ,this,SLOT(SetCoolStandby(bool)));
+    connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
+}
+
+StartupDialog::~StartupDialog()
+{
+    delete ui;
+}
+
+bool StartupDialog::MapRead(const QString& dir){
+    char Map_chars[5];
+    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)] = ' ';
+    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::COOL)]    = 'C';
+    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::HOT)]     = 'H';
+    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]    = 'I';
+    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]   = '#';
+
+    //旧式のマップフォーマットが不明のためリテラルは暫定とする。
+
+    QFile file(dir);
+    int  item_count = 0;
+    bool exist_cool = false;
+    bool exist_hot  = false;
+
+
+    if (file.open(QIODevice::ReadOnly)){
+        for(int i=0;i<GameSystem::MAP_HEIGHT;i++){
+            char buf[1024]={};
+            int str_length;
+            str_length = file.readLine(buf,1024);
+
+            //文字列が満たない
+            if(str_length < GameSystem::MAP_WIDTH){
+                QMessageBox msg;
+                msg.setText(QString("エラー:") +
+                            QString::number(i) + "行目が" +
+                            QString::number(GameSystem::MAP_WIDTH) + "文字未満かもしれません。\n" +
+                            "そこは空白で埋めて読み込みます。");
+                msg.exec();
+            }
+
+            //マップ読み出し
+            for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)])map[i][j] = GameSystem::MAP_OBJECT::NOTHING;
+                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK  )])map[i][j] = GameSystem::MAP_OBJECT::BLOCK;
+                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::ITEM   )]){
+                    map[i][j] = GameSystem::MAP_OBJECT::ITEM;
+                    item_count++;
+                }
+                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::COOL   )]){
+                    map[i][j] = GameSystem::MAP_OBJECT::COOL;
+                    exist_cool = true;
+                }
+                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::HOT    )]){
+                    map[i][j] = GameSystem::MAP_OBJECT::HOT;
+                    exist_hot = true;
+                }
+            }
+        }
+        //初期位置が存在しないとか
+        if(exist_cool == false || exist_hot == false){
+            QMessageBox msg;
+            QString user;
+            if(exist_cool == false && exist_hot == false)user = "CoolとHot";
+            else if(exist_cool == false)user = "Cool";
+            else if(exist_hot  == false)user = "Hot";
+            msg.setText(QString("エラー:") + user + "の初期位置が存在しません");
+            msg.exec();
+            return false;
+        }
+        //アイテム数が少なすぎる
+        if(item_count < 4){
+            QMessageBox msg;
+            msg.setText("警告:なんかアイテム少なくね？まあこのままでも実行できるけどさ");
+            msg.exec();
+        }
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
+void StartupDialog::PushedMapSelect(){
+
+    QString folder = QDir::homePath();
+    QString cap    = tr("マップを開く");
+    QString filter = tr("マップファイル (*.map)");
+
+    QString filePath = QFileDialog::getOpenFileName( this, cap, folder, filter );
+    this->ui->MapDirEdit->setText(filePath);
+    SetMapStandby(MapRead(filePath));
+}
+
+void StartupDialog::SetMapStandby (bool state){
+    map_standby = state;
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
+}
 
 void StartupDialog::SetHotStandby (bool state){
     this->hot_standby = state;
@@ -16,7 +146,7 @@ void StartupDialog::SetHotStandby (bool state){
         this->ui->HotStateLabel->setText("未接続");
 
     }
-    this->ui->ServerStartButton->setEnabled(hot_standby == true && cool_standby == true);
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
 void StartupDialog::SetCoolStandby(bool state){
     this->cool_standby = state;
@@ -32,7 +162,7 @@ void StartupDialog::SetCoolStandby(bool state){
         this->ui->CoolStateLabel->setText("未接続");
 
     }
-    this->ui->ServerStartButton->setEnabled(hot_standby == true && cool_standby == true);
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
 
 void StartupDialog::HotConnected  (){
@@ -52,33 +182,6 @@ void StartupDialog::HotDisConnected (){
 }
 void StartupDialog::CoolDisConnected (){
     this->ui->CoolConnectButton->toggle();
-}
-
-StartupDialog::StartupDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::StartupDialog),
-    hot_standby(false),
-    cool_standby(false)
-{
-    ui->setupUi(this);
-    this->cool_client = new TCPClient(2009);
-    this->hot_client  = new TCPClient(2010);
-    //ローカルIPの探索
-    foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
-        if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
-            this->ui->LocalIPLabel->setText(address.toString());
-    }
-    connect(this->hot_client ,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
-    connect(this->hot_client ,SIGNAL(Ready(bool))   ,this,SLOT(SetHotStandby(bool)));
-    connect(this->hot_client ,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
-    connect(this->cool_client,SIGNAL(Connected())   ,this,SLOT(CoolConnected()));
-    connect(this->cool_client,SIGNAL(Ready(bool))   ,this,SLOT(SetCoolStandby(bool)));
-    connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
-}
-
-StartupDialog::~StartupDialog()
-{
-    delete ui;
 }
 
 void StartupDialog::HotConnectionToggled(bool state){

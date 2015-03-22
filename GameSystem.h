@@ -3,9 +3,16 @@
 
 #include <QObject>
 
+//二次元配列エイリアス
+template <class T>
+using Field = QVector<QVector<T>>;
+
 class GameSystem
 {
 public:
+    const static int MAP_WIDTH  = 17;
+    const static int MAP_HEIGHT = 15;
+
     //接続状態
     enum class CONNECTING_STATUS{
         FINISHED,
@@ -14,9 +21,17 @@ public:
     //マップ上に存在する物体
     enum class MAP_OBJECT{
         NOTHING,
-        TARGET ,
+        HOT    ,
+        COOL   ,
         BLOCK  ,
         ITEM   ,
+    };
+    //マップ上に描画する非物体
+    enum class MAP_OVERLAY{
+        NOTHING,
+        LOOK,
+        SEACH,
+        GETREADY,
     };
 
     //クライアントの行動
@@ -48,9 +63,6 @@ public:
 
         QString toString();
     };
-
-    GameSystem();
-    ~GameSystem();
 };
 
 #endif // GAMESYSTEM_H

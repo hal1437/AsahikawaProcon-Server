@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
+    <width>524</width>
     <height>320</height>
    </rect>
   </property>
@@ -215,7 +215,10 @@
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <item>
-           <widget class="QLineEdit" name="lineEdit">
+           <widget class="QLineEdit" name="MapDirEdit">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
             <property name="placeholderText">
              <string>MapData...</string>
             </property>
@@ -275,7 +278,7 @@
           <item row="1" column="1">
            <widget class="QLabel" name="GrobalIPLabel">
             <property name="text">
-             <string>1.1.1.1</string>
+             <string>不明</string>
             </property>
            </widget>
           </item>
@@ -499,8 +502,8 @@
    <slot>HotConnectionToggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>417</x>
-     <y>131</y>
+     <x>512</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -540,11 +543,44 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>ServerStartButton</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>351</x>
+     <y>292</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_4</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>PushedMapSelect()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>224</x>
+     <y>214</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>179</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>CoolConnectionToggled(bool)</slot>
   <slot>HotConnectionToggled(bool)</slot>
   <slot>CoolComboBoxChenged(QString)</slot>
   <slot>HotComboBoxChenged(QString)</slot>
+  <slot>PushedMapSelect()</slot>
  </slots>
 </ui>
