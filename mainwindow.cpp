@@ -108,8 +108,8 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     if(winner == GameSystem::WINNER::DRAW)this->ui->WinnerLabel->setText("DRAW");
 }
 GameSystem::WINNER MainWindow::Judge(){
-    bool cool_lose;
-    bool hot_lose;
+    bool cool_lose = false;
+    bool hot_lose  = false;
     GameBoard*& board = this->ui->Field;
     GameSystem::AroundData cool_around;
     GameSystem::AroundData hot_around;
