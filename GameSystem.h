@@ -2,6 +2,8 @@
 #define GAMESYSTEM_H
 
 #include <QObject>
+#include <QPoint>
+#include <QVector>
 
 //二次元配列エイリアス
 template <class T>
@@ -10,9 +12,14 @@ using Field = QVector<QVector<T>>;
 class GameSystem
 {
 public:
-    const static int MAP_WIDTH  = 17;
-    const static int MAP_HEIGHT = 15;
+    const static int MAP_WIDTH  = 23;
+    const static int MAP_HEIGHT = 17;
 
+    //チーム
+    enum class TEAM{
+        COOL,
+        HOT ,
+    };
     //接続状態
     enum class CONNECTING_STATUS{
         FINISHED,
@@ -20,11 +27,10 @@ public:
     };
     //マップ上に存在する物体
     enum class MAP_OBJECT{
-        NOTHING,
-        HOT    ,
-        COOL   ,
-        BLOCK  ,
-        ITEM   ,
+        NOTHING = 0,
+        TARGET  = 1,
+        BLOCK   = 2,
+        ITEM    = 3,
     };
     //マップ上に描画する非物体
     enum class MAP_OVERLAY{
@@ -32,6 +38,14 @@ public:
         LOOK,
         SEACH,
         GETREADY,
+    };
+
+    struct Map{
+        Field<GameSystem::MAP_OBJECT> field;
+        int turn;
+        QString name;
+        QPoint cool_first_point;
+        QPoint hot_first_point;
     };
 
     //クライアントの行動
@@ -54,6 +68,8 @@ public:
         };
         ACTION action;
         ROTE   rote;
+
+        QPoint  GetRoteVector(); //方向ベクトル取得
         static Method fromString(const QString& str);
     };
     //周辺情報
@@ -61,7 +77,7 @@ public:
         CONNECTING_STATUS connect;
         MAP_OBJECT data[9];
 
-        QString toString();
+        QString toString();      //文字列変換
     };
 };
 

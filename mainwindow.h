@@ -21,19 +21,27 @@ private:
         HOT_ACTION,
     };
 
-    const int FRAME_RATE = 500;
+    const int FRAME_RATE = 300;
+
+    TURN process;
+    int hot_score;
+    int cool_score;
+
+    QTimer* clock;
+    StartupDialog* startup;
 
 protected:
     void keyPressEvent(QKeyEvent* event);
 public:
-    QTimer* clock;
-    StartupDialog* startup;
-
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
 private:
     Ui::MainWindow *ui;
+
+private slots:
+    //ゲーム進行
+    void StepGame();
 };
 
 #endif // MAINWINDOW_H

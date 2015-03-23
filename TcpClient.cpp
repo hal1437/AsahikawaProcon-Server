@@ -66,10 +66,12 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
 
 bool TCPClient::OpenSocket(){
     this->server->listen(QHostAddress::Any,this->Port);
+    return true;
 }
 bool TCPClient::CloseSocket(){
     this->server->close();
     emit Ready(false);
+    return true;
 }
 bool TCPClient::isConnecting(){
     return this->server->isListening();

@@ -21,11 +21,12 @@ private:
     bool map_standby;
     bool hot_standby;
     bool cool_standby;
-    BaseClient* hot_client;
-    BaseClient* cool_client;
 
 public:
-    Field<GameSystem::MAP_OBJECT> map;
+    GameSystem::Map map;
+
+    BaseClient* hot_client;
+    BaseClient* cool_client;
 
 public:
     bool MapRead(const QString& dir);

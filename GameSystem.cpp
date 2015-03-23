@@ -1,6 +1,17 @@
 #include "GameSystem.h"
 
 
+QPoint GameSystem::Method::GetRoteVector(){
+    //方向ベクトル生成
+    switch(this->rote){
+        case GameSystem::Method::ROTE::UP:    return QPoint( 0,-1);
+        case GameSystem::Method::ROTE::RIGHT: return QPoint( 1, 0);
+        case GameSystem::Method::ROTE::DOWN:  return QPoint( 0, 1);
+        case GameSystem::Method::ROTE::LEFT:  return QPoint(-1, 0);
+        default:                              return QPoint( 0, 0);
+    }
+}
+
 GameSystem::Method GameSystem::Method::fromString(const QString& str){
     //文字列から抽出
     GameSystem::Method answer;
@@ -22,10 +33,8 @@ QString GameSystem::AroundData::toString(){
     QString str;
     str.append('0' + static_cast<int>(this->connect));
     for(int i=0;i<9;i++){
-        if(i==5)str.append('0');
-        else if(this->data[i] == GameSystem::MAP_OBJECT::NOTHING)str.append('0');
-        else if(this->data[i] == GameSystem::MAP_OBJECT::HOT)    str.append('1');
-        else if(this->data[i] == GameSystem::MAP_OBJECT::COOL)   str.append('1');
+        if     (this->data[i] == GameSystem::MAP_OBJECT::NOTHING)str.append('0');
+        else if(this->data[i] == GameSystem::MAP_OBJECT::TARGET) str.append('1');
         else if(this->data[i] == GameSystem::MAP_OBJECT::BLOCK)  str.append('2');
         else if(this->data[i] == GameSystem::MAP_OBJECT::ITEM)   str.append('3');
     }

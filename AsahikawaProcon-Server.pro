@@ -21,7 +21,7 @@ SOURCES += main.cpp\
     TcpClient.cpp \
     BaseClient.cpp \
     ComClient.cpp \
-    GraphicField.cpp
+    GameBoard.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -29,11 +29,11 @@ HEADERS  += mainwindow.h \
     TcpClient.h \
     BaseClient.h \
     ComClient.h \
-    GraphicField.h
+    GameBoard.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
-    GraphicField.ui
+    GameBoard.ui
 
 RESOURCES += \
     pictures.qrc

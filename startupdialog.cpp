@@ -11,9 +11,6 @@ StartupDialog::StartupDialog(QWidget *parent) :
     hot_standby(false),
     cool_standby(false)
 {
-    //マップ初期化
-    map.resize(GameSystem::MAP_HEIGHT);
-    for(auto& v : map)v = QVector<GameSystem::MAP_OBJECT >(GameSystem::MAP_WIDTH,GameSystem::MAP_OBJECT ::BLOCK);
 
     //UI初期化
     ui->setupUi(this);
@@ -43,71 +40,45 @@ StartupDialog::~StartupDialog()
 }
 
 bool StartupDialog::MapRead(const QString& dir){
-    char Map_chars[5];
-    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)] = ' ';
-    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::COOL)]    = 'C';
-    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::HOT)]     = 'H';
-    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]    = 'I';
-    Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]   = '#';
-
-    //旧式のマップフォーマットが不明のためリテラルは暫定とする。
 
     QFile file(dir);
-    int  item_count = 0;
-    bool exist_cool = false;
-    bool exist_hot  = false;
-
-
     if (file.open(QIODevice::ReadOnly)){
-        for(int i=0;i<GameSystem::MAP_HEIGHT;i++){
-            char buf[1024]={};
-            int str_length;
-            str_length = file.readLine(buf,1024);
+        char buf[1024]={};
+        int str_length;
+        while((str_length = file.readLine(buf,1024)) != -1){
+            QString str = QString::fromLatin1(buf);
+            str.replace("\r","");
+            str.replace("\n","");
 
-            //文字列が満たない
-            if(str_length < GameSystem::MAP_WIDTH){
-                QMessageBox msg;
-                msg.setText(QString("エラー:") +
-                            QString::number(i) + "行目が" +
-                            QString::number(GameSystem::MAP_WIDTH) + "文字未満かもしれません。\n" +
-                            "そこは空白で埋めて読み込みます。");
-                msg.exec();
+            //マップ名
+            if(str[0]=='N'){
+               this->map.name = str.remove(0,2);
+            }
+            //ターン数
+            if(str[0]=='T'){
+               this->map.turn = str.remove(0,2).toInt();
             }
 
-            //マップ読み出し
-            for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
-                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)])map[i][j] = GameSystem::MAP_OBJECT::NOTHING;
-                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK  )])map[i][j] = GameSystem::MAP_OBJECT::BLOCK;
-                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::ITEM   )]){
-                    map[i][j] = GameSystem::MAP_OBJECT::ITEM;
-                    item_count++;
+            //マップ
+            if(str[0]=='D'){
+                QStringList list = str.remove(0,2).split(",");
+                QVector<GameSystem::MAP_OBJECT> vec;
+                foreach(QString s,list){
+                    vec.push_back(static_cast<GameSystem::MAP_OBJECT>(s.toInt()));
                 }
-                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::COOL   )]){
-                    map[i][j] = GameSystem::MAP_OBJECT::COOL;
-                    exist_cool = true;
-                }
-                if(buf[j] == Map_chars[static_cast<int>(GameSystem::MAP_OBJECT::HOT    )]){
-                    map[i][j] = GameSystem::MAP_OBJECT::HOT;
-                    exist_hot = true;
-                }
+                this->map.field.push_back(vec);
             }
-        }
-        //初期位置が存在しないとか
-        if(exist_cool == false || exist_hot == false){
-            QMessageBox msg;
-            QString user;
-            if(exist_cool == false && exist_hot == false)user = "CoolとHot";
-            else if(exist_cool == false)user = "Cool";
-            else if(exist_hot  == false)user = "Hot";
-            msg.setText(QString("エラー:") + user + "の初期位置が存在しません");
-            msg.exec();
-            return false;
-        }
-        //アイテム数が少なすぎる
-        if(item_count < 4){
-            QMessageBox msg;
-            msg.setText("警告:なんかアイテム少なくね？まあこのままでも実行できるけどさ");
-            msg.exec();
+
+            //Cool初期位置
+            if(str[0]=='C'){
+                QStringList list = str.remove(0,2).split(",");
+                this->map.cool_first_point = QPoint(list[0].toInt(),list[1].toInt());
+            }
+            //Hot初期位置
+            if(str[0]=='H'){
+                QStringList list = str.remove(0,2).split(",");
+                this->map.hot_first_point = QPoint(list[0].toInt(),list[1].toInt());
+            }
         }
         return true;
     }else{
@@ -131,7 +102,6 @@ void StartupDialog::SetMapStandby (bool state){
     map_standby = state;
     this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
-
 void StartupDialog::SetHotStandby (bool state){
     this->hot_standby = state;
 
@@ -177,13 +147,12 @@ void StartupDialog::CoolConnected (){
     this->ui->CoolStateLabel->setText("接続中");
     this->ui->CoolConnectButton->setText("　切断　");
 }
-void StartupDialog::HotDisConnected (){
+void StartupDialog::HotDisConnected  (){
     this->ui->HotConnectButton->toggle();
 }
 void StartupDialog::CoolDisConnected (){
     this->ui->CoolConnectButton->toggle();
 }
-
 void StartupDialog::HotConnectionToggled(bool state){
     if(state){
         dynamic_cast<TCPClient*>(this->hot_client)->OpenSocket();
@@ -214,7 +183,6 @@ void StartupDialog::CoolConnectionToggled(bool state){
         this->ui->CoolPortSpinBox->setEnabled(true);
     }
 }
-
 void StartupDialog::HotComboBoxChenged(QString text){
     if(text=="TCPユーザー"){
         this->hot_client = new TCPClient(this->ui->HotPortSpinBox->value(),this);
