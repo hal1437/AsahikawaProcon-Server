@@ -27,10 +27,10 @@ StartupDialog::StartupDialog(QWidget *parent) :
 
     //シグナル・スロットの接続
     connect(this->hot_client ,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
-    connect(this->hot_client ,SIGNAL(Ready(bool))   ,this,SLOT(SetHotStandby(bool)));
+    connect(this->hot_client ,SIGNAL(Ready())       ,this,SLOT(SetHotStandby()));
     connect(this->hot_client ,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
     connect(this->cool_client,SIGNAL(Connected())   ,this,SLOT(CoolConnected()));
-    connect(this->cool_client,SIGNAL(Ready(bool))   ,this,SLOT(SetCoolStandby(bool)));
+    connect(this->cool_client,SIGNAL(Ready())       ,this,SLOT(SetCoolStandby()));
     connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
 }
 
@@ -40,7 +40,7 @@ StartupDialog::~StartupDialog()
 }
 
 bool StartupDialog::MapRead(const QString& dir){
-
+    //ファイルからマップを読み込む
     QFile file(dir);
     if (file.open(QIODevice::ReadOnly)){
         char buf[1024]={};
@@ -86,9 +86,7 @@ bool StartupDialog::MapRead(const QString& dir){
     }
 
 }
-
 void StartupDialog::PushedMapSelect(){
-
     QString folder = QDir::homePath();
     QString cap    = tr("マップを開く");
     QString filter = tr("マップファイル (*.map)");
@@ -102,56 +100,70 @@ void StartupDialog::SetMapStandby (bool state){
     map_standby = state;
     this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
-void StartupDialog::SetHotStandby (bool state){
-    this->hot_standby = state;
+void StartupDialog::SetCoolStandby(){
+    this->cool_standby = true;
 
-    if(state){
-        this->ui->HotNameLabel ->setText(this->hot_client->Name == "" ? "Hot" : this->hot_client->Name);
-        this->ui->HotIPLabel   ->setText(this->hot_client->IP);
-        this->ui->HotStateLabel->setText("準備完了");
-        this->ui->HotConnectButton->setText("　切断　");
-    }else{
-        this->ui->HotNameLabel ->setText("不明");
-        this->ui->HotIPLabel   ->setText("不明");
-        this->ui->HotStateLabel->setText("未接続");
-
-    }
+    this->ui->CoolNameLabel ->setText(this->cool_client->Name == "" ? "Cool" : this->cool_client->Name);
+    this->ui->CoolIPLabel   ->setText(this->cool_client->IP);
+    this->ui->CoolStateLabel->setText("準備完了");
+    this->ui->CoolConnectButton->setText("　切断　");
     this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
-void StartupDialog::SetCoolStandby(bool state){
-    this->cool_standby = state;
+void StartupDialog::SetHotStandby (){
+    this->hot_standby = true;
 
-    if(state){
-        this->ui->CoolNameLabel ->setText(this->cool_client->Name == "" ? "Cool" : this->cool_client->Name);
-        this->ui->CoolIPLabel   ->setText(this->cool_client->IP);
-        this->ui->CoolStateLabel->setText("準備完了");
-        this->ui->CoolConnectButton->setText("　切断　");
-    }else{
-        this->ui->CoolNameLabel ->setText("不明");
-        this->ui->CoolIPLabel   ->setText("不明");
-        this->ui->CoolStateLabel->setText("未接続");
-
-    }
-    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
-}
-
-void StartupDialog::HotConnected  (){
-    this->ui->HotNameLabel ->setText("不明");
+    this->ui->HotNameLabel ->setText(this->hot_client->Name == "" ? "Hot" : this->hot_client->Name);
     this->ui->HotIPLabel   ->setText(this->hot_client->IP);
-    this->ui->HotStateLabel->setText("接続中");
+    this->ui->HotStateLabel->setText("準備完了");
     this->ui->HotConnectButton->setText("　切断　");
+
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
+
 void StartupDialog::CoolConnected (){
-    this->ui->CoolNameLabel ->setText("不明");
     this->ui->CoolIPLabel   ->setText(this->cool_client->IP);
     this->ui->CoolStateLabel->setText("接続中");
     this->ui->CoolConnectButton->setText("　切断　");
 }
-void StartupDialog::HotDisConnected  (){
-    this->ui->HotConnectButton->toggle();
+void StartupDialog::HotConnected  (){
+    this->ui->HotIPLabel   ->setText(this->hot_client->IP);
+    this->ui->HotStateLabel->setText("接続中");
+    this->ui->HotConnectButton->setText("　切断　");
 }
 void StartupDialog::CoolDisConnected (){
-    this->ui->CoolConnectButton->toggle();
+    this->cool_standby = false;
+    this->ui->CoolNameLabel ->setText("不明");
+    this->ui->CoolIPLabel   ->setText("不明");
+    this->ui->CoolStateLabel->setText("未接続");
+
+    //状態解除
+    if(this->ui->CoolConnectButton->isChecked())this->ui->CoolConnectButton->toggle();
+}
+void StartupDialog::HotDisConnected  (){
+    this->hot_standby = false;
+    this->ui->HotNameLabel ->setText("不明");
+    this->ui->HotIPLabel   ->setText("不明");
+    this->ui->HotStateLabel->setText("未接続");
+
+    //状態解除
+    if(this->ui->HotConnectButton->isChecked())this->ui->HotConnectButton->toggle();
+}
+
+void StartupDialog::CoolConnectionToggled(bool state){
+    if(state){
+        dynamic_cast<TCPClient*>(this->cool_client)->OpenSocket();
+        this->ui->CoolConnectButton->setText("待機終了");
+        this->ui->CoolStateLabel->setText("接続可能");
+        this->ui->CoolPortSpinBox->setEnabled(false);
+    }else{
+        dynamic_cast<TCPClient*>(this->cool_client)->CloseSocket();
+        this->ui->CoolConnectButton->setText("接続開始");
+        this->ui->CoolStateLabel->setText("非接続");
+        this->ui->CoolNameLabel->setText("不明");
+        this->ui->CoolIPLabel->setText("不明");
+        this->ui->CoolPortSpinBox->setEnabled(true);
+        this->cool_standby = false;
+    }
 }
 void StartupDialog::HotConnectionToggled(bool state){
     if(state){
@@ -166,42 +178,8 @@ void StartupDialog::HotConnectionToggled(bool state){
         this->ui->HotNameLabel->setText("不明");
         this->ui->HotIPLabel->setText("不明");
         this->ui->HotPortSpinBox->setEnabled(true);
+        this->hot_standby = false;
     }
-}
-void StartupDialog::CoolConnectionToggled(bool state){
-    if(state){
-        dynamic_cast<TCPClient*>(this->cool_client)->OpenSocket();
-        this->ui->CoolConnectButton->setText("待機終了");
-        this->ui->CoolStateLabel->setText("接続可能");
-        this->ui->CoolPortSpinBox->setEnabled(false);
-    }else{
-        dynamic_cast<TCPClient*>(this->cool_client)->CloseSocket();
-        this->ui->CoolConnectButton->setText("接続開始");
-        this->ui->CoolStateLabel->setText("非接続");
-        this->ui->CoolNameLabel->setText("不明");
-        this->ui->CoolIPLabel->setText("不明");
-        this->ui->CoolPortSpinBox->setEnabled(true);
-    }
-}
-void StartupDialog::HotComboBoxChenged(QString text){
-    if(text=="TCPユーザー"){
-        this->hot_client = new TCPClient(this->ui->HotPortSpinBox->value(),this);
-        this->ui->HotStateLabel->setText("非接続");
-        this->ui->HotNameLabel->setText("不明");
-        this->ui->HotPortSpinBox->setEnabled(true);
-        this->ui->HotConnectButton->setEnabled(true);
-        SetHotStandby(false);
-    }else if(text=="自動くん"){
-        this->hot_client = new ComClient(this);
-        this->ui->HotStateLabel->setText("自動");
-        this->ui->HotNameLabel->setText("自動くん");
-        this->ui->HotPortSpinBox->setEnabled(false);
-        this->ui->HotConnectButton->setEnabled(false);
-        SetHotStandby(true);
-    }
-    connect(this->hot_client,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
-    connect(this->hot_client,SIGNAL(Ready(bool))   ,this,SLOT(SetHotStandby(bool)));
-    connect(this->hot_client,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
 }
 void StartupDialog::CoolComboBoxChenged(QString text){
     if(text=="TCPユーザー"){
@@ -211,17 +189,46 @@ void StartupDialog::CoolComboBoxChenged(QString text){
         this->ui->CoolNameLabel->setText("不明");
         this->ui->CoolPortSpinBox->setEnabled(true);
         this->ui->CoolConnectButton->setEnabled(true);
-        SetCoolStandby(false);
     }else if(text=="自動くん"){
         this->cool_client = new ComClient();
         this->ui->CoolStateLabel->setText("自動");
         this->ui->CoolNameLabel->setText("自動くん");
         this->ui->CoolPortSpinBox->setEnabled(false);
         this->ui->CoolConnectButton->setEnabled(false);
-        SetCoolStandby(true);
+    }else if(text=="ManualClient"){
+        this->cool_client = new ManualClient(this);
+        this->ui->CoolPortSpinBox->setEnabled(false);
+        this->ui->CoolConnectButton->setEnabled(false);
     }
+    this->cool_standby = false;
     connect(this->cool_client,SIGNAL(Connected())   ,this,SLOT(CoolConnected()));
-    connect(this->cool_client,SIGNAL(Ready(bool))   ,this,SLOT(SetCoolStandby(bool)));
+    connect(this->cool_client,SIGNAL(Ready())       ,this,SLOT(SetCoolStandby()));
     connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
+    this->cool_client->Startup();
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
+void StartupDialog::HotComboBoxChenged(QString text){
+    if(text=="TCPユーザー"){
+        this->hot_client = new TCPClient(this->ui->HotPortSpinBox->value(),this);
+        this->ui->HotStateLabel->setText("非接続");
+        this->ui->HotNameLabel->setText("不明");
+        this->ui->HotPortSpinBox->setEnabled(true);
+        this->ui->HotConnectButton->setEnabled(true);
+    }else if(text=="自動くん"){
+        this->hot_client = new ComClient(this);
+        this->ui->HotPortSpinBox->setEnabled(false);
+        this->ui->HotConnectButton->setEnabled(false);
+    }else if(text=="ManualClient"){
+        this->hot_client = new ManualClient(this);
+        this->ui->HotPortSpinBox->setEnabled(false);
+        this->ui->HotConnectButton->setEnabled(false);
+    }
+    this->hot_standby = false;
+    connect(this->hot_client,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
+    connect(this->hot_client,SIGNAL(Ready())       ,this,SLOT(SetHotStandby()));
+    connect(this->hot_client,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
+    this->hot_client->Startup();
+    this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
+}
+
 

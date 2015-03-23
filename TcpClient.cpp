@@ -74,7 +74,7 @@ bool TCPClient::OpenSocket(){
 }
 bool TCPClient::CloseSocket(){
     this->server->close();
-    emit Ready(false);
+    emit DisConnect();
     return true;
 }
 bool TCPClient::isConnecting(){
@@ -99,8 +99,8 @@ QString TCPClient::GetTeamName(){
     if(this->Name == ""){
         this->Name = client->readAll();
         disconnect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
-        emit ReturnTeamName(this->Name);
-        emit Ready(true);
+        emit WriteTeamName();
+        emit Ready();
         return this->Name;
     }
     return this->Name;

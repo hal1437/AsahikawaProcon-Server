@@ -4,12 +4,14 @@
 #include <QObject>
 #include "BaseClient.h"
 
-class ComClient : public BaseClient
+class ComClient : virtual public BaseClient
 {
 public:
     virtual bool WaitGetReady();
     virtual GameSystem::Method WaitReturnMethod(GameSystem::AroundData data);
     virtual bool WaitEndSharp(GameSystem::AroundData data);
+
+    virtual void Startup();
 
     explicit ComClient(QObject *parent = 0);
     ~ComClient();

@@ -21,14 +21,17 @@ public:
     //Methodに対する周辺情報のレスポンスを送信し、#が来るまで待つ
     virtual bool WaitEndSharp(GameSystem::AroundData data)=0;
 
+    //親のシグナルスロットが終わりしだい呼び出される関数
+    virtual void Startup();
+
     explicit BaseClient(QObject *parent = 0);
     virtual ~BaseClient();
 
 signals:
-    void Connected();                   //接続
-    void ReturnTeamName(QString name);  //チーム名
-    void Ready(bool state);             //準備完了シグナル
-    void Disconnected();                //切断
+    void Connected();       //接続           (IP表示)
+    void WriteTeamName();   //チーム名        (チーム名表示)
+    void Ready();           //準備完了シグナル (準備完了)
+    void Disconnected();    //切断           (きる)
 public slots:
 
 };

@@ -21,7 +21,9 @@ SOURCES += main.cpp\
     TcpClient.cpp \
     BaseClient.cpp \
     ComClient.cpp \
-    GameBoard.cpp
+    GameBoard.cpp \
+    ManualClientDialog.cpp \
+    ManualClient.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -29,11 +31,14 @@ HEADERS  += mainwindow.h \
     TcpClient.h \
     BaseClient.h \
     ComClient.h \
-    GameBoard.h
+    GameBoard.h \
+    ManualClientDialog.h \
+    ManualClient.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
-    GameBoard.ui
+    GameBoard.ui \
+    ManualClientDialog.ui
 
 RESOURCES += \
     pictures.qrc

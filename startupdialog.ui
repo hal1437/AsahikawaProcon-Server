@@ -159,6 +159,11 @@
                 <string>自動くん</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>ManualClient</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item>
@@ -443,6 +448,11 @@
               <item>
                <property name="text">
                 <string>自動くん</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>ManualClient</string>
                </property>
               </item>
              </widget>

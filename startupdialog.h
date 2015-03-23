@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include "TcpClient.h"
 #include "ComClient.h"
+#include "ManualClient.h"
 
 namespace Ui {
 class StartupDialog;
@@ -39,8 +40,8 @@ public slots:
     void PushedMapSelect();
 
     void SetMapStandby (bool state);
-    void SetHotStandby (bool state);
-    void SetCoolStandby(bool state);
+    void SetHotStandby ();
+    void SetCoolStandby();
 
     void HotConnected  ();
     void CoolConnected ();
