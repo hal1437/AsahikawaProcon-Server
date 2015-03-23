@@ -18,6 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->startup = new StartupDialog(this);
     process = COOL_GETREADY;
+    hot_score = 0;
+    cool_score = 0;
+
     if(this->startup->exec()){
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
@@ -57,6 +60,7 @@ void MainWindow::StepGame(){
     else if(process == COOL_ACTION){
         startup->cool_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos));
         this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
+        PickItem(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos);
         process = HOT_GETREADY;
     }
     else if(process == HOT_GETREADY){
@@ -66,6 +70,7 @@ void MainWindow::StepGame(){
     }
     else if(process == HOT_ACTION){
         startup->hot_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos));
+        PickItem(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos);
         this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
         process = COOL_GETREADY;
     };
@@ -74,9 +79,73 @@ void MainWindow::StepGame(){
     repaint();
 
     //End
+    GameSystem::WINNER win = Judge();
+    if(win != GameSystem::WINNER::CONTINUE)Finish(win);
 
 }
 
+void MainWindow::PickItem(GameSystem::TEAM team, GameSystem::Method method, QPoint &pos){
 
+    if(ui->Field->FieldAccess(team,pos) == GameSystem::MAP_OBJECT::ITEM){
+        ui->Field->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
+        ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
+        if(team == GameSystem::TEAM::COOL)cool_score++;
+        if(team == GameSystem::TEAM::HOT) hot_score++;
+        ui->CoolScoreLabel->setText("Cool : " + QString::number(cool_score));
+        ui->HotScoreLabel ->setText("Hot : "  + QString::number(hot_score));
+    }
 
+}
+void MainWindow::Finish(GameSystem::WINNER winner){
+    this->clock->stop();
+    QString append_str = "";
 
+    if(startup->cool_client->disconnected_flag)append_str.append("[Cool Disconnected...]");
+    else if(startup->hot_client ->disconnected_flag)append_str.append("[Hot Disconnected...]");
+
+    if(winner == GameSystem::WINNER::COOL)this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
+    if(winner == GameSystem::WINNER::HOT) this->ui->WinnerLabel->setText("HOT WIN!"  + append_str);
+    if(winner == GameSystem::WINNER::DRAW)this->ui->WinnerLabel->setText("DRAW");
+}
+GameSystem::WINNER MainWindow::Judge(){
+    bool cool_lose;
+    bool hot_lose;
+    GameBoard*& board = this->ui->Field;
+    GameSystem::AroundData cool_around;
+    GameSystem::AroundData hot_around;
+
+    cool_around = board->FieldAccessAround(GameSystem::TEAM::COOL,board->cool_pos);
+    hot_around  = board->FieldAccessAround(GameSystem::TEAM::HOT ,board->hot_pos );
+
+    //ブロック置かれ死
+    if(cool_around.data[4] == GameSystem::MAP_OBJECT::BLOCK)cool_lose=true;
+    if(hot_around .data[4] == GameSystem::MAP_OBJECT::BLOCK)hot_lose=true;
+
+    //ブロック囲まれ死
+    if(cool_around.data[1] == GameSystem::MAP_OBJECT::BLOCK &&
+       cool_around.data[3] == GameSystem::MAP_OBJECT::BLOCK &&
+       cool_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
+       cool_around.data[7] == GameSystem::MAP_OBJECT::BLOCK)cool_lose=true;
+    if(hot_around .data[1] == GameSystem::MAP_OBJECT::BLOCK &&
+       hot_around .data[3] == GameSystem::MAP_OBJECT::BLOCK &&
+       hot_around .data[5] == GameSystem::MAP_OBJECT::BLOCK &&
+       hot_around .data[7] == GameSystem::MAP_OBJECT::BLOCK)hot_lose=true;
+
+    //切断死
+    if(startup->cool_client->disconnected_flag)cool_lose=true;
+    if(startup->hot_client ->disconnected_flag)hot_lose =true;
+
+    //相打ち、または時間切れ時はアイテム判定とする
+    if((cool_lose && hot_lose) || ui->TimeBar->value()==0){
+        cool_lose = false;
+        hot_lose  = false;
+
+        if(hot_score == cool_score)return GameSystem::WINNER::DRAW;
+        else if(hot_score > cool_score)return GameSystem::WINNER::HOT;
+        else if(hot_score < cool_score)return GameSystem::WINNER::COOL;
+
+    }
+    if(cool_lose)return GameSystem::WINNER::HOT;
+    else if(hot_lose)return GameSystem::WINNER::COOL;
+    else return GameSystem::WINNER::CONTINUE;
+}

@@ -80,6 +80,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
     //周辺情報取得
     switch(method.action){
         case GameSystem::Method::ACTION::PUT:
+            this->field.field[(pos + method.GetRoteVector()).y()][(pos + method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
             return FieldAccessAround(team,pos);
         case GameSystem::Method::ACTION::LOOK:
             return FieldAccessAround(team,pos + method.GetRoteVector() * 2);

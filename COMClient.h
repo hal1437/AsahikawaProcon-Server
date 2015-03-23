@@ -11,7 +11,6 @@ public:
     virtual GameSystem::Method WaitReturnMethod(GameSystem::AroundData data);
     virtual bool WaitEndSharp(GameSystem::AroundData data);
 
-
     explicit ComClient(QObject *parent = 0);
     ~ComClient();
 };

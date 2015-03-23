@@ -11,6 +11,7 @@ class BaseClient : public QObject
 public:
     QString Name;//クラアント名
     QString IP;  //IP
+    bool disconnected_flag; //切断フラグ
 
 public:
     //GetReadyを要求するメソッド

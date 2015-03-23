@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>570</width>
-    <height>582</height>
+    <width>448</width>
+    <height>442</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -174,12 +174,26 @@
          </item>
          <item>
           <spacer name="horizontalSpacer_3">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QLabel" name="WinnerLabel">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_4">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -219,8 +233,8 @@
       </property>
       <property name="minimumSize">
        <size>
-        <width>544</width>
-        <height>480</height>
+        <width>440</width>
+        <height>340</height>
        </size>
       </property>
      </widget>

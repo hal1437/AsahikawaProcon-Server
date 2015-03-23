@@ -2,7 +2,8 @@
 
 BaseClient::BaseClient(QObject *parent) :
     QObject(parent),
-    Name("")
+    Name(""),
+    disconnected_flag(false)
 {
 
 }

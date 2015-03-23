@@ -20,6 +20,13 @@ public:
         COOL,
         HOT ,
     };
+    //勝った人
+    enum class WINNER{
+        COOL,
+        HOT ,
+        DRAW,
+        CONTINUE,
+    };
     //接続状態
     enum class CONNECTING_STATUS{
         FINISHED,

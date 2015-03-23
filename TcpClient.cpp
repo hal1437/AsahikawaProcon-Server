@@ -1,6 +1,7 @@
 #include "TcpClient.h"
 
 bool TCPClient::WaitGetReady(){
+    if(disconnected_flag)return false;
     //ターン開始文字列
     client->write(QString("@\r\n").toUtf8());
 
@@ -14,13 +15,14 @@ bool TCPClient::WaitGetReady(){
         return (response == "gr\r\n");
     }else{
         //レスポンスなし
-
+        disconnected_flag=true;
         qDebug() << QString("[WaitGetReady Port") + QString::number(this->Port) +"]:Noting responce";
         return false;
     }
 
 }
 GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
+    if(disconnected_flag)return GameSystem::Method();
     //周辺情報文字列
     client->write(QString(data.toString() + "\r\n").toUtf8());
 
@@ -34,7 +36,7 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
         return GameSystem::Method::fromString(response);
     }else{
         //レスポンスなし
-
+        disconnected_flag=true;
         qDebug() << QString("[WaitReturnMethod Port") + QString::number(this->Port) +"]:Noting responce";
         return GameSystem::Method{GameSystem::Method::ACTION::UNKNOWN,
                                   GameSystem::Method::ROTE::UNKNOWN};
@@ -43,6 +45,8 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
 
 }
 bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
+    if(disconnected_flag)return false;
+
     //周辺情報文字列
     client->write(QString(data.toString() + "\r\n").toUtf8());
 
@@ -56,7 +60,7 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
         return (response == "#\r\n");
     }else{
         //レスポンスなし
-
+        disconnected_flag=true;
         qDebug() << QString("[WaitEndSharp Port") + QString::number(this->Port) +"]:Noting responce";
         return false;
     }
@@ -88,6 +92,7 @@ void TCPClient::DisConnect(){
     this->client = nullptr;
     this->IP   = "";
     this->Name = "";
+    disconnected_flag=true;
 }
 
 QString TCPClient::GetTeamName(){

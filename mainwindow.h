@@ -21,7 +21,7 @@ private:
         HOT_ACTION,
     };
 
-    const int FRAME_RATE = 300;
+    const int FRAME_RATE = 100;
 
     TURN process;
     int hot_score;
@@ -42,6 +42,12 @@ private:
 private slots:
     //ゲーム進行
     void StepGame();
+    //アイテム取得の判定
+    void PickItem(GameSystem::TEAM team,GameSystem::Method method,QPoint& pos);
+    //決着判定
+    GameSystem::WINNER Judge();
+    //決着
+    void Finish(GameSystem::WINNER win);
 };
 
 #endif // MAINWINDOW_H
