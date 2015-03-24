@@ -1,4 +1,7 @@
 #include "GameSystem.h"
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
 
 
 QPoint GameSystem::Method::GetRoteVector(){
@@ -26,6 +29,36 @@ GameSystem::Method GameSystem::Method::fromString(const QString& str){
     else if(str[1] == 'l')answer.rote   = GameSystem::Method::ROTE::LEFT;
     else                  answer.rote   = GameSystem::Method::ROTE::UNKNOWN;
     return answer;
+}
+
+bool GameSystem::Map::Export(QString Filename){
+    QFile file(Filename);
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::information(nullptr, "ファイルを開けません",
+            file.errorString());
+        return false;
+    }else{
+
+        QString outname(Filename.split("/").last().remove(".map"));
+
+        QTextStream stream( &file );
+        stream << "N:" << outname << "\n";
+        stream << "T:" << QString::number(this->turn) << "\n";
+        for(auto v1 : field){
+            stream << "D:";
+            for(auto it = v1.begin();it != v1.end();it++){
+                stream << QString::number(static_cast<int>(*it));
+                if(it != v1.end()-1)stream << ",";
+            }
+            stream << "\n";
+        }
+        stream << "H:" << QString::number(hot_first_point .x()) << "," << QString::number(hot_first_point .y()) << "\n";
+        stream << "C:" << QString::number(cool_first_point.x()) << "," << QString::number(cool_first_point.y()) ;
+        file.close();
+        return true;
+    }
+
 }
 
 QString GameSystem::AroundData::toString(){

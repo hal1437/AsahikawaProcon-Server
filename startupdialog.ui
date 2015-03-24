@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>524</width>
+    <width>530</width>
     <height>320</height>
    </rect>
   </property>
@@ -308,6 +308,13 @@
         </spacer>
        </item>
        <item>
+        <widget class="QPushButton" name="MapEditButton">
+         <property name="text">
+          <string>MapEdit</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="ServerStartButton">
          <property name="enabled">
           <bool>false</bool>
@@ -585,6 +592,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>MapEditButton</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>ShowMapEditDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>443</x>
+     <y>264</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>473</x>
+     <y>236</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>CoolConnectionToggled(bool)</slot>
@@ -592,5 +615,6 @@
   <slot>CoolComboBoxChenged(QString)</slot>
   <slot>HotComboBoxChenged(QString)</slot>
   <slot>PushedMapSelect()</slot>
+  <slot>ShowMapEditDialog()</slot>
  </slots>
 </ui>

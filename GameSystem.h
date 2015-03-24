@@ -46,13 +46,15 @@ public:
         SEACH,
         GETREADY,
     };
-
+    //ゲーム盤
     struct Map{
         Field<GameSystem::MAP_OBJECT> field;
         int turn;
         QString name;
         QPoint cool_first_point;
         QPoint hot_first_point;
+
+        bool Export(QString Filename);
     };
 
     //クライアントの行動

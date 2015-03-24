@@ -1,5 +1,6 @@
 #include "startupdialog.h"
 #include "ui_startupdialog.h"
+#include "MapEditerDialog.h"
 #include <QNetworkInterface>
 #include <QDesktopServices>
 
@@ -25,18 +26,44 @@ StartupDialog::StartupDialog(QWidget *parent) :
             this->ui->LocalIPLabel->setText(address.toString());
     }
 
-    //シグナル・スロットの接続
+    //シグナル・スロットの接続    
     connect(this->hot_client ,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
     connect(this->hot_client ,SIGNAL(Ready())       ,this,SLOT(SetHotStandby()));
     connect(this->hot_client ,SIGNAL(Disconnected()),this,SLOT(HotDisConnected()));
     connect(this->cool_client,SIGNAL(Connected())   ,this,SLOT(CoolConnected()));
     connect(this->cool_client,SIGNAL(Ready())       ,this,SLOT(SetCoolStandby()));
     connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
+
+
+    map = GameSystem::Map{
+        QVector<QVector<GameSystem::MAP_OBJECT>>(GameSystem::MAP_HEIGHT,
+                QVector<GameSystem::MAP_OBJECT>(GameSystem::MAP_WIDTH,GameSystem::MAP_OBJECT::NOTHING)),
+        100,
+        "noname",
+        QPoint(1,1),
+        MapEditerDialog::MirrorPoint(QPoint(1,1))
+    };
 }
 
 StartupDialog::~StartupDialog()
 {
     delete ui;
+}
+
+
+void StartupDialog::ShowMapEditDialog(){
+    MapEditerDialog diag(map);
+    if(diag.exec()){
+        if(diag.filepath == ""){
+            this->ui->MapDirEdit->setText("[CUSTOM MAP]");
+            map = diag.GetMap();
+        }
+        else{
+            //再読み込み
+            if(MapRead(diag.filepath))this->ui->MapDirEdit->setText(diag.filepath);
+        }
+    }
+    SetMapStandby(true);
 }
 
 bool StartupDialog::MapRead(const QString& dir){
@@ -45,6 +72,7 @@ bool StartupDialog::MapRead(const QString& dir){
     if (file.open(QIODevice::ReadOnly)){
         char buf[1024]={};
         int str_length;
+        int calm=0;
         while((str_length = file.readLine(buf,1024)) != -1){
             QString str = QString::fromLatin1(buf);
             str.replace("\r","");
@@ -66,7 +94,8 @@ bool StartupDialog::MapRead(const QString& dir){
                 foreach(QString s,list){
                     vec.push_back(static_cast<GameSystem::MAP_OBJECT>(s.toInt()));
                 }
-                this->map.field.push_back(vec);
+                this->map.field[calm] = vec;
+                calm++;
             }
 
             //Cool初期位置

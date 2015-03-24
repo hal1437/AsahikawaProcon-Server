@@ -23,7 +23,8 @@ SOURCES += main.cpp\
     ComClient.cpp \
     GameBoard.cpp \
     ManualClientDialog.cpp \
-    ManualClient.cpp
+    ManualClient.cpp \
+    MapEditerDialog.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -33,12 +34,14 @@ HEADERS  += mainwindow.h \
     ComClient.h \
     GameBoard.h \
     ManualClientDialog.h \
-    ManualClient.h
+    ManualClient.h \
+    MapEditerDialog.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
     GameBoard.ui \
-    ManualClientDialog.ui
+    ManualClientDialog.ui \
+    MapEditerDialog.ui
 
 RESOURCES += \
     pictures.qrc

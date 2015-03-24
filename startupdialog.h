@@ -37,6 +37,8 @@ public:
 
 public slots:
 
+    void ShowMapEditDialog();
+
     void PushedMapSelect();
 
     void SetMapStandby (bool state);
