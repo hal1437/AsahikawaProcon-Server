@@ -17,8 +17,8 @@ StartupDialog::StartupDialog(QWidget *parent) :
     ui->setupUi(this);
 
     //クライアント初期化
-    this->cool_client = new TCPClient(2009);
-    this->hot_client  = new TCPClient(2010);
+    this->cool_client = new TCPClient();
+    this->hot_client  = new TCPClient();
 
     //ローカルIPの探索
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
@@ -180,7 +180,7 @@ void StartupDialog::HotDisConnected  (){
 
 void StartupDialog::CoolConnectionToggled(bool state){
     if(state){
-        dynamic_cast<TCPClient*>(this->cool_client)->OpenSocket();
+        dynamic_cast<TCPClient*>(this->cool_client)->OpenSocket(ui->CoolPortSpinBox->value());
         this->ui->CoolConnectButton->setText("待機終了");
         this->ui->CoolStateLabel->setText("接続可能");
         this->ui->CoolPortSpinBox->setEnabled(false);
@@ -196,7 +196,7 @@ void StartupDialog::CoolConnectionToggled(bool state){
 }
 void StartupDialog::HotConnectionToggled(bool state){
     if(state){
-        dynamic_cast<TCPClient*>(this->hot_client)->OpenSocket();
+        dynamic_cast<TCPClient*>(this->hot_client)->OpenSocket(ui->HotPortSpinBox->value());
         this->ui->HotConnectButton->setText("待機終了");
         this->ui->HotStateLabel->setText("接続可能");
         this->ui->HotPortSpinBox->setEnabled(false);
@@ -212,8 +212,7 @@ void StartupDialog::HotConnectionToggled(bool state){
 }
 void StartupDialog::CoolComboBoxChenged(QString text){
     if(text=="TCPユーザー"){
-        this->cool_client = new TCPClient(this->ui->CoolPortSpinBox->value(),this);
-        dynamic_cast<TCPClient*>(this->cool_client)->OpenSocket();
+        this->cool_client = new TCPClient(this);
         this->ui->CoolStateLabel->setText("非接続");
         this->ui->CoolNameLabel->setText("不明");
         this->ui->CoolPortSpinBox->setEnabled(true);
@@ -238,7 +237,7 @@ void StartupDialog::CoolComboBoxChenged(QString text){
 }
 void StartupDialog::HotComboBoxChenged(QString text){
     if(text=="TCPユーザー"){
-        this->hot_client = new TCPClient(this->ui->HotPortSpinBox->value(),this);
+        this->hot_client = new TCPClient(this);
         this->ui->HotStateLabel->setText("非接続");
         this->ui->HotNameLabel->setText("不明");
         this->ui->HotPortSpinBox->setEnabled(true);

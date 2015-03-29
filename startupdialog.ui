@@ -252,6 +252,13 @@
          </spacer>
         </item>
         <item>
+         <widget class="QPushButton" name="MapEditButton">
+          <property name="text">
+           <string>MapEdit</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
            <widget class="QLabel" name="LocalIPLabel">
@@ -306,13 +313,6 @@
           </size>
          </property>
         </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="MapEditButton">
-         <property name="text">
-          <string>MapEdit</string>
-         </property>
-        </widget>
        </item>
        <item>
         <widget class="QPushButton" name="ServerStartButton">

@@ -16,7 +16,7 @@ bool TCPClient::WaitGetReady(){
     }else{
         //レスポンスなし
         disconnected_flag=true;
-        qDebug() << QString("[WaitGetReady Port") + QString::number(this->Port) +"]:Noting responce";
+        qDebug() << QString("[WaitGetReady Port") + QString::number(this->client->localPort()) +"]:Noting responce";
         return false;
     }
 
@@ -37,7 +37,7 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
     }else{
         //レスポンスなし
         disconnected_flag=true;
-        qDebug() << QString("[WaitReturnMethod Port") + QString::number(this->Port) +"]:Noting responce";
+        qDebug() << QString("[WaitReturnMethod Port") + QString::number(this->client->localPort()) +"]:Noting responce";
         return GameSystem::Method{GameSystem::Method::ACTION::UNKNOWN,
                                   GameSystem::Method::ROTE::UNKNOWN};
     }
@@ -61,19 +61,22 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
     }else{
         //レスポンスなし
         disconnected_flag=true;
-        qDebug() << QString("[WaitEndSharp Port") + QString::number(this->Port) +"]:Noting responce";
+        qDebug() << QString("[WaitEndSharp Port") + QString::number(this->client->localPort()) +"]:Noting responce";
         return false;
     }
 
 }
 
 
-bool TCPClient::OpenSocket(){
-    this->server->listen(QHostAddress::Any,this->Port);
+bool TCPClient::OpenSocket(int Port){
+    this->server->listen(QHostAddress::Any,Port);
     return true;
 }
 bool TCPClient::CloseSocket(){
+    if(!this->client)this->client->disconnectFromHost();
+    this->client = nullptr;
     this->server->close();
+    this->server = new QTcpServer(this);
     emit DisConnect();
     return true;
 }
@@ -106,9 +109,8 @@ QString TCPClient::GetTeamName(){
     return this->Name;
 }
 
-TCPClient::TCPClient(int port,QObject *parent) :
-    BaseClient(parent),
-    Port(port)
+TCPClient::TCPClient(QObject *parent) :
+    BaseClient(parent)
 {
     this->server = new QTcpServer(this);
     this->client = nullptr;

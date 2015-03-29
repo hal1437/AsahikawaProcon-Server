@@ -13,7 +13,6 @@ class TCPClient : public BaseClient
     //TCPユーザー用の接続サーバー
 private:
     const static int TIMEOUT = 50000;   //タイムアウト
-    const int Port;             //開放ポート
     QTcpServer*  server;        //TCPサーバー
     QTcpSocket*  client;        //TCPクライアント
 public:
@@ -23,13 +22,13 @@ public:
     virtual bool WaitEndSharp(GameSystem::AroundData data);
 
     //ポート開放
-    bool OpenSocket();
+    bool OpenSocket(int Port);
     //ポート開放
     bool CloseSocket();
     //接続確認
     bool isConnecting();
 
-    explicit TCPClient(int Port, QObject *parent = 0);
+    explicit TCPClient(QObject *parent = 0);
     virtual ~TCPClient();
 
 signals:
