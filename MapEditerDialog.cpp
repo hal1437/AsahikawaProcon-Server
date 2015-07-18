@@ -63,8 +63,8 @@ void MapEditerDialog::mouseMoveEvent(QMouseEvent* event){
 
 void MapEditerDialog::FillItem(const QPoint& pos){
     //有効範囲内であれば
-    if(pos.x() > 0 && pos.x() < GameSystem::MAP_WIDTH  * this->IMAGE_PART_SIZE &&
-       pos.y() > 0 && pos.y() < GameSystem::MAP_HEIGHT * this->IMAGE_PART_SIZE){
+    if(pos.x() > 0 && pos.x() < GameSystem::MAP_WIDTH  * this->IMAGE_PART_SIZE +20 &&
+       pos.y() > 0 && pos.y() < GameSystem::MAP_HEIGHT * this->IMAGE_PART_SIZE +20){
         int left_m,top_m;
         this->layout()->getContentsMargins(&left_m,&top_m,nullptr,nullptr);
         QPoint fill_point((pos.x() - left_m)/this->IMAGE_PART_SIZE,(pos.y() - top_m)/this->IMAGE_PART_SIZE);

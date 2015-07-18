@@ -116,7 +116,7 @@ bool StartupDialog::MapRead(const QString& dir){
 
 }
 void StartupDialog::PushedMapSelect(){
-    QString folder = QDir::homePath();
+    QString folder = QDir::currentPath();
     QString cap    = tr("マップを開く");
     QString filter = tr("マップファイル (*.map)");
 
