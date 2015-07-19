@@ -73,7 +73,7 @@ bool TCPClient::OpenSocket(int Port){
     return true;
 }
 bool TCPClient::CloseSocket(){
-    if(!this->client)this->client->disconnectFromHost();
+    if(this->client != nullptr)this->client->disconnectFromHost();
     this->client = nullptr;
     this->server->close();
     this->server = new QTcpServer(this);

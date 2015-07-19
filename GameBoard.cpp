@@ -27,15 +27,28 @@ void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
     painter.setRenderHint(QPainter::Antialiasing, true);//アンチエイリアスセット
     painter.setPen(QPen(Qt::green, 3));
 
-    //画像の描画
+    //空白の描画
     for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
         for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
-            painter.drawImage(j * image_part_width,i * image_part_height,field_resource[static_cast<int>(field.field[i][j])]);
+            if(field.field[i][j] == GameSystem::MAP_OBJECT::NOTHING){
+                painter.drawImage(j * image_part_width,i * image_part_height,field_resource[static_cast<int>(field.field[i][j])]);
+            }
         }
     }
+
     //プレイヤーの描画
     painter.drawImage(cool_pos.x() * image_part_width,cool_pos.y() * image_part_height,team_resource[static_cast<int>(GameSystem::TEAM::COOL)]);
     painter.drawImage(hot_pos.x()  * image_part_width,hot_pos.y()  * image_part_height,team_resource[static_cast<int>(GameSystem::TEAM::HOT )]);
+
+    //空白の描画
+    for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
+        for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+            if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
+                painter.drawImage(j * image_part_width,i * image_part_height,field_resource[static_cast<int>(field.field[i][j])]);
+            }
+        }
+    }
+
     //オーバーレイの描画
     for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
         for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
