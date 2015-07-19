@@ -12,7 +12,7 @@ class TCPClient : public BaseClient
     Q_OBJECT
     //TCPユーザー用の接続サーバー
 private:
-    const static int TIMEOUT = 50000;   //タイムアウト
+    const static int TIMEOUT = 5000;   //タイムアウト
     QTcpServer*  server;        //TCPサーバー
     QTcpSocket*  client;        //TCPクライアント
 public:
