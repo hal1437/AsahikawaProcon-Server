@@ -61,6 +61,43 @@ bool GameSystem::Map::Export(QString Filename){
 
 }
 
+void GameSystem::Map::CreateRandomMap(){
+    const int BLOCK_NUM = 100;
+    const int ITEM_NUM = 30;
+
+    turn = 300;
+    name = "[RANDOM MAP]";
+
+    hot_first_point  = QPoint(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+    cool_first_point = QPoint(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+
+    //ブロック配置
+    for(int i=0;i<BLOCK_NUM;i++){
+        QPoint pos(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+        if((hot_first_point  - pos).manhattanLength() > 1 &&
+           (cool_first_point - pos).manhattanLength() > 1 &&
+           field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::BLOCK){
+            field[pos.y()][pos.x()] = GameSystem::MAP_OBJECT::BLOCK;
+        }else{
+            i--;
+            continue;
+        }
+    }
+
+    //アイテム配置
+    for(int i=0;i<ITEM_NUM;i++){
+        QPoint pos(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+        if((hot_first_point  - pos).manhattanLength() > 1 &&
+           (cool_first_point - pos).manhattanLength() > 1 &&
+            field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::ITEM){
+            field[pos.y()][pos.x()] = GameSystem::MAP_OBJECT::ITEM;
+        }else{
+            i--;
+            continue;
+        }
+    }
+}
+
 QString GameSystem::AroundData::toString(){
     //文字列へ変換
     QString str;

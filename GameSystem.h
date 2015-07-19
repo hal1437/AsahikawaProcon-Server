@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QPoint>
 #include <QVector>
+#include <QtGlobal>
+#include <QTime>
 
 //二次元配列エイリアス
 template <class T>
@@ -54,6 +56,7 @@ public:
         QPoint cool_first_point;
         QPoint hot_first_point;
 
+        void CreateRandomMap();
         bool Export(QString Filename);
     };
 

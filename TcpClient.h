@@ -21,9 +21,9 @@ public:
     virtual GameSystem::Method WaitReturnMethod(GameSystem::AroundData data);
     virtual bool WaitEndSharp(GameSystem::AroundData data);
 
-    //ポート開放
+    //ポート開く
     bool OpenSocket(int Port);
-    //ポート開放
+    //ポート閉じる
     bool CloseSocket();
     //接続確認
     bool isConnecting();

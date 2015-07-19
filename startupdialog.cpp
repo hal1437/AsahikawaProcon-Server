@@ -43,6 +43,8 @@ StartupDialog::StartupDialog(QWidget *parent) :
         QPoint(1,1),
         MapEditerDialog::MirrorPoint(QPoint(1,1))
     };
+    map.CreateRandomMap();
+    map_standby = true;
 }
 
 StartupDialog::~StartupDialog()
