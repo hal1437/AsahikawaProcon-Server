@@ -54,7 +54,7 @@ void MainWindow::StepGame(){
 
     if(process == COOL_GETREADY){
         startup->cool_client->WaitGetReady();
-        cool_mehod = startup->cool_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::COOL,ui->Field->cool_pos));
+        cool_mehod = startup->cool_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::COOL,ui->Field->cool_pos,GameSystem::Method::ACTION::GETREADY));
         process = COOL_ACTION;
     }
     else if(process == COOL_ACTION){
@@ -65,7 +65,7 @@ void MainWindow::StepGame(){
     }
     else if(process == HOT_GETREADY){
         startup->hot_client->WaitGetReady();
-        hot_mehod = startup->hot_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::HOT,ui->Field->hot_pos));
+        hot_mehod = startup->hot_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::HOT,ui->Field->hot_pos,GameSystem::Method::ACTION::GETREADY));
         process = HOT_ACTION;
     }
     else if(process == HOT_ACTION){
@@ -86,7 +86,7 @@ void MainWindow::StepGame(){
 
 void MainWindow::PickItem(GameSystem::TEAM team, GameSystem::Method method, QPoint &pos){
 
-    if(ui->Field->FieldAccess(team,pos) == GameSystem::MAP_OBJECT::ITEM){
+    if(ui->Field->FieldAccess(team,pos,method.action) == GameSystem::MAP_OBJECT::ITEM){
         ui->Field->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
         if(team == GameSystem::TEAM::COOL)cool_score++;
@@ -114,8 +114,8 @@ GameSystem::WINNER MainWindow::Judge(){
     GameSystem::AroundData cool_around;
     GameSystem::AroundData hot_around;
 
-    cool_around = board->FieldAccessAround(GameSystem::TEAM::COOL,board->cool_pos);
-    hot_around  = board->FieldAccessAround(GameSystem::TEAM::HOT ,board->hot_pos );
+    cool_around = board->FieldAccessAround(GameSystem::TEAM::COOL,board->cool_pos,GameSystem::Method::ACTION::UNKNOWN);
+    hot_around  = board->FieldAccessAround(GameSystem::TEAM::HOT ,board->hot_pos ,GameSystem::Method::ACTION::UNKNOWN);
 
     //ブロック置かれ死
     if(cool_around.data[4] == GameSystem::MAP_OBJECT::BLOCK)cool_lose=true;

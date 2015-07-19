@@ -1,9 +1,12 @@
 <RCC>
     <qresource prefix="/Pictures">
-        <file>block1.jpg</file>
-        <file>cool1.jpg</file>
-        <file>floor1.jpg</file>
-        <file>hot1.jpg</file>
-        <file>item1.jpg</file>
+        <file>block1.png</file>
+        <file>cool1.png</file>
+        <file>floor1.png</file>
+        <file>hot1.png</file>
+        <file>item1.png</file>
+        <file>getready.png</file>
+        <file>look.png</file>
+        <file>search.png</file>
     </qresource>
 </RCC>

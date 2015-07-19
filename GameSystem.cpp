@@ -63,7 +63,7 @@ bool GameSystem::Map::Export(QString Filename){
 
 void GameSystem::Map::CreateRandomMap(){
     const int BLOCK_NUM = 100;
-    const int ITEM_NUM = 30;
+    const int ITEM_NUM = 10;
 
     turn = 300;
     name = "[RANDOM MAP]";

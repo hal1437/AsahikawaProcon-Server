@@ -24,6 +24,7 @@ private:
 
     QImage team_resource[2];
     QImage field_resource[5];
+    QImage overray_resource[4];
 
 protected:
     void resizeEvent(QResizeEvent *event); //リサイズイベント
@@ -36,9 +37,9 @@ public:
     Field<GameSystem::MAP_OVERLAY> overlay;
 
     //フィールドへアクセスする
-    GameSystem::MAP_OBJECT FieldAccess(GameSystem::TEAM team, const QPoint& pos);
+    GameSystem::MAP_OBJECT FieldAccess(GameSystem::TEAM team, const QPoint& pos, GameSystem::Method::ACTION action);
     //周辺情報を取得する
-    GameSystem::AroundData FieldAccessAround(GameSystem::TEAM team,const QPoint& center);
+    GameSystem::AroundData FieldAccessAround(GameSystem::TEAM team, const QPoint& center, GameSystem::Method::ACTION action);
     //メソッドで周辺情報を取得する
     GameSystem::AroundData FieldAccessMethod(GameSystem::TEAM team,GameSystem::Method method,QPoint& pos);
 

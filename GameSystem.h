@@ -14,7 +14,7 @@ using Field = QVector<QVector<T>>;
 class GameSystem
 {
 public:
-    const static int MAP_WIDTH  = 23;
+    const static int MAP_WIDTH  = 21;
     const static int MAP_HEIGHT = 17;
 
     //チーム
@@ -68,7 +68,8 @@ public:
             LOOK,
             SEACH,
             PUT,
-            UNKNOWN
+            GETREADY,
+            UNKNOWN,
         };
         //方向
         enum class ROTE{
