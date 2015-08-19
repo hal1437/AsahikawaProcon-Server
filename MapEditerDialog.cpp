@@ -26,10 +26,10 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     ui->listWidget->addItem(new QListWidgetItem("Block"));
     ui->listWidget->addItem(new QListWidgetItem("Item"));
     ui->listWidget->setIconSize(QSize(32,32));
-    ui->listWidget->item(0)->setIcon(QIcon(":/Pictures/floor1.jpg"));
-    ui->listWidget->item(1)->setIcon(QIcon(":/Pictures/cool1.jpg"));
-    ui->listWidget->item(2)->setIcon(QIcon(":/Pictures/block1.jpg"));
-    ui->listWidget->item(3)->setIcon(QIcon(":/Pictures/item1.jpg"));
+    ui->listWidget->item(0)->setIcon(QIcon(":/Pictures/floor1.png"));
+    ui->listWidget->item(1)->setIcon(QIcon(":/Pictures/hot1.png"));
+    ui->listWidget->item(2)->setIcon(QIcon(":/Pictures/block1.png"));
+    ui->listWidget->item(3)->setIcon(QIcon(":/Pictures/item1.png"));
 
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
@@ -62,33 +62,33 @@ void MapEditerDialog::mouseMoveEvent(QMouseEvent* event){
 }
 
 void MapEditerDialog::FillItem(const QPoint& pos){
-    //有効範囲内であれば
-    if(pos.x() > 0 && pos.x() < GameSystem::MAP_WIDTH  * this->IMAGE_PART_SIZE +20 &&
-       pos.y() > 0 && pos.y() < GameSystem::MAP_HEIGHT * this->IMAGE_PART_SIZE +20){
-        int left_m,top_m;
-        this->layout()->getContentsMargins(&left_m,&top_m,nullptr,nullptr);
-        QPoint fill_point((pos.x() - left_m)/this->IMAGE_PART_SIZE,(pos.y() - top_m)/this->IMAGE_PART_SIZE);
+    int left_m,top_m;
+    this->layout()->getContentsMargins(&left_m,&top_m,nullptr,nullptr);
+    QPoint fill_point((pos.x() - left_m)/ui->widget->image_part_width,(pos.y() - top_m)/ui->widget->image_part_height);
 
-        GameSystem::MAP_OBJECT obj;
-        if     (ui->listWidget->selectedItems().first()->text() == "Nothing")obj = GameSystem::MAP_OBJECT::NOTHING;
-        else if(ui->listWidget->selectedItems().first()->text() == "Block"  )obj = GameSystem::MAP_OBJECT::BLOCK;
-        else if(ui->listWidget->selectedItems().first()->text() == "Item"   )obj = GameSystem::MAP_OBJECT::ITEM;
-        if(ui->listWidget->selectedItems().first()->text() == "Target" ){
-            //初期位置変更
-            this->ui->widget->field.cool_first_point = fill_point;
-            this->ui->widget->field.hot_first_point  = MirrorPoint(fill_point);
-            this->ui->widget->cool_pos = fill_point;
-            this->ui->widget->hot_pos  = MirrorPoint(fill_point);
-        }else{
-            this->ui->widget->field.field[fill_point.y()][fill_point.x()] = obj;
-            //対称コピー
-            if(ui->SymmetryCheck->isChecked()){
-                QPoint r_fill_point(MirrorPoint(fill_point));
-                this->ui->widget->field.field[r_fill_point.y()][r_fill_point.x()] = obj;
-            }
+    //有効範囲内でなければスキップ
+    if(fill_point.x() < 0 || fill_point.x() >= GameSystem::MAP_WIDTH ||
+       fill_point.y() < 0 || fill_point.y() >= GameSystem::MAP_HEIGHT)return;
+
+    GameSystem::MAP_OBJECT obj;
+    if     (ui->listWidget->selectedItems().first()->text() == "Nothing")obj = GameSystem::MAP_OBJECT::NOTHING;
+    else if(ui->listWidget->selectedItems().first()->text() == "Block"  )obj = GameSystem::MAP_OBJECT::BLOCK;
+    else if(ui->listWidget->selectedItems().first()->text() == "Item"   )obj = GameSystem::MAP_OBJECT::ITEM;
+    if(ui->listWidget->selectedItems().first()->text() == "Target" ){
+        //初期位置変更
+        this->ui->widget->field.cool_first_point = fill_point;
+        this->ui->widget->field.hot_first_point  = MirrorPoint(fill_point);
+        this->ui->widget->cool_pos = fill_point;
+        this->ui->widget->hot_pos  = MirrorPoint(fill_point);
+    }else{
+        this->ui->widget->field.field[fill_point.y()][fill_point.x()] = obj;
+        //対称コピー
+        if(ui->SymmetryCheck->isChecked()){
+            QPoint r_fill_point(MirrorPoint(fill_point));
+            this->ui->widget->field.field[r_fill_point.y()][r_fill_point.x()] = obj;
         }
-        update();
     }
+    update();
 }
 
 void MapEditerDialog::Clear(){

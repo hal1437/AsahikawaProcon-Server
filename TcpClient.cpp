@@ -1,25 +1,65 @@
 #include "TcpClient.h"
 
+QString TCPClient::VisibilityString(QString str){
+    QString answer;
+    for(int i = 0;i < str.size();i++){
+        if     (str[i] == '\n')answer.push_back("\\n");
+        else if(str[i] == '\r')answer.push_back("\\r");
+        else   answer.push_back(str[i]);
+    }
+    return answer;
+}
+
+QString TCPClient::WaitResponce(){
+    int ignore = 0;
+
+    while(ignore != this->IGNORE_INVALD){
+        //レスポンス待ち
+        if(this->client->waitForReadyRead(this->TIMEOUT)){
+            //レスポンスあり
+            QString response = "";
+
+            //自動結合
+            do{
+                response += client->readLine();
+            }while(*(response.end()-1) != '\n' && this->client->waitForReadyRead(this->TIMEOUT));
+
+            qDebug() << "" + VisibilityString(response);
+
+            //不正文字列：空
+            if(response == "" || response == "\n" || response == "\r" || response == "\r\n"){
+                ignore++;
+                continue;
+            }
+            //不正文字列：改行なし
+            if(*(response.end()-1) != '\n'){
+                disconnected_flag = true;
+                qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting \\n";
+                return QString();
+            }
+
+            return response;
+        }else{
+            //レスポンスなし
+            disconnected_flag = true;
+            qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting responce";
+            return QString();
+        }
+    }
+    disconnected_flag=true;
+    qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Too many invald responce";
+    return QString();
+}
+
 bool TCPClient::WaitGetReady(){
     if(disconnected_flag)return false;
     //ターン開始文字列
     client->write(QString("@\r\n").toUtf8());
 
     //レスポンス待ち
-    if(this->client->waitForReadyRead(this->TIMEOUT)){
-        //レスポンスあり
-
-        QString response;
-        response = client->readAll();
-        qDebug() << response;
-        return (response == "gr\r\n");
-    }else{
-        //レスポンスなし
-        disconnected_flag=true;
-        qDebug() << QString("[WaitGetReady Port") + QString::number(this->client->localPort()) +"]:Noting responce";
-        return false;
-    }
-
+    QString response = WaitResponce();
+    qDebug() << (response == "gr\r\n");
+    return (response == "gr\r\n");
 }
 GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
     if(disconnected_flag)return GameSystem::Method();
@@ -27,22 +67,10 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
     client->write(QString(data.toString() + "\r\n").toUtf8());
 
     //レスポンス待ち
-    if(this->client->waitForReadyRead(this->TIMEOUT)){
-        //レスポンスあり
-
-        QString response;
-        response = client->readAll();
-        qDebug() << response;
-        return GameSystem::Method::fromString(response);
-    }else{
-        //レスポンスなし
-        disconnected_flag=true;
-        qDebug() << QString("[WaitReturnMethod Port") + QString::number(this->client->localPort()) +"]:Noting responce";
-        return GameSystem::Method{GameSystem::Method::ACTION::UNKNOWN,
-                                  GameSystem::Method::ROTE::UNKNOWN};
-    }
-
-
+    QString response = WaitResponce();
+    if(response != QString())return GameSystem::Method::fromString(response);
+    else return GameSystem::Method{GameSystem::Method::ACTION::UNKNOWN,
+                                   GameSystem::Method::ROTE::UNKNOWN};
 }
 bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
     if(disconnected_flag)return false;
@@ -51,20 +79,7 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
     client->write(QString(data.toString() + "\r\n").toUtf8());
 
     //レスポンス待ち
-    if(this->client->waitForReadyRead(this->TIMEOUT)){
-        //レスポンスあり
-
-        QString response;
-        response = client->readAll();
-        qDebug() << response;
-        return (response == "#\r\n");
-    }else{
-        //レスポンスなし
-        disconnected_flag=true;
-        qDebug() << QString("[WaitEndSharp Port") + QString::number(this->client->localPort()) +"]:Noting responce";
-        return false;
-    }
-
+    return(WaitResponce() == "#\r\n");
 }
 
 

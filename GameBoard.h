@@ -19,9 +19,6 @@ private:
     int map_width;
     int map_height;
 
-    float image_part_width;
-    float image_part_height;
-
     QImage team_resource[2];
     QImage field_resource[5];
     QImage overray_resource[4];
@@ -31,6 +28,8 @@ protected:
     void paintEvent(QPaintEvent *event);         //ペイントイベント
 public:
 
+    float image_part_width;
+    float image_part_height;
     QPoint cool_pos;
     QPoint hot_pos;
     GameSystem::Map field;
