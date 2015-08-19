@@ -261,4 +261,7 @@ void StartupDialog::HotComboBoxChenged(QString text){
     this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }
 
-
+void StartupDialog::ChangedTexture(QString text){
+    if(text == "あっさり")this->map.texture = GameSystem::Texture::Light;
+    if(text == "こってり")this->map.texture = GameSystem::Texture::Heavy;
+}

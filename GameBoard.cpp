@@ -9,30 +9,13 @@ void GameBoard::resizeEvent(QResizeEvent *event){
     image_part_width  = static_cast<float>(event->size().width ()) / GameSystem::MAP_WIDTH;
     image_part_height = static_cast<float>(event->size().height()) / GameSystem::MAP_HEIGHT;
 
-    //画像読み込み
-    this->team_resource[static_cast<int>(GameSystem::TEAM::COOL)]    = QImage(":/Pictures/cool1.png");
-    this->team_resource[static_cast<int>(GameSystem::TEAM::HOT)]     = QImage(":/Pictures/hot1.png");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)] = QImage(":/Pictures/floor1.png");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]    = QImage(":/Pictures/item1.png");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]   = QImage(":/Pictures/block1.png");
-
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::NOTHING)]  = QImage();
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QImage(":/Pictures/look.png");
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QImage(":/Pictures/getready.png");
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QImage(":/Pictures/search.png");
-
-    //変形
-    for(QImage& img:team_resource   )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
-    for(QImage& img:field_resource  )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
-    for(QImage& img:overray_resource)img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
-
+    ReloadTexture(texture);
 }
 void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
 {
     QPainter painter(this);
     painter.setRenderHints( painter.renderHints() | QPainter::Antialiasing );
-    //painter.setRenderHint(QPainter::Antialiasing, true);//アンチエイリアスセット
-    painter.setPen(QPen(Qt::green, 3));
+    painter.fillRect(QRect(0,0,width(),height()),Qt::white);
 
     //空白の描画
     for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
@@ -123,6 +106,8 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
 
 void GameBoard::setMap(const GameSystem::Map& map){
     field = map;
+    this->texture = map.texture;
+    ReloadTexture(texture);
 
     cool_pos = field.cool_first_point;
     hot_pos  = field.hot_first_point;
@@ -133,29 +118,47 @@ void GameBoard::setMap(const GameSystem::Map& map){
     for(auto& v : overlay)v = QVector<GameSystem::MAP_OVERLAY>(map_width,GameSystem::MAP_OVERLAY::NOTHING);
 
 }
+QString GameBoard::GetTexturePath(GameSystem::Texture tex){
+    if(tex == GameSystem::Texture::Light)return ":/Light/Texture/Light";
+    if(tex == GameSystem::Texture::Heavy)return ":/Heavy/Texture/Heavy";
+}
 
 GameBoard::GameBoard(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::GameBoard)
 {
-    //画像読み込み
-    this->team_resource[static_cast<int>(GameSystem::TEAM::COOL)]    = QImage(":/Pictures/cool1.jpg");
-    this->team_resource[static_cast<int>(GameSystem::TEAM::HOT)]     = QImage(":/Pictures/hot1.jpg");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)] = QImage(":/Pictures/floor1.jpg");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]    = QImage(":/Pictures/item1.jpg");
-    this->field_resource[static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]   = QImage(":/Pictures/block1.jpg");
-
     image_part_width  = 32.0;
     image_part_height = 32.0;
-
-    //変形
-    for(QImage& img:team_resource )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio);
-    for(QImage& img:field_resource)img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio);
-
+    //画像読み込み
     ui->setupUi(this);
 }
 
 GameBoard::~GameBoard()
 {
     delete ui;
+}
+
+
+void GameBoard::ReloadTexture(GameSystem::Texture tex){
+    this->texture = tex;
+
+    QString path = GetTexturePath(tex);
+
+    //画像読み込み
+    this->team_resource   [static_cast<int>(GameSystem::TEAM::COOL)]            = QImage(path + "/Cool.png");
+    this->team_resource   [static_cast<int>(GameSystem::TEAM::HOT)]             = QImage(path + "/Hot.png");
+    this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]   = QImage(path + "/Floor.png");
+    this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]      = QImage(path + "/Item.png");
+    this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]     = QImage(path + "/Block.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::NOTHING)]  = QImage();
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QImage(path + "/Look.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QImage(path + "/Getready.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QImage(path + "/Search.png");
+
+    //変形
+    for(QImage& img:team_resource   )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    for(QImage& img:field_resource  )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    for(QImage& img:overray_resource){
+        if(img != QImage())img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    }
 }

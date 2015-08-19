@@ -19,6 +19,7 @@ private:
     int map_width;
     int map_height;
 
+    GameSystem::Texture texture;
     QImage team_resource[2];
     QImage field_resource[5];
     QImage overray_resource[4];
@@ -48,6 +49,8 @@ public:
     //オーバーレイを全て削除する
     void RefreshOverlay();
 
+    static QString GetTexturePath(GameSystem::Texture tex);
+
     explicit GameBoard(QWidget *parent = 0);
     ~GameBoard();
 
@@ -55,6 +58,7 @@ private:
     Ui::GameBoard *ui;
 
 public slots:
+    void ReloadTexture(GameSystem::Texture tex);
 };
 
 #endif // GRAPHICFIELD_H

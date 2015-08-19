@@ -41,6 +41,11 @@ public:
         BLOCK   = 2,
         ITEM    = 3,
     };
+    //テクスチャ
+    enum class Texture{
+        Light = 0, //あっさり
+        Heavy = 1, //こってり
+    };
     //マップ上に描画する非物体
     enum class MAP_OVERLAY{
         NOTHING,
@@ -55,10 +60,12 @@ public:
         QString name;
         QPoint cool_first_point;
         QPoint hot_first_point;
+        GameSystem::Texture texture;
 
         void CreateRandomMap();
         bool Export(QString Filename);
     };
+
 
     //クライアントの行動
     struct Method{

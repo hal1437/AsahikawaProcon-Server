@@ -44,4 +44,4 @@ FORMS    += mainwindow.ui \
     MapEditerDialog.ui
 
 RESOURCES += \
-    pictures.qrc
+    texture.qrc

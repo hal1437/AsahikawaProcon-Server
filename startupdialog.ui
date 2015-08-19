@@ -564,8 +564,8 @@
    <slot>HotComboBoxChenged(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>286</x>
-     <y>130</y>
+     <x>425</x>
+     <y>147</y>
     </hint>
     <hint type="destinationlabel">
      <x>344</x>
@@ -580,8 +580,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>351</x>
-     <y>292</y>
+     <x>528</x>
+     <y>359</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -612,12 +612,28 @@
    <slot>ShowMapEditDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>443</x>
-     <y>264</y>
+     <x>259</x>
+     <y>308</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
      <y>236</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>comboBox</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>ChangedTexture(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>185</x>
+     <y>253</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>302</x>
+     <y>273</y>
     </hint>
    </hints>
   </connection>
@@ -629,5 +645,6 @@
   <slot>HotComboBoxChenged(QString)</slot>
   <slot>PushedMapSelect()</slot>
   <slot>ShowMapEditDialog()</slot>
+  <slot>ChangedTexture(QString)</slot>
  </slots>
 </ui>

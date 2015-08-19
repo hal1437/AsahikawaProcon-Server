@@ -57,6 +57,8 @@ public slots:
     void HotComboBoxChenged (QString text);
     void CoolComboBoxChenged(QString text);
 
+    void ChangedTexture(QString text);
+
 };
 
 #endif // STARTUPDIALOG_H

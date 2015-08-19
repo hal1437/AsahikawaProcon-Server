@@ -26,10 +26,10 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     ui->listWidget->addItem(new QListWidgetItem("Block"));
     ui->listWidget->addItem(new QListWidgetItem("Item"));
     ui->listWidget->setIconSize(QSize(32,32));
-    ui->listWidget->item(0)->setIcon(QIcon(":/Pictures/floor1.png"));
-    ui->listWidget->item(1)->setIcon(QIcon(":/Pictures/hot1.png"));
-    ui->listWidget->item(2)->setIcon(QIcon(":/Pictures/block1.png"));
-    ui->listWidget->item(3)->setIcon(QIcon(":/Pictures/item1.png"));
+    ui->listWidget->item(0)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Floor.png"));
+    ui->listWidget->item(1)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Hot.png"));
+    ui->listWidget->item(2)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Block.png"));
+    ui->listWidget->item(3)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Item.png"));
 
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
