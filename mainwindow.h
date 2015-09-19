@@ -5,7 +5,8 @@
 #include <QTimer>
 #include <QKeyEvent>
 #include "startupdialog.h"
-
+#include <fstream>
+#include <QDateTime>
 namespace Ui {
 class MainWindow;
 }
@@ -21,11 +22,12 @@ private:
         HOT_ACTION,
     };
 
-    const int FRAME_RATE = 100;
+    const int FRAME_RATE = 150;
 
     TURN process;
     int hot_score;
     int cool_score;
+    std::ofstream log;
 
     QTimer* clock;
     StartupDialog* startup;

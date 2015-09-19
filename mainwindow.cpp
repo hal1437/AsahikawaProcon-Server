@@ -1,6 +1,26 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+const char* getTime(){
+    return (QString("[") + QDateTime::currentDateTime().toString("yyyy:MM:dd:hh:mm:ss") + QString("]")).toUtf8().constData();
+}
+std::string convertString(GameSystem::Method method){
+    std::string str;
+    if(method.action == GameSystem::Method::ACTION::GETREADY)str += "GetReady";
+    if(method.action == GameSystem::Method::ACTION::LOOK)    str += "Look";
+    if(method.action == GameSystem::Method::ACTION::PUT)     str += "Put";
+    if(method.action == GameSystem::Method::ACTION::SEACH)   str += "Seach";
+    if(method.action == GameSystem::Method::ACTION::WALK)    str += "Walk";
+
+    if(method.rote == GameSystem::Method::ROTE::UP)str += "Up";
+    if(method.rote == GameSystem::Method::ROTE::RIGHT)str += "Right";
+    if(method.rote == GameSystem::Method::ROTE::LEFT)str += "Left";
+    if(method.rote == GameSystem::Method::ROTE::DOWN)str += "Down";
+
+    return str;
+}
+
+
 void MainWindow::keyPressEvent(QKeyEvent * event){
     //縦に比率を合わせる
     if(event->key()==Qt::Key_F){
@@ -21,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     hot_score = 0;
     cool_score = 0;
 
+    log.open((std::string("log") + getTime() + ".txt").c_str());
+
     if(this->startup->exec()){
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
@@ -39,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         exit(0);
     }
+    log << getTime() << "セットアップ完了　ゲームを開始します。"<< std::endl;
 }
 
 MainWindow::~MainWindow()
@@ -51,28 +74,55 @@ void MainWindow::StepGame(){
     static GameSystem::Method cool_mehod;
     static GameSystem::Method hot_mehod;
     this->ui->Field->RefreshOverlay();
+    static int turn_count;
+
+    if(ui->TimeBar->value() != turn_count){
+       turn_count = ui->TimeBar->value();
+       log << "-----" << "第" << ui->TimeBar->value() << "ターン" << "-----" << std::endl;
+    }
 
     if(process == COOL_GETREADY){
-        startup->cool_client->WaitGetReady();
+        if(!startup->cool_client->WaitGetReady()){
+            log << getTime() << "[停止]COOLが正常にGetReadyを返しませんでした!" << std::endl;
+        }
         cool_mehod = startup->cool_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::COOL,ui->Field->cool_pos,GameSystem::Method::ACTION::GETREADY));
+
         process = COOL_ACTION;
     }
     else if(process == COOL_ACTION){
         startup->cool_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos));
         this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
         PickItem(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos);
+
+        if(cool_mehod.action == GameSystem::Method::ACTION::GETREADY){
+            log << getTime() << "[停止]COOLが行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << std::endl;
+        }else if (cool_mehod.rote   == GameSystem::Method::ROTE::UNKNOWN){
+            log << getTime() << "[停止]COOLの行動メソッドが不正な方向を示しています！" << std::endl;
+        }
+
         process = HOT_GETREADY;
+        log << getTime() << "[行動]COOLが" + convertString(cool_mehod) + "を行いました。" << std::endl;
     }
     else if(process == HOT_GETREADY){
-        startup->hot_client->WaitGetReady();
+        if(!startup->hot_client->WaitGetReady()){
+            log << getTime() << "[停止]HOTが正常にGetReadyを返しませんでした!" << std::endl;
+        }
         hot_mehod = startup->hot_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::HOT,ui->Field->hot_pos,GameSystem::Method::ACTION::GETREADY));
+
         process = HOT_ACTION;
     }
     else if(process == HOT_ACTION){
         startup->hot_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos));
         PickItem(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos);
         this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
+
+        if(hot_mehod.action == GameSystem::Method::ACTION::GETREADY){
+            log << getTime() << "[停止]HOTが行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << std::endl;
+        }else if (hot_mehod.rote   == GameSystem::Method::ROTE::UNKNOWN){
+            log << getTime() << "[停止]HOTの行動メソッドが不正な方向を示しています！" << std::endl;
+        }
         process = COOL_GETREADY;
+        log << getTime() << "[行動]HOTが" + convertString(hot_mehod) + "を行いました。" << std::endl;
     };
 
     this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
@@ -89,8 +139,14 @@ void MainWindow::PickItem(GameSystem::TEAM team, GameSystem::Method method, QPoi
     if(ui->Field->FieldAccess(team,pos,method.action) == GameSystem::MAP_OBJECT::ITEM){
         ui->Field->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
-        if(team == GameSystem::TEAM::COOL)cool_score++;
-        if(team == GameSystem::TEAM::HOT) hot_score++;
+        if(team == GameSystem::TEAM::COOL){
+            cool_score++;
+            log << getTime() << "[取得]COOLがアイテムを取得しました。" << std::endl;
+        }
+        if(team == GameSystem::TEAM::HOT){
+            hot_score++;
+            log << getTime() << "[取得]HOTがアイテムを取得しました。" << std::endl;
+        }
         ui->CoolScoreLabel->setText("Cool : " + QString::number(cool_score));
         ui->HotScoreLabel ->setText("Hot : "  + QString::number(hot_score));
     }
@@ -100,12 +156,28 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     this->clock->stop();
     QString append_str = "";
 
-    if(startup->cool_client->disconnected_flag)append_str.append("[Cool Disconnected...]");
-    else if(startup->hot_client ->disconnected_flag)append_str.append("[Hot Disconnected...]");
+    if(startup->cool_client->disconnected_flag){
+        append_str.append("[Cool Disconnected...]");
+        log << getTime() << "[終了]COOLとの通信が切断されています。" << std::endl;
+    }else if(startup->hot_client ->disconnected_flag){
+        append_str.append("[Hot Disconnected...]");
+        log << getTime() << "[終了]HOTとの通信が切断されています。" << std::endl;
+    }
+    log << this->ui->WinnerLabel->text().toStdString() << std::endl;
+    log.close();
 
-    if(winner == GameSystem::WINNER::COOL)this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
-    if(winner == GameSystem::WINNER::HOT) this->ui->WinnerLabel->setText("HOT WIN!"  + append_str);
-    if(winner == GameSystem::WINNER::DRAW)this->ui->WinnerLabel->setText("DRAW");
+    if(winner == GameSystem::WINNER::COOL){
+        this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
+        log << getTime() << "[決着]COOLが勝利しました。" << std::endl;
+    }
+    if(winner == GameSystem::WINNER::HOT){
+        this->ui->WinnerLabel->setText("HOT WIN!"  + append_str);
+        log << getTime() << "[決着]HOTが勝利しました。" << std::endl;
+    }
+    if(winner == GameSystem::WINNER::DRAW){
+        this->ui->WinnerLabel->setText("DRAW");
+        log << getTime() << "[決着]引き分けです。" << std::endl;
+    }
 }
 GameSystem::WINNER MainWindow::Judge(){
     bool cool_lose = false;

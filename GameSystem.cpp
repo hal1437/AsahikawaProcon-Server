@@ -65,7 +65,7 @@ void GameSystem::Map::CreateRandomMap(){
     const int BLOCK_NUM = 100;
     const int ITEM_NUM = 10;
 
-    turn = 300;
+    turn = 100;
     name = "[RANDOM MAP]";
 
     hot_first_point  = QPoint(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
