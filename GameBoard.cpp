@@ -6,20 +6,24 @@ void GameBoard::resizeEvent(QResizeEvent *event){
 
     //常に同じアスペクト比になるようにするとか？
 
-    image_part_width  = static_cast<float>(event->size().width ()) / GameSystem::MAP_WIDTH;
-    image_part_height = static_cast<float>(event->size().height()) / GameSystem::MAP_HEIGHT;
+    image_part_width  = static_cast<float>(event->size().width ()) / field.size.x();
+    image_part_height = static_cast<float>(event->size().height()) / field.size.y();
 
     ReloadTexture(texture);
 }
 void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
 {
+    image_part_width  = static_cast<float>(size().width ()) / field.size.x();
+    image_part_height = static_cast<float>(size().height()) / field.size.y();
+    ReloadTexture(texture);
+
     QPainter painter(this);
     painter.setRenderHints( painter.renderHints() | QPainter::Antialiasing );
     painter.fillRect(QRect(0,0,width(),height()),Qt::white);
 
     //空白の描画
-    for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
-        for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+    for(int i = 0;i < field.size.y();i++){
+        for(int j = 0;j < field.size.x();j++){
             painter.drawImage(j * image_part_width,i * image_part_height,field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
         }
     }
@@ -29,8 +33,8 @@ void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
     painter.drawImage(hot_pos.x()  * image_part_width,hot_pos.y()  * image_part_height,team_resource[static_cast<int>(GameSystem::TEAM::HOT )]);
 
     //空白の描画
-    for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
-        for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+    for(int i = 0;i < field.size.y();i++){
+        for(int j = 0;j < field.size.x();j++){
             if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
                 painter.drawImage(j * image_part_width,i * image_part_height,field_resource[static_cast<int>(field.field[i][j])]);
             }
@@ -38,8 +42,8 @@ void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
     }
 
     //オーバーレイの描画
-    for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
-        for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+    for(int i = 0;i < field.size.y();i++){
+        for(int j = 0;j < field.size.x();j++){
             if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
                 painter.drawImage(j * image_part_width,i * image_part_height,overray_resource[static_cast<int>(overlay[i][j])]);
             }
@@ -48,8 +52,8 @@ void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
 }
 void GameBoard::RefreshOverlay(){
     //すべてNOTINGにする
-    for(int i = 0;i < GameSystem::MAP_HEIGHT;i++){
-        for(int j = 0;j < GameSystem::MAP_WIDTH;j++){
+    for(int i = 0;i < field.size.y();i++){
+        for(int j = 0;j < field.size.x();j++){
             overlay[i][j] = GameSystem::MAP_OVERLAY::NOTHING;
         }
     }
@@ -58,7 +62,7 @@ void GameBoard::RefreshOverlay(){
 GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::TEAM team, const QPoint& pos,GameSystem::Method::ACTION action){
     //場外
     if(pos.x() <  0                     || pos.y() <  0)                     return GameSystem::MAP_OBJECT::BLOCK;
-    if(pos.x() >= GameSystem::MAP_WIDTH || pos.y() >= GameSystem::MAP_HEIGHT)return GameSystem::MAP_OBJECT::BLOCK;
+    if(pos.x() >= field.size.x() || pos.y() >= field.size.y())return GameSystem::MAP_OBJECT::BLOCK;
     //有効
     if(action == GameSystem::Method::ACTION::LOOK)    this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
     if(action == GameSystem::Method::ACTION::SEACH)   this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::SEACH;
@@ -83,7 +87,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
     switch(method.action){
         case GameSystem::Method::ACTION::PUT:
             if((pos + method.GetRoteVector()).y() >= 0 &&(pos + method.GetRoteVector()).x() >= 0&&
-               (pos + method.GetRoteVector()).y() < GameSystem::MAP_HEIGHT &&(pos + method.GetRoteVector()).x() < GameSystem::MAP_WIDTH){
+               (pos + method.GetRoteVector()).y() < field.size.y() &&(pos + method.GetRoteVector()).x() < field.size.x()){
                 this->field.field[(pos + method.GetRoteVector()).y()][(pos + method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
             }
             return FieldAccessAround(team,pos,method.action);

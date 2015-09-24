@@ -4,11 +4,6 @@
 #include <QFileDialog>
 #include <QDesktopServices>
 
-QPoint MapEditerDialog::MirrorPoint(const QPoint& pos){
-    QPoint center(GameSystem::MAP_WIDTH / 2.0f,GameSystem::MAP_HEIGHT / 2.0f);
-    return center * 2 - pos;
-}
-
 MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     QDialog(parent),
     ui(new Ui::MapEditerDialog),
@@ -67,8 +62,8 @@ void MapEditerDialog::FillItem(const QPoint& pos){
     QPoint fill_point((pos.x() - left_m)/ui->widget->image_part_width,(pos.y() - top_m)/ui->widget->image_part_height);
 
     //有効範囲内でなければスキップ
-    if(fill_point.x() < 0 || fill_point.x() >= GameSystem::MAP_WIDTH ||
-       fill_point.y() < 0 || fill_point.y() >= GameSystem::MAP_HEIGHT)return;
+    if(fill_point.x() < 0 || fill_point.x() >= ui->widget->field.size.x() ||
+       fill_point.y() < 0 || fill_point.y() >= ui->widget->field.size.y())return;
 
     GameSystem::MAP_OBJECT obj;
     if     (ui->listWidget->selectedItems().first()->text() == "Nothing")obj = GameSystem::MAP_OBJECT::NOTHING;
@@ -77,14 +72,14 @@ void MapEditerDialog::FillItem(const QPoint& pos){
     if(ui->listWidget->selectedItems().first()->text() == "Target" ){
         //初期位置変更
         this->ui->widget->field.cool_first_point = fill_point;
-        this->ui->widget->field.hot_first_point  = MirrorPoint(fill_point);
+        this->ui->widget->field.hot_first_point  = ui->widget->field.MirrorPoint(fill_point);
         this->ui->widget->cool_pos = fill_point;
-        this->ui->widget->hot_pos  = MirrorPoint(fill_point);
+        this->ui->widget->hot_pos  = ui->widget->field.MirrorPoint(fill_point);
     }else{
         this->ui->widget->field.field[fill_point.y()][fill_point.x()] = obj;
         //対称コピー
         if(ui->SymmetryCheck->isChecked()){
-            QPoint r_fill_point(MirrorPoint(fill_point));
+            QPoint r_fill_point(ui->widget->field.MirrorPoint(fill_point));
             this->ui->widget->field.field[r_fill_point.y()][r_fill_point.x()] = obj;
         }
     }
@@ -118,3 +113,17 @@ void MapEditerDialog::SelectItem(QListWidgetItem *next, QListWidgetItem *old){
     }
 }
 
+void MapEditerDialog::ComboChanged(QString value){
+    if(value=="通常(21x17)"){
+        this->ui->widget->field.SetSize(QPoint(21,17));
+    }
+    if(value=="決戦(15x17)"){
+        this->ui->widget->field.SetSize(QPoint(15,17));
+    }
+
+    this->ui->widget->cool_pos = this->ui->widget->field.cool_first_point;
+    this->ui->widget->hot_pos = this->ui->widget->field.hot_first_point;
+    resize(QSize(ui->widget->field.size.x()*25+134,ui->widget->field.size.y()*25+4));
+    update();
+    ui->widget->paintEvent(nullptr);
+}

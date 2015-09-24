@@ -14,12 +14,18 @@ using Field = QVector<QVector<T>>;
 class GameSystem
 {
 public:
-    //旧マップサイズ
+    //通常マップサイズ
     //const static int MAP_WIDTH  = 21;
     //const static int MAP_HEIGHT = 17;
-    const static int MAP_WIDTH  = 15;
-    const static int MAP_HEIGHT = 17;
 
+    //決戦マップサイズ
+    //const static int MAP_WIDTH  = 15;
+    //const static int MAP_HEIGHT = 17;
+
+
+    //通常マップサイズ
+    const static int DEFAULT_MAP_WIDTH  = 21;
+    const static int DEFAULT_MAP_HEIGHT = 17;
 
     //チーム
     enum class TEAM{
@@ -62,9 +68,14 @@ public:
         Field<GameSystem::MAP_OBJECT> field;
         int turn;
         QString name;
+        QPoint size;
         QPoint cool_first_point;
         QPoint hot_first_point;
         GameSystem::Texture texture;
+
+        Map();
+        void SetSize(QPoint size);
+        QPoint MirrorPoint(const QPoint& pos);
 
         void CreateRandomMap();
         bool Export(QString Filename);

@@ -3,7 +3,7 @@
 #include "MapEditerDialog.h"
 #include <QNetworkInterface>
 #include <QDesktopServices>
-
+#include <QHostInfo>
 
 StartupDialog::StartupDialog(QWidget *parent) :
     QDialog(parent),
@@ -25,7 +25,7 @@ StartupDialog::StartupDialog(QWidget *parent) :
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != QHostAddress(QHostAddress::LocalHost))
             this->ui->LocalIPLabel->setText(address.toString());
     }
-
+    this->ui->HostName->setText(QHostInfo::localHostName());
     //シグナル・スロットの接続    
     connect(this->hot_client ,SIGNAL(Connected())   ,this,SLOT(HotConnected()));
     connect(this->hot_client ,SIGNAL(Ready())       ,this,SLOT(SetHotStandby()));
@@ -34,15 +34,6 @@ StartupDialog::StartupDialog(QWidget *parent) :
     connect(this->cool_client,SIGNAL(Ready())       ,this,SLOT(SetCoolStandby()));
     connect(this->cool_client,SIGNAL(Disconnected()),this,SLOT(CoolDisConnected()));
 
-
-    map = GameSystem::Map{
-        QVector<QVector<GameSystem::MAP_OBJECT>>(GameSystem::MAP_HEIGHT,
-                QVector<GameSystem::MAP_OBJECT>(GameSystem::MAP_WIDTH,GameSystem::MAP_OBJECT::NOTHING)),
-        100,
-        "noname",
-        QPoint(1,1),
-        MapEditerDialog::MirrorPoint(QPoint(1,1))
-    };
     map.CreateRandomMap();
     map_standby = true;
 }

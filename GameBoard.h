@@ -25,9 +25,9 @@ private:
     QImage overray_resource[4];
 
 protected:
-    void resizeEvent(QResizeEvent *event); //リサイズイベント
-    void paintEvent(QPaintEvent *event);         //ペイントイベント
 public:
+    void paintEvent(QPaintEvent *event);         //ペイントイベント
+    void resizeEvent(QResizeEvent *event); //リサイズイベント
 
     float image_part_width;
     float image_part_height;

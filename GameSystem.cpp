@@ -31,6 +31,24 @@ GameSystem::Method GameSystem::Method::fromString(const QString& str){
     return answer;
 }
 
+
+GameSystem::Map::Map():
+    turn(100),
+    name("[DEFAULT MAP]"),
+    size(DEFAULT_MAP_WIDTH,DEFAULT_MAP_HEIGHT),
+    cool_first_point(0,0),
+    hot_first_point(0,0),
+    texture(GameSystem::Texture::Light){
+}
+void GameSystem::Map::SetSize(QPoint size){
+    this->size = size;
+    this->CreateRandomMap();
+}
+
+QPoint GameSystem::Map::MirrorPoint(const QPoint& pos){
+    QPoint center(size.x() / 2.0f, size.y() / 2.0f);
+    return center * 2 - pos;
+}
 bool GameSystem::Map::Export(QString Filename){
     QFile file(Filename);
 
@@ -68,12 +86,16 @@ void GameSystem::Map::CreateRandomMap(){
     turn = 100;
     name = "[RANDOM MAP]";
 
-    hot_first_point  = QPoint(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
-    cool_first_point = QPoint(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+    hot_first_point  = QPoint(qrand() % size.x(),qrand() % size.x());
+    cool_first_point = QPoint(qrand() % size.x(),qrand() % size.y());
 
+    field.clear();
+    for(int i=0;i<size.y();i++){
+        field.push_back(QVector<GameSystem::MAP_OBJECT>(size.x()));
+    }
     //ブロック配置
     for(int i=0;i<BLOCK_NUM;i++){
-        QPoint pos(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+        QPoint pos(qrand() % size.x(),qrand() % size.y());
         if((hot_first_point  - pos).manhattanLength() > 1 &&
            (cool_first_point - pos).manhattanLength() > 1 &&
            field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::BLOCK){
@@ -86,7 +108,7 @@ void GameSystem::Map::CreateRandomMap(){
 
     //アイテム配置
     for(int i=0;i<ITEM_NUM;i++){
-        QPoint pos(qrand()%MAP_WIDTH,qrand()%MAP_HEIGHT);
+        QPoint pos(qrand() % size.x(),qrand() % size.y());
         if((hot_first_point  - pos).manhattanLength() > 1 &&
            (cool_first_point - pos).manhattanLength() > 1 &&
             field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::ITEM){

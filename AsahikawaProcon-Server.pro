@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     GameBoard.cpp \
     ManualClientDialog.cpp \
     ManualClient.cpp \
-    MapEditerDialog.cpp
+    MapEditerDialog.cpp \
+    SettingDialog.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -35,13 +36,15 @@ HEADERS  += mainwindow.h \
     GameBoard.h \
     ManualClientDialog.h \
     ManualClient.h \
-    MapEditerDialog.h
+    MapEditerDialog.h \
+    SettingDialog.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
     GameBoard.ui \
     ManualClientDialog.ui \
-    MapEditerDialog.ui
+    MapEditerDialog.ui \
+    SettingDialog.ui
 
 RESOURCES += \
     texture.qrc

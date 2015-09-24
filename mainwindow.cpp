@@ -26,7 +26,7 @@ void MainWindow::keyPressEvent(QKeyEvent * event){
     if(event->key()==Qt::Key_F){
         int left_margin=0,right_margin=0;
         this->ui->centralWidget->layout()->getContentsMargins(&left_margin,nullptr,&right_margin,nullptr);
-        this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/GameSystem::MAP_HEIGHT)*GameSystem::MAP_WIDTH,this->ui->Field->size().height());
+        this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/ui->Field->field.size.y())*ui->Field->field.size.x(),this->ui->Field->size().height());
         this->resize(QSize(this->ui->Field->width() + left_margin + right_margin,this->size().height()));
     }
 }

@@ -16,7 +16,6 @@ class MapEditerDialog : public QDialog
 
 public:
     static const int IMAGE_PART_SIZE = 25;
-    static QPoint MirrorPoint(const QPoint& pos);
     QString filepath;
 
 
@@ -38,6 +37,7 @@ private slots:
     void FillItem(const QPoint& pos); //設置
     void Clear();                     //全消し
     void SpinChanged(int value);
+    void ComboChanged(QString value);
 
 public slots:
     void SelectItem(QListWidgetItem* next, QListWidgetItem* old);
