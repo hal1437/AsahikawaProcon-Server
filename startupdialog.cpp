@@ -12,13 +12,12 @@ StartupDialog::StartupDialog(QWidget *parent) :
     hot_standby(false),
     cool_standby(false)
 {
-
     //UI初期化
     ui->setupUi(this);
 
     //クライアント初期化
-    this->cool_client = new TCPClient();
-    this->hot_client  = new TCPClient();
+    this->cool_client = new ComClient();
+    this->hot_client  = new ComClient();
 
     //ローカルIPの探索
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {

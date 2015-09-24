@@ -58,7 +58,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     log.open(QString(path + "/log" + getTime() + ".txt").toStdString().c_str());
 
+
     if(this->startup->exec()){
+        this->ui->Field->cool_pos = this->startup->map.cool_first_point;
+        this->ui->Field->hot_pos = this->startup->map.hot_first_point;
+        qDebug() << this->ui->Field->cool_pos;
+        qDebug() << this->ui->Field->hot_pos;
+        this->ui->Field->setMap(this->startup->map);
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
         this->ui->TimeBar->setMaximum(this->startup->map.turn);
@@ -212,7 +218,7 @@ GameSystem::WINNER MainWindow::Judge(){
         cool_lose=true;
     }
     if(hot_around .data[4] == GameSystem::MAP_OBJECT::BLOCK){
-        log << getTime() << "[死因]H       OTブロック置かれ死" << std::endl;
+        log << getTime() << "[死因]HOTブロック置かれ死" << std::endl;
         hot_lose=true;
     }
 

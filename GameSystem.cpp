@@ -87,7 +87,7 @@ void GameSystem::Map::CreateRandomMap(){
     name = "[RANDOM MAP]";
 
     hot_first_point  = QPoint(qrand() % size.x(),qrand() % size.x());
-    cool_first_point = QPoint(qrand() % size.x(),qrand() % size.y());
+    cool_first_point = QPoint(qrand() % size.y(),qrand() % size.y());
 
     field.clear();
     for(int i=0;i<size.y();i++){
