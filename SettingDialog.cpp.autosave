@@ -14,7 +14,7 @@ SettingDialog::SettingDialog(QWidget *parent) :
 
 
     QVariant v = mSettings->value( "LogFilepath" );
-    if (v.type() != QVariant::Invalid)
+    if (v.type() != QVariant::Invalid)  
     {
         ui->Log->setText(v.toString());
     }

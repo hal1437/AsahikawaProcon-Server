@@ -533,8 +533,8 @@
    <slot>CoolConnectionToggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>171</x>
-     <y>123</y>
+     <x>268</x>
+     <y>151</y>
     </hint>
     <hint type="destinationlabel">
      <x>82</x>
@@ -597,8 +597,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>528</x>
-     <y>359</y>
+     <x>554</x>
+     <y>337</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -613,8 +613,8 @@
    <slot>PushedMapSelect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>224</x>
-     <y>214</y>
+     <x>545</x>
+     <y>209</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -629,8 +629,8 @@
    <slot>ShowMapEditDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>259</x>
-     <y>308</y>
+     <x>545</x>
+     <y>244</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -645,12 +645,28 @@
    <slot>ChangedTexture(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>185</x>
-     <y>253</y>
+     <x>539</x>
+     <y>284</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
      <y>273</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>Setting()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>310</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>250</x>
+     <y>341</y>
     </hint>
    </hints>
   </connection>
@@ -663,5 +679,6 @@
   <slot>PushedMapSelect()</slot>
   <slot>ShowMapEditDialog()</slot>
   <slot>ChangedTexture(QString)</slot>
+  <slot>Setting()</slot>
  </slots>
 </ui>

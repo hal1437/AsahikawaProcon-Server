@@ -1,8 +1,9 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QSettings>
 
 const char* getTime(){
-    return (QString("[") + QDateTime::currentDateTime().toString("yyyy:MM:dd:hh:mm:ss") + QString("]")).toUtf8().constData();
+    return (QString("[") + QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + QString("]")).toUtf8().constData();
 }
 std::string convertString(GameSystem::Method method){
     std::string str;
@@ -41,7 +42,21 @@ MainWindow::MainWindow(QWidget *parent) :
     hot_score = 0;
     cool_score = 0;
 
-    log.open((std::string("log") + getTime() + ".txt").c_str());
+    QString path;
+    QSettings* mSettings;
+    mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+    QVariant v = mSettings->value( "LogFilepath" );
+    if (v.type() != QVariant::Invalid){
+        path = v.toString();
+    }
+    v = mSettings->value( "Gamespeed" );
+    if (v.type() != QVariant::Invalid){
+        FRAME_RATE = v.toInt();
+    }
+
+
+    log.open(QString(path + "/log" + getTime() + ".txt").toStdString().c_str());
 
     if(this->startup->exec()){
         //ui初期化
@@ -68,6 +83,8 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+
 
 void MainWindow::StepGame(){
     //ゲーム進行
@@ -164,7 +181,6 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         log << getTime() << "[終了]HOTとの通信が切断されています。" << std::endl;
     }
     log << this->ui->WinnerLabel->text().toStdString() << std::endl;
-    log.close();
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
@@ -178,6 +194,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         this->ui->WinnerLabel->setText("DRAW");
         log << getTime() << "[決着]引き分けです。" << std::endl;
     }
+    log.close();
 }
 GameSystem::WINNER MainWindow::Judge(){
     bool cool_lose = false;
@@ -190,25 +207,45 @@ GameSystem::WINNER MainWindow::Judge(){
     hot_around  = board->FieldAccessAround(GameSystem::TEAM::HOT ,board->hot_pos ,GameSystem::Method::ACTION::UNKNOWN);
 
     //ブロック置かれ死
-    if(cool_around.data[4] == GameSystem::MAP_OBJECT::BLOCK)cool_lose=true;
-    if(hot_around .data[4] == GameSystem::MAP_OBJECT::BLOCK)hot_lose=true;
+    if(cool_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){
+        log << getTime() << "[死因]COOLブロック置かれ死" << std::endl;
+        cool_lose=true;
+    }
+    if(hot_around .data[4] == GameSystem::MAP_OBJECT::BLOCK){
+        log << getTime() << "[死因]H       OTブロック置かれ死" << std::endl;
+        hot_lose=true;
+    }
 
     //ブロック囲まれ死
     if(cool_around.data[1] == GameSystem::MAP_OBJECT::BLOCK &&
        cool_around.data[3] == GameSystem::MAP_OBJECT::BLOCK &&
        cool_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
-       cool_around.data[7] == GameSystem::MAP_OBJECT::BLOCK)cool_lose=true;
+       cool_around.data[7] == GameSystem::MAP_OBJECT::BLOCK){
+        log << getTime() << "[死因]COOLブロック囲まれ死" << std::endl;
+        cool_lose=true;
+    }
     if(hot_around .data[1] == GameSystem::MAP_OBJECT::BLOCK &&
        hot_around .data[3] == GameSystem::MAP_OBJECT::BLOCK &&
        hot_around .data[5] == GameSystem::MAP_OBJECT::BLOCK &&
-       hot_around .data[7] == GameSystem::MAP_OBJECT::BLOCK)hot_lose=true;
+       hot_around .data[7] == GameSystem::MAP_OBJECT::BLOCK){
+        log << getTime() << "[死因]HOTブロック囲まれ死" << std::endl;
+        hot_lose=true;
+    }
 
     //切断死
-    if(startup->cool_client->disconnected_flag)cool_lose=true;
-    if(startup->hot_client ->disconnected_flag)hot_lose =true;
+    if(startup->cool_client->disconnected_flag){
+        log << getTime() << "[死因]COOL通信切断死" << std::endl;
+        cool_lose=true;
+    }
+    if(startup->hot_client ->disconnected_flag){
+        log << getTime() << "[死因]HOT通信切断死" << std::endl;
+        hot_lose =true;
+    }
 
     //相打ち、または時間切れ時はアイテム判定とする
     if((cool_lose && hot_lose) || ui->TimeBar->value()==0){
+        log << getTime() << "[情報]相打ちまたは、タイムアップのためアイテム判定を行います" << std::endl;
+        log << getTime() << "[得点]COOL" << cool_score << "点 HOT" << hot_score << "点" << std::endl;
         cool_lose = false;
         hot_lose  = false;
 

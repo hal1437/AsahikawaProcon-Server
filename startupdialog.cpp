@@ -87,6 +87,7 @@ bool StartupDialog::MapRead(const QString& dir){
                 foreach(QString s,list){
                     vec.push_back(static_cast<GameSystem::MAP_OBJECT>(s.toInt()));
                 }
+                this->map.size.setX(vec.size());
                 this->map.field[calm] = vec;
                 calm++;
             }
@@ -102,6 +103,7 @@ bool StartupDialog::MapRead(const QString& dir){
                 this->map.hot_first_point = QPoint(list[0].toInt(),list[1].toInt());
             }
         }
+        this->map.size.setY(map.field.size());
         return true;
     }else{
         return false;
@@ -256,3 +258,13 @@ void StartupDialog::ChangedTexture(QString text){
     if(text == "あっさり")this->map.texture = GameSystem::Texture::Light;
     if(text == "こってり")this->map.texture = GameSystem::Texture::Heavy;
 }
+void StartupDialog::Setting(){
+    SettingDialog* diag;
+    diag = new SettingDialog;
+    if(diag->exec() == QDialog::Accepted){
+        //設定を保存
+        diag->Export();
+    }
+}
+
+

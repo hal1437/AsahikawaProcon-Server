@@ -22,7 +22,7 @@ private:
         HOT_ACTION,
     };
 
-    const int FRAME_RATE = 150;
+    int FRAME_RATE = 150;
 
     TURN process;
     int hot_score;

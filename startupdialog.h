@@ -8,6 +8,7 @@
 #include "TcpClient.h"
 #include "ComClient.h"
 #include "ManualClient.h"
+#include "SettingDialog.h"
 
 namespace Ui {
 class StartupDialog;
@@ -58,6 +59,9 @@ public slots:
     void CoolComboBoxChenged(QString text);
 
     void ChangedTexture(QString text);
+
+    //設定
+    void Setting();
 
 };
 

@@ -12,7 +12,7 @@ class TCPClient : public BaseClient
     Q_OBJECT
     //TCPユーザー用の接続サーバー
 private:
-    const static int TIMEOUT = 5000;   //タイムアウト
+    int TIMEOUT = 5000;   //タイムアウト
     const static int IGNORE_INVALD = 10;   //無効ライン無視回数
 
     const QString NEWLINE_CODE = "";

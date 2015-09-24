@@ -1,4 +1,5 @@
 #include "TcpClient.h"
+#include <QSettings>
 
 QString TCPClient::VisibilityString(QString str){
     QString answer;
@@ -127,6 +128,14 @@ QString TCPClient::GetTeamName(){
 TCPClient::TCPClient(QObject *parent) :
     BaseClient(parent)
 {
+    QSettings* mSettings;
+    mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+    QVariant v = mSettings->value( "Timeout" );
+    if (v.type() != QVariant::Invalid){
+        TIMEOUT = v.toInt();
+    }
+
     this->server = new QTcpServer(this);
     this->client = nullptr;
     //接続最大数を1に固定
