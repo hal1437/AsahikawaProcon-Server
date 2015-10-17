@@ -146,7 +146,7 @@ void MainWindow::StepGame(){
         }
         process = COOL_GETREADY;
         log << getTime() << "[行動]HOTが" + convertString(hot_mehod) + "を行いました。" << std::endl;
-    };
+    }
 
     this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
     repaint();

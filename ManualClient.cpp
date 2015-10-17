@@ -8,6 +8,8 @@ bool ManualClient::WaitGetReady(){
 GameSystem::Method ManualClient::WaitReturnMethod(GameSystem::AroundData data){
     //自動返答
     diag->AppendLog(QString("[GetReady  Response] ") + data.toString());
+
+    //GUIレスポンス待ち
     QEventLoop eventLoop;
     QDialog::connect(diag, SIGNAL(ReadyAction()), &eventLoop, SLOT(quit()));
     eventLoop.exec();//GUIからのレスポンスがあるまで待機

@@ -11,8 +11,7 @@ void GameBoard::resizeEvent(QResizeEvent *event){
 
     ReloadTexture(texture);
 }
-void GameBoard::paintEvent(QPaintEvent *event)//描画イベント
-{
+void GameBoard::paintEvent(QPaintEvent *event){
     image_part_width  = static_cast<float>(size().width ()) / field.size.x();
     image_part_height = static_cast<float>(size().height()) / field.size.y();
     ReloadTexture(texture);
@@ -61,7 +60,7 @@ void GameBoard::RefreshOverlay(){
 
 GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::TEAM team, const QPoint& pos,GameSystem::Method::ACTION action){
     //場外
-    if(pos.x() <  0                     || pos.y() <  0)                     return GameSystem::MAP_OBJECT::BLOCK;
+    if(pos.x() <  0              || pos.y() <  0)             return GameSystem::MAP_OBJECT::BLOCK;
     if(pos.x() >= field.size.x() || pos.y() >= field.size.y())return GameSystem::MAP_OBJECT::BLOCK;
     //有効
     if(action == GameSystem::Method::ACTION::LOOK)    this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
@@ -86,8 +85,10 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
     //周辺情報取得
     switch(method.action){
         case GameSystem::Method::ACTION::PUT:
-            if((pos + method.GetRoteVector()).y() >= 0 &&(pos + method.GetRoteVector()).x() >= 0&&
-               (pos + method.GetRoteVector()).y() < field.size.y() &&(pos + method.GetRoteVector()).x() < field.size.x()){
+            if((pos + method.GetRoteVector()).y() >= 0 &&
+               (pos + method.GetRoteVector()).x() >= 0 &&
+               (pos + method.GetRoteVector()).y() < field.size.y() &&
+               (pos + method.GetRoteVector()).x() < field.size.x()){
                 this->field.field[(pos + method.GetRoteVector()).y()][(pos + method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
             }
             return FieldAccessAround(team,pos,method.action);
@@ -101,7 +102,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
             //接続状態
             around.connect = GameSystem::CONNECTING_STATUS::CONTINUE;
             //情報取得
-            for(int i=0;i<9;i++)around.data[i] = FieldAccess(team,pos + method.GetRoteVector() * i,method.action);
+            for(int i=1;i<10;i++)around.data[i] = FieldAccess(team,pos + method.GetRoteVector() * i,method.action);
             return around;
         default:
             return GameSystem::AroundData();
