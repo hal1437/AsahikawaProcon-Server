@@ -42,6 +42,7 @@ MainWindow::MainWindow(QWidget *parent) :
     hot_score = 0;
     cool_score = 0;
 
+    //ServerSetting読み込み
     QString path;
     QSettings* mSettings;
     mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
@@ -54,10 +55,13 @@ MainWindow::MainWindow(QWidget *parent) :
     if (v.type() != QVariant::Invalid){
         FRAME_RATE = v.toInt();
     }
+
+    //ログファイルオープン
     file = new QFile(QString(path + "/log" + getTime() + ".txt"),this);
     file->open(QIODevice::WriteOnly);
     log.setDevice(file);
 
+    //スタートアップダイアログ開始
     if(this->startup->exec()){
         this->ui->Field->cool_pos = this->startup->map.cool_first_point;
         this->ui->Field->hot_pos = this->startup->map.hot_first_point;

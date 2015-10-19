@@ -16,8 +16,10 @@ StartupDialog::StartupDialog(QWidget *parent) :
     ui->setupUi(this);
 
     //クライアント初期化
-    this->cool_client = new ComClient();
+    this->cool_client = new TCPClient();
     this->hot_client  = new ComClient();
+    CoolComboBoxChenged("TCPユーザー");
+    HotComboBoxChenged("TCPユーザー");
 
     //ローカルIPの探索
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
