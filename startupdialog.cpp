@@ -17,7 +17,7 @@ StartupDialog::StartupDialog(QWidget *parent) :
 
     //クライアント初期化
     this->cool_client = new TCPClient();
-    this->hot_client  = new ComClient();
+    this->hot_client  = new TCPClient();
     CoolComboBoxChenged("TCPユーザー");
     HotComboBoxChenged("TCPユーザー");
 
