@@ -7,6 +7,9 @@
 #include "startupdialog.h"
 #include <fstream>
 #include <QDateTime>
+#include <QFile>
+#include <QDataStream>
+
 namespace Ui {
 class MainWindow;
 }
@@ -27,10 +30,13 @@ private:
     TURN process;
     int hot_score;
     int cool_score;
-    std::ofstream log;
+    //std::ofstream log;
 
     QTimer* clock;
     StartupDialog* startup;
+
+    QFile* file;
+    QTextStream log;
 
 protected:
     void keyPressEvent(QKeyEvent* event);
