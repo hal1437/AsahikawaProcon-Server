@@ -44,7 +44,9 @@ void GameBoard::paintEvent(QPaintEvent *event){
     for(int i = 0;i < field.size.y();i++){
         for(int j = 0;j < field.size.x();j++){
             if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
-                painter.drawImage(j * image_part_width,i * image_part_height,overray_resource[static_cast<int>(overlay[i][j])]);
+                painter.drawImage(j * image_part_width,
+                                  i * image_part_height,
+                                  overray_resource[static_cast<int>(overlay[i][j])]);
             }
         }
     }
@@ -63,7 +65,9 @@ GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::TEAM team, const QPoin
     if(pos.x() <  0              || pos.y() <  0)             return GameSystem::MAP_OBJECT::BLOCK;
     if(pos.x() >= field.size.x() || pos.y() >= field.size.y())return GameSystem::MAP_OBJECT::BLOCK;
     //有効
-    if(action == GameSystem::Method::ACTION::LOOK)    this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
+    if(action == GameSystem::Method::ACTION::LOOK){
+        this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
+    }
     if(action == GameSystem::Method::ACTION::SEACH)   this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::SEACH;
     if(action == GameSystem::Method::ACTION::GETREADY)this->overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::GETREADY;
 
@@ -153,16 +157,19 @@ void GameBoard::ReloadTexture(GameSystem::Texture tex){
     this->team_resource   [static_cast<int>(GameSystem::TEAM::COOL)]            = QImage(path + "/Cool.png");
     this->team_resource   [static_cast<int>(GameSystem::TEAM::HOT)]             = QImage(path + "/Hot.png");
     this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]   = QImage(path + "/Floor.png");
+    this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::TARGET)]    = QImage();
     this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::ITEM)]      = QImage(path + "/Item.png");
     this->field_resource  [static_cast<int>(GameSystem::MAP_OBJECT::BLOCK)]     = QImage(path + "/Block.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::NOTHING)]  = QImage();
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QImage(path + "/Look.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QImage(path + "/Getready.png");
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QImage(path + "/Search.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QImage(path + "/Seach.png");
 
     //変形
     for(QImage& img:team_resource   )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
-    for(QImage& img:field_resource  )img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    for(QImage& img:field_resource  ){
+        if(img != QImage())img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
+    }
     for(QImage& img:overray_resource){
         if(img != QImage())img = img.scaled(image_part_width,image_part_height,Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     }

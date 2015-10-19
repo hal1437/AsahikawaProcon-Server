@@ -162,7 +162,7 @@ void MainWindow::StepGame(){
 
 void MainWindow::PickItem(GameSystem::TEAM team, GameSystem::Method method, QPoint &pos){
 
-    if(ui->Field->FieldAccess(team,pos,method.action) == GameSystem::MAP_OBJECT::ITEM){
+    if(ui->Field->FieldAccess(team,pos,GameSystem::Method::ACTION::UNKNOWN) == GameSystem::MAP_OBJECT::ITEM){
         ui->Field->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
         if(team == GameSystem::TEAM::COOL){

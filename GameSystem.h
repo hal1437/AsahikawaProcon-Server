@@ -24,7 +24,7 @@ public:
 
 
     //通常マップサイズ
-    const static int DEFAULT_MAP_WIDTH  = 21;
+    const static int DEFAULT_MAP_WIDTH  = 15;
     const static int DEFAULT_MAP_HEIGHT = 17;
 
     //チーム

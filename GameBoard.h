@@ -21,7 +21,7 @@ private:
 
     GameSystem::Texture texture;
     QImage team_resource[2];
-    QImage field_resource[5];
+    QImage field_resource[4];
     QImage overray_resource[4];
 
 protected:

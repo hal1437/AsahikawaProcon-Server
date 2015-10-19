@@ -29,6 +29,7 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
     ui->listWidget->setCurrentRow(0);
+    ComboChanged("決戦(15x17)");
 }
 
 MapEditerDialog::~MapEditerDialog()
@@ -124,6 +125,8 @@ void MapEditerDialog::ComboChanged(QString value){
     this->ui->widget->cool_pos = this->ui->widget->field.cool_first_point;
     this->ui->widget->hot_pos = this->ui->widget->field.hot_first_point;
     resize(QSize(ui->widget->field.size.x()*25+134,ui->widget->field.size.y()*25+4));
-    update();
+    ui->widget->setMap(ui->widget->field);
     ui->widget->paintEvent(nullptr);
+    update();
+
 }
