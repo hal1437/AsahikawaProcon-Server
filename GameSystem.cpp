@@ -63,6 +63,7 @@ bool GameSystem::Map::Export(QString Filename){
         QTextStream stream( &file );
         stream << "N:" << outname << "\n";
         stream << "T:" << QString::number(this->turn) << "\n";
+        stream << "S:" << QString::number(size.x()) << "," << QString::number(size.y()) << "\n";
         for(auto v1 : field){
             stream << "D:";
             for(auto it = v1.begin();it != v1.end();it++){
