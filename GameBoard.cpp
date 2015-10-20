@@ -106,7 +106,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::TEAM team, GameS
             //接続状態
             around.connect = GameSystem::CONNECTING_STATUS::CONTINUE;
             //情報取得
-            for(int i=1;i<10;i++)around.data[i] = FieldAccess(team,pos + method.GetRoteVector() * i,method.action);
+            for(int i=1;i<10;i++)around.data[i-1] = FieldAccess(team,pos + method.GetRoteVector() * i,method.action);
             return around;
         default:
             return GameSystem::AroundData();
