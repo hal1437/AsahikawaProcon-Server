@@ -174,12 +174,12 @@
         <widget class="QComboBox" name="comboBox">
          <item>
           <property name="text">
-           <string>通常(21x17)</string>
+           <string>決戦(15x17)</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>決戦(15x17)</string>
+           <string>広域(21x17)</string>
           </property>
          </item>
         </widget>

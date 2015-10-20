@@ -115,7 +115,7 @@ void MapEditerDialog::SelectItem(QListWidgetItem *next, QListWidgetItem *old){
 }
 
 void MapEditerDialog::ComboChanged(QString value){
-    if(value=="通常(21x17)"){
+    if(value=="広域(21x17)"){
         this->ui->widget->field.SetSize(QPoint(21,17));
     }
     if(value=="決戦(15x17)"){
