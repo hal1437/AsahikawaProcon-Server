@@ -27,8 +27,8 @@ void MainWindow::keyPressEvent(QKeyEvent * event){
     if(event->key()==Qt::Key_F){
         int left_margin=0,right_margin=0;
         this->ui->centralWidget->layout()->getContentsMargins(&left_margin,nullptr,&right_margin,nullptr);
-        this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/ui->Field->field.size.y())*ui->Field->field.size.x(),this->ui->Field->size().height());
-        this->resize(QSize(this->ui->Field->width() + left_margin + right_margin,this->size().height()));
+        //this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/ui->Field->field.size.y())*ui->Field->field.size.x(),this->ui->Field->size().height());
+        //this->resize(QSize(this->ui->Field->width() + left_margin + right_margin,this->size().height()));
     }
 }
 
@@ -38,23 +38,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->startup = new StartupDialog(this);
-    process = COOL_GETREADY;
-    hot_score = 0;
-    cool_score = 0;
+
+    for(int i=0;i<TEAM_COUNT;i++)team_score[i] = 0;
 
     //ServerSetting読み込み
     QString path;
     QSettings* mSettings;
+    QVariant v;
     mSettings = new QSettings( "setting.ini", QSettings::IniFormat ); // iniファイルで設定を保存
     mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
-    QVariant v = mSettings->value( "LogFilepath" );
-    if (v.type() != QVariant::Invalid){
-        path = v.toString();
-    }
+    v = mSettings->value( "LogFilepath" );
+    if (v.type() != QVariant::Invalid)path = v.toString();
     v = mSettings->value( "Gamespeed" );
-    if (v.type() != QVariant::Invalid){
-        FRAME_RATE = v.toInt();
-    }
+    if (v.type() != QVariant::Invalid)FRAME_RATE = v.toInt();
 
     //ログファイルオープン
     file = new QFile(QString(path + "/log" + getTime() + ".txt"),this);
@@ -63,22 +59,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //スタートアップダイアログ開始
     if(this->startup->exec()){
-        this->ui->Field->cool_pos = this->startup->map.cool_first_point;
-        this->ui->Field->hot_pos = this->startup->map.hot_first_point;
-        qDebug() << this->ui->Field->cool_pos;
-        qDebug() << this->ui->Field->hot_pos;
+        //マップ初期化
+        for(int i=0;i<TEAM_COUNT;i++){
+            this->ui->Field->team_pos[i] = this->startup->map.team_first_point[i];
+            qDebug() << this->ui->Field->team_pos[i];
+        }
         this->ui->Field->setMap(this->startup->map);
+
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
         this->ui->TimeBar->setMaximum(this->startup->map.turn);
         this->ui->TimeBar->setValue  (this->startup->map.turn);
         this->ui->TurnLabel     ->setText("Turn : " + QString::number(this->ui->TimeBar->value()));
-        this->ui->HotNameLabel  ->setText(this->startup->hot_client ->Name == "" ? "Hot"  : this->startup->hot_client ->Name);
-        this->ui->CoolNameLabel ->setText(this->startup->cool_client->Name == "" ? "Cool" : this->startup->cool_client->Name);
+        //this->ui->HotNameLabel  ->setText(this->startup->hot_client ->Name == "" ? "Hot"  : this->startup->hot_client ->Name);
+        //this->ui->CoolNameLabel ->setText(this->startup->cool_client->Name == "" ? "Cool" : this->startup->cool_client->Name);
         this->ui->HotScoreLabel ->setText("Hot : 0");
         this->ui->CoolScoreLabel->setText("Cool : 0");
 
-        //タイマーコネクト
+        //タイマー開始
         this->clock = new QTimer();
         connect(this->clock,SIGNAL(timeout()),this,SLOT(StepGame()));
         this->clock->start(FRAME_RATE);
@@ -97,60 +95,41 @@ MainWindow::~MainWindow()
 
 void MainWindow::StepGame(){
     //ゲーム進行
-    static GameSystem::Method cool_mehod;
-    static GameSystem::Method hot_mehod;
+    static GameSystem::Method team_mehod[TEAM_COUNT];
     this->ui->Field->RefreshOverlay();
     static int turn_count;
 
+
+    //ターンログ出力
     if(ui->TimeBar->value() != turn_count){
        turn_count = ui->TimeBar->value();
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\n";
     }
 
-    if(process == COOL_GETREADY){
-        if(!startup->cool_client->WaitGetReady()){
-            log << getTime() + "[停止]COOLが正常にGetReadyを返しませんでした!" << "\n";
-        }
-        cool_mehod = startup->cool_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::COOL,ui->Field->cool_pos,GameSystem::Method::ACTION::GETREADY));
-
-        process = COOL_ACTION;
-    }
-    else if(process == COOL_ACTION){
-        startup->cool_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos));
-        this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
-        PickItem(GameSystem::TEAM::COOL,cool_mehod,ui->Field->cool_pos);
-
-        if(cool_mehod.action == GameSystem::Method::ACTION::GETREADY){
-            log << getTime() + "[停止]COOLが行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\n";
-        }else if (cool_mehod.rote   == GameSystem::Method::ROTE::UNKNOWN){
-            log << getTime() + "[停止]COOLの行動メソッドが不正な方向を示しています！" << "\n";
-        }
-
-        process = HOT_GETREADY;
-        log << getTime() + "[行動]COOLが" + convertString(cool_mehod) + "を行いました。" << "\n";
-    }
-    else if(process == HOT_GETREADY){
-        if(!startup->hot_client->WaitGetReady()){
-            log << getTime() + "[停止]HOTが正常にGetReadyを返しませんでした!" << "\n";
-        }
-        hot_mehod = startup->hot_client->WaitReturnMethod(this->ui->Field->FieldAccessAround(GameSystem::TEAM::HOT,ui->Field->hot_pos,GameSystem::Method::ACTION::GETREADY));
-
-        process = HOT_ACTION;
-    }
-    else if(process == HOT_ACTION){
-        startup->hot_client->WaitEndSharp(this->ui->Field->FieldAccessMethod(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos));
-        PickItem(GameSystem::TEAM::HOT,hot_mehod,ui->Field->hot_pos);
-        this->ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
-
-        if(hot_mehod.action == GameSystem::Method::ACTION::GETREADY){
-            log << getTime() + "[停止]HOTが行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\n";
-        }else if (hot_mehod.rote   == GameSystem::Method::ROTE::UNKNOWN){
-            log << getTime() + "[停止]HOTの行動メソッドが不正な方向を示しています！" << "\n";
-        }
-        process = COOL_GETREADY;
-        log << getTime() + "[行動]HOTが" + convertString(hot_mehod) + "を行いました。" << "\n";
+    // GetReady
+    if(!startup->team_client[player]->WaitGetReady()){
+        log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\n";
     }
 
+    team_mehod[player] = startup->team_client[player]->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                                                                        GameSystem::Method::ACTION::GETREADY,
+                                                                                                                        GameSystem::Method::ROTE::UNKNOWN},
+                                                                                                     ui->Field->team_pos[player]));
+    team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
+
+    // Method
+    startup->team_client[player]->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]));
+    PickItem(team_mehod[player]);
+
+    if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY)log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\n";
+    if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN) log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\n";
+    if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN)   log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\n";
+
+    log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
+
+
+    //refresh
+    ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
     this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
     repaint();
 
@@ -160,21 +139,18 @@ void MainWindow::StepGame(){
 
 }
 
-void MainWindow::PickItem(GameSystem::TEAM team, GameSystem::Method method, QPoint &pos){
+void MainWindow::PickItem(GameSystem::Method method){
 
-    if(ui->Field->FieldAccess(team,pos,GameSystem::Method::ACTION::UNKNOWN) == GameSystem::MAP_OBJECT::ITEM){
+    //移動先がアイテムの場合は壁を置く
+    QPoint pos = ui->Field->team_pos[static_cast<int>(method.team)];
+    if(ui->Field->FieldAccess(method,pos) == GameSystem::MAP_OBJECT::ITEM){
         ui->Field->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
-        if(team == GameSystem::TEAM::COOL){
-            cool_score++;
-            log << getTime() + "[取得]COOLがアイテムを取得しました。" << "\n";
-        }
-        if(team == GameSystem::TEAM::HOT){
-            hot_score++;
-            log << getTime() + "[取得]HOTがアイテムを取得しました。" << "\n";
-        }
-        ui->CoolScoreLabel->setText("Cool : " + QString::number(cool_score));
-        ui->HotScoreLabel ->setText("Hot : "  + QString::number(hot_score));
+
+        team_score[static_cast<int>(method.team)]++;
+        log << getTime() + "[取得]" + GameSystem::TEAM_PROPERTY::getTeamName(method.team) + "がアイテムを取得しました。" << "\n";
+        ui->CoolScoreLabel->setText("Cool : " + QString::number(team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
+        ui->HotScoreLabel ->setText("Hot : "  + QString::number(team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
     }
 
 }
@@ -182,12 +158,12 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     this->clock->stop();
     QString append_str = "";
 
-    if(startup->cool_client->disconnected_flag){
-        append_str.append("[Cool Disconnected...]");
-        log << getTime() + "[終了]COOLとの通信が切断されています。" << "\n";
-    }else if(startup->hot_client ->disconnected_flag){
-        append_str.append("[Hot Disconnected...]");
-        log << getTime() + "[終了]HOTとの通信が切断されています。" << "\n";
+    //disconnect
+    for(int i=0;i<TEAM_COUNT;i++){
+        if(startup->team_client[i]->disconnected_flag){
+            append_str.append("[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
+            log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\n";
+        }
     }
     log << this->ui->WinnerLabel->text() << "\n";
 
@@ -206,64 +182,60 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     //log.close();
 }
 GameSystem::WINNER MainWindow::Judge(){
-    bool cool_lose = false;
-    bool hot_lose  = false;
+    bool team_lose[TEAM_COUNT];
     GameBoard*& board = this->ui->Field;
-    GameSystem::AroundData cool_around;
-    GameSystem::AroundData hot_around;
 
-    cool_around = board->FieldAccessAround(GameSystem::TEAM::COOL,board->cool_pos,GameSystem::Method::ACTION::UNKNOWN);
-    hot_around  = board->FieldAccessAround(GameSystem::TEAM::HOT ,board->hot_pos ,GameSystem::Method::ACTION::UNKNOWN);
+    for(int i=0;i<TEAM_COUNT;i++){
 
-    //ブロック置かれ死
-    if(cool_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){
-        log << getTime() + "[死因]COOLブロック置かれ死" << "\n";
-        cool_lose=true;
-    }
-    if(hot_around .data[4] == GameSystem::MAP_OBJECT::BLOCK){
-        log << getTime() + "[死因]HOTブロック置かれ死" << "\n";
-        hot_lose=true;
-    }
+        GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(i));
 
-    //ブロック囲まれ死
-    if(cool_around.data[1] == GameSystem::MAP_OBJECT::BLOCK &&
-       cool_around.data[3] == GameSystem::MAP_OBJECT::BLOCK &&
-       cool_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
-       cool_around.data[7] == GameSystem::MAP_OBJECT::BLOCK){
-        log << getTime() + "[死因]COOLブロック囲まれ死" << "\n";
-        cool_lose=true;
-    }
-    if(hot_around .data[1] == GameSystem::MAP_OBJECT::BLOCK &&
-       hot_around .data[3] == GameSystem::MAP_OBJECT::BLOCK &&
-       hot_around .data[5] == GameSystem::MAP_OBJECT::BLOCK &&
-       hot_around .data[7] == GameSystem::MAP_OBJECT::BLOCK){
-        log << getTime() + "[死因]HOTブロック囲まれ死" << "\n";
-        hot_lose=true;
-    }
+        //ブロック置かれ死
+        if(team_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){
+            log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック置かれ死" << "\n";
+            team_lose[i]=true;
+        }
 
-    //切断死
-    if(startup->cool_client->disconnected_flag){
-        log << getTime() + "[死因]COOL通信切断死" << "\n";
-        cool_lose=true;
-    }
-    if(startup->hot_client ->disconnected_flag){
-        log << getTime() +"[死因]HOT通信切断死" << "\n";
-        hot_lose =true;
+        //ブロック囲まれ死
+        if(team_around.data[1] == GameSystem::MAP_OBJECT::BLOCK &&
+           team_around.data[3] == GameSystem::MAP_OBJECT::BLOCK &&
+           team_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
+           team_around.data[7] == GameSystem::MAP_OBJECT::BLOCK){
+            log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック囲まれ死" << "\n";
+            team_lose[i]=true;
+        }
+
+        //切断死
+        if(startup->team_client[i]->disconnected_flag){
+            log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "通信切断死" << "\n";
+            team_lose[i]=true;
+        }
     }
 
     //相打ち、または時間切れ時はアイテム判定とする
-    if((cool_lose && hot_lose) || ui->TimeBar->value()==0){
+    if(!qFind(team_lose,team_lose+TEAM_COUNT,false) || ui->TimeBar->value()==0){
         log << getTime() + "[情報]相打ちまたは、タイムアップのためアイテム判定を行います" + "\n";
-        log << getTime() + "[得点]COOL" + QString::number(cool_score) + "点 HOT" + QString::number(hot_score) + "点" + "\n";
-        cool_lose = false;
-        hot_lose  = false;
+        log << getTime() + "[得点]";
+        for(int i=0;i<TEAM_COUNT;i++){
+            log << GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_score[i] + "  ";
+            team_lose[i] = false;
+        }
+        log << "\n";
 
-        if(hot_score == cool_score)return GameSystem::WINNER::DRAW;
-        else if(hot_score > cool_score)return GameSystem::WINNER::HOT;
-        else if(hot_score < cool_score)return GameSystem::WINNER::COOL;
+        //引き分けかな？
+        QSet<int> team_score_set; //スコア
+        for(int i=0;i<TEAM_COUNT;i++){
+            team_score_set.insert(team_score[i]);
+        }
+        if(team_score_set.size()==1)return GameSystem::WINNER::DRAW;
 
+        int index=0;
+        for(int i=0;i<TEAM_COUNT;i++){
+            if(team_score[index] < team_score[i])index = i;
+        }
+        //勝者判定
+        return static_cast<GameSystem::WINNER>(index);
     }
-    if(cool_lose)return GameSystem::WINNER::HOT;
-    else if(hot_lose)return GameSystem::WINNER::COOL;
+    if(team_lose[0])return GameSystem::WINNER::HOT;
+    else if(team_lose[1])return GameSystem::WINNER::COOL;
     else return GameSystem::WINNER::CONTINUE;
 }

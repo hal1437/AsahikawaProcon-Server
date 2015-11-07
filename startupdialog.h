@@ -20,15 +20,13 @@ class StartupDialog : public QDialog
 
 private:
     Ui::StartupDialog *ui;
+    bool team_standby[TEAM_COUNT];
     bool map_standby;
-    bool hot_standby;
-    bool cool_standby;
 
 public:
     GameSystem::Map map;
 
-    BaseClient* hot_client;
-    BaseClient* cool_client;
+    BaseClient* team_client[TEAM_COUNT];
 
 public:
     bool MapRead(const QString& dir);
@@ -39,24 +37,10 @@ public:
 public slots:
 
     void ShowMapEditDialog();
-
     void PushedMapSelect();
 
+    void ClientStandby(BaseClient* client,bool complate);
     void SetMapStandby (bool state);
-    void SetHotStandby ();
-    void SetCoolStandby();
-
-    void HotConnected  ();
-    void CoolConnected ();
-
-    void HotDisConnected  ();
-    void CoolDisConnected ();
-
-    void HotConnectionToggled (bool state);
-    void CoolConnectionToggled(bool state);
-
-    void HotComboBoxChenged (QString text);
-    void CoolComboBoxChenged(QString text);
 
     void ChangedTexture(QString text);
 

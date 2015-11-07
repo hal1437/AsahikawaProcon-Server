@@ -70,7 +70,8 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
     //レスポンス待ち
     QString response = WaitResponce();
     if(response != QString())return GameSystem::Method::fromString(response);
-    else return GameSystem::Method{GameSystem::Method::ACTION::UNKNOWN,
+    else return GameSystem::Method{GameSystem::TEAM::UNKNOWN,
+                                   GameSystem::Method::ACTION::UNKNOWN,
                                    GameSystem::Method::ROTE::UNKNOWN};
 }
 bool TCPClient::WaitEndSharp(GameSystem::AroundData data){

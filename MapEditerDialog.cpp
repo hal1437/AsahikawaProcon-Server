@@ -60,7 +60,7 @@ void MapEditerDialog::mouseMoveEvent(QMouseEvent* event){
 void MapEditerDialog::FillItem(const QPoint& pos){
     int left_m,top_m;
     this->layout()->getContentsMargins(&left_m,&top_m,nullptr,nullptr);
-    QPoint fill_point((pos.x() - left_m)/ui->widget->image_part_width,(pos.y() - top_m)/ui->widget->image_part_height);
+    QPoint fill_point((pos.x() - left_m)/ui->widget->image_part.width(),(pos.y() - top_m)/ui->widget->image_part.height());
 
     //有効範囲内でなければスキップ
     if(fill_point.x() < 0 || fill_point.x() >= ui->widget->field.size.x() ||
@@ -72,10 +72,10 @@ void MapEditerDialog::FillItem(const QPoint& pos){
     else if(ui->listWidget->selectedItems().first()->text() == "Item"   )obj = GameSystem::MAP_OBJECT::ITEM;
     if(ui->listWidget->selectedItems().first()->text() == "Target" ){
         //初期位置変更
-        this->ui->widget->field.cool_first_point = fill_point;
-        this->ui->widget->field.hot_first_point  = ui->widget->field.MirrorPoint(fill_point);
-        this->ui->widget->cool_pos = fill_point;
-        this->ui->widget->hot_pos  = ui->widget->field.MirrorPoint(fill_point);
+        this->ui->widget->field.team_first_point[static_cast<int>(GameSystem::TEAM::COOL)] = fill_point;
+        this->ui->widget->field.team_first_point[static_cast<int>(GameSystem::TEAM::HOT )] = ui->widget->field.MirrorPoint(fill_point);
+        this->ui->widget->team_pos[static_cast<int>(GameSystem::TEAM::COOL)] = fill_point;
+        this->ui->widget->team_pos[static_cast<int>(GameSystem::TEAM::HOT )] = ui->widget->field.MirrorPoint(fill_point);
     }else{
         this->ui->widget->field.field[fill_point.y()][fill_point.x()] = obj;
         //対称コピー
@@ -122,11 +122,11 @@ void MapEditerDialog::ComboChanged(QString value){
         this->ui->widget->field.SetSize(QPoint(15,17));
     }
 
-    this->ui->widget->cool_pos = this->ui->widget->field.cool_first_point;
-    this->ui->widget->hot_pos = this->ui->widget->field.hot_first_point;
+    this->ui->widget->team_pos[static_cast<int>(GameSystem::TEAM::COOL)] = this->ui->widget->field.team_first_point[static_cast<int>(GameSystem::TEAM::COOL)];
+    this->ui->widget->team_pos[static_cast<int>(GameSystem::TEAM::HOT )] = this->ui->widget->field.team_first_point[static_cast<int>(GameSystem::TEAM::HOT )];
     resize(QSize(ui->widget->field.size.x()*25+134,ui->widget->field.size.y()*25+4));
     ui->widget->setMap(ui->widget->field);
-    ui->widget->paintEvent(nullptr);
+    paintEvent(nullptr);
     update();
 
 }

@@ -4,6 +4,14 @@
 #include <QMessageBox>
 
 
+
+
+QString GameSystem::TEAM_PROPERTY::getTeamName(GameSystem::TEAM team){
+    if(team == GameSystem::TEAM::COOL)return "COOL";
+    if(team == GameSystem::TEAM::HOT) return "HOT";
+    return "UNKNOWN";
+}
+
 QPoint GameSystem::Method::GetRoteVector(){
     //方向ベクトル生成
     switch(this->rote){
@@ -36,8 +44,6 @@ GameSystem::Map::Map():
     turn(100),
     name("[DEFAULT MAP]"),
     size(DEFAULT_MAP_WIDTH,DEFAULT_MAP_HEIGHT),
-    cool_first_point(0,0),
-    hot_first_point(0,0),
     texture(GameSystem::Texture::Light){
 }
 void GameSystem::Map::SetSize(QPoint size){
@@ -49,17 +55,61 @@ QPoint GameSystem::Map::MirrorPoint(const QPoint& pos){
     QPoint center(size.x() / 2.0f, size.y() / 2.0f);
     return center * 2 - pos;
 }
+
+bool GameSystem::Map::Import(QString Filename){
+    //ファイルからマップを読み込む
+    QFile file(Filename);
+    if (file.open(QIODevice::ReadOnly)){
+        char buf[1024]={};
+        int str_length;
+        int calm=0;
+        while((str_length = file.readLine(buf,1024)) != -1){
+            QString str = QString::fromLatin1(buf);
+            str.replace("\r","");
+            str.replace("\n","");
+
+            //マップ名
+            if(str[0]=='N')name = str.remove(0,2);
+            //ターン数
+            if(str[0]=='T')turn = str.remove(0,2).toInt();
+
+
+            //マップ
+            if(str[0]=='D'){
+                QStringList list = str.remove(0,2).split(",");
+                QVector<GameSystem::MAP_OBJECT> vec;
+                foreach(QString s,list){
+                    vec.push_back(static_cast<GameSystem::MAP_OBJECT>(s.toInt()));
+                }
+                size.setX(vec.size());
+                field[calm] = vec;
+                calm++;
+            }
+
+            //チーム初期位置
+            for(int i=0;i<TEAM_COUNT;i++){
+                if(str[0]==GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i))[0]){
+                    QStringList list = str.remove(0,2).split(",");
+                    team_first_point[i] = QPoint(list[0].toInt(),list[1].toInt());
+                }
+            }
+        }
+        return true;
+    }else{
+        return false;
+    }
+
+}
+
 bool GameSystem::Map::Export(QString Filename){
     QFile file(Filename);
 
     if (!file.open(QIODevice::WriteOnly)) {
-        QMessageBox::information(nullptr, "ファイルを開けません",
-            file.errorString());
+        QMessageBox::information(nullptr, "ファイルを開けません",file.errorString());
         return false;
     }else{
-
+        //Map出力
         QString outname(Filename.split("/").last().remove(".map"));
-
         QTextStream stream( &file );
         stream << "N:" << outname << "\n";
         stream << "T:" << QString::number(this->turn) << "\n";
@@ -72,8 +122,14 @@ bool GameSystem::Map::Export(QString Filename){
             }
             stream << "\n";
         }
-        stream << "H:" << QString::number(hot_first_point .x()) << "," << QString::number(hot_first_point .y()) << "\n";
-        stream << "C:" << QString::number(cool_first_point.x()) << "," << QString::number(cool_first_point.y()) ;
+        for(int i=0;i<TEAM_COUNT;i++){
+            stream << GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i))[0]
+                    << ":"
+                    << QString::number(team_first_point[i] .x())
+                    << ","
+                    << QString::number(team_first_point[i] .y());
+            if(i == TEAM_COUNT-1)stream << "\n";
+        }
         file.close();
         return true;
     }
@@ -86,9 +142,9 @@ void GameSystem::Map::CreateRandomMap(){
 
     turn = 100;
     name = "[RANDOM MAP]";
-    hot_first_point  = QPoint(qrand() % size.x(),qrand() % size.y());
-    cool_first_point = QPoint(qrand() % size.x(),qrand() % size.y());
-
+    for(int i=0;i<TEAM_COUNT;i++){
+        team_first_point[i]  = QPoint(qrand() % size.x(),qrand() % size.y());
+    }
     field.clear();
     for(int i=0;i<size.y();i++){
         field.push_back(QVector<GameSystem::MAP_OBJECT>(size.x()));
@@ -96,9 +152,11 @@ void GameSystem::Map::CreateRandomMap(){
     //ブロック配置
     for(int i=0;i<BLOCK_NUM;i++){
         QPoint pos(qrand() % size.x(),qrand() % size.y());
-        if((hot_first_point  - pos).manhattanLength() > 1 &&
-           (cool_first_point - pos).manhattanLength() > 1 &&
-           field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::BLOCK){
+        bool all_of = true;
+        for(int j=0;j<TEAM_COUNT;j++){
+            if(!((team_first_point[j]  - pos).manhattanLength() > 1))all_of=false;
+        }
+        if(all_of && field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::BLOCK){
             field[pos.y()][pos.x()] = GameSystem::MAP_OBJECT::BLOCK;
         }else{
             i--;
@@ -109,9 +167,12 @@ void GameSystem::Map::CreateRandomMap(){
     //アイテム配置
     for(int i=0;i<ITEM_NUM;i++){
         QPoint pos(qrand() % size.x(),qrand() % size.y());
-        if((hot_first_point  - pos).manhattanLength() > 1 &&
-           (cool_first_point - pos).manhattanLength() > 1 &&
-            field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::ITEM){
+
+        bool all_of = true;
+        for(int j=0;j<TEAM_COUNT;j++){
+            if(!((team_first_point[j]  - pos).manhattanLength() > 1))all_of=false;
+        }
+        if(all_of && field[pos.y()][pos.x()] != GameSystem::MAP_OBJECT::ITEM){
             field[pos.y()][pos.x()] = GameSystem::MAP_OBJECT::ITEM;
         }else{
             i--;

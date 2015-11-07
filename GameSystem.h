@@ -11,6 +11,10 @@
 template <class T>
 using Field = QVector<QVector<T>>;
 
+//チーム情報マクロ
+#define TEAM_COUNT 2
+#define TEAMS COOL,HOT
+
 class GameSystem
 {
 public:
@@ -22,28 +26,37 @@ public:
     //const static int MAP_WIDTH  = 15;
     //const static int MAP_HEIGHT = 17;
 
-
     //通常マップサイズ
     const static int DEFAULT_MAP_WIDTH  = 15;
     const static int DEFAULT_MAP_HEIGHT = 17;
 
     //チーム
     enum class TEAM{
-        COOL,
-        HOT ,
+        TEAMS,
+        UNKNOWN
     };
+
+    //チーム情報
+    struct TEAM_PROPERTY {
+        const static int TEAMS_COUNT = TEAM_COUNT; //チーム数
+
+        //チーム名取得
+        static QString getTeamName(GameSystem::TEAM team);
+    };
+
     //勝った人
     enum class WINNER{
-        COOL,
-        HOT ,
+        TEAMS,
         DRAW,
         CONTINUE,
     };
+
     //接続状態
     enum class CONNECTING_STATUS{
         FINISHED,
         CONTINUE,
     };
+
     //マップ上に存在する物体
     enum class MAP_OBJECT{
         NOTHING = 0,
@@ -51,11 +64,13 @@ public:
         BLOCK   = 2,
         ITEM    = 3,
     };
+
     //テクスチャ
     enum class Texture{
         Light = 0, //あっさり
         Heavy = 1, //こってり
     };
+
     //マップ上に描画する非物体
     enum class MAP_OVERLAY{
         NOTHING,
@@ -66,18 +81,19 @@ public:
     //ゲーム盤
     struct Map{
         Field<GameSystem::MAP_OBJECT> field;
-        int turn;
-        QString name;
-        QPoint size;
-        QPoint cool_first_point;
-        QPoint hot_first_point;
-        GameSystem::Texture texture;
+        int turn;                       //ターン
+        QString name;                   //ステージ名
+        QPoint size;                    //マップサイズ
+        QPoint team_first_point[TEAM_COUNT];//チーム初期位置
+        GameSystem::Texture texture;    //テクスチャ
 
         Map();
+
         void SetSize(QPoint size);
         QPoint MirrorPoint(const QPoint& pos);
 
         void CreateRandomMap();
+        bool Import(QString Filename);
         bool Export(QString Filename);
     };
 
@@ -101,6 +117,7 @@ public:
             LEFT,
             UNKNOWN
         };
+        TEAM   team;
         ACTION action;
         ROTE   rote;
 

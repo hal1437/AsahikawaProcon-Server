@@ -5,7 +5,7 @@ bool ComClient::WaitGetReady(){
 }
 GameSystem::Method ComClient::WaitReturnMethod(GameSystem::AroundData data){
 
-    return GameSystem::Method{GameSystem::Method::ACTION::SEACH,GameSystem::Method::ROTE::UP};
+    return GameSystem::Method{GameSystem::TEAM::UNKNOWN, GameSystem::Method::ACTION::SEACH,GameSystem::Method::ROTE::UP};
 }
 
 bool ComClient::WaitEndSharp(GameSystem::AroundData data){

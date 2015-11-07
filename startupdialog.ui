@@ -17,7 +17,7 @@
    <item>
     <layout class="QGridLayout" name="gridLayout">
      <item row="0" column="2" colspan="2">
-      <widget class="QGroupBox" name="HotGroupBox">
+      <widget class="ClientSettingForm" name="HotGroupBox">
        <property name="title">
         <string>HOT</string>
        </property>
@@ -40,143 +40,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <item>
-           <layout class="QFormLayout" name="formLayout_2">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-            </property>
-            <property name="horizontalSpacing">
-             <number>-1</number>
-            </property>
-            <property name="verticalSpacing">
-             <number>2</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>状態：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="HotStateLabel">
-              <property name="text">
-               <string>非接続</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>ポート番号：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QSpinBox" name="HotPortSpinBox">
-              <property name="minimum">
-               <number>1024</number>
-              </property>
-              <property name="maximum">
-               <number>65535</number>
-              </property>
-              <property name="value">
-               <number>2010</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_11">
-              <property name="text">
-               <string>接続名：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="HotNameLabel">
-              <property name="text">
-               <string>不明</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_8">
-              <property name="text">
-               <string>IP：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="HotIPLabel">
-              <property name="text">
-               <string>不明</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QComboBox" name="HotComboBox">
-              <item>
-               <property name="text">
-                <string>TCPユーザー</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>自動くん</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ManualClient</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="HotConnectButton">
-              <property name="text">
-               <string>待機開始</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="checked">
-               <bool>false</bool>
-              </property>
-              <property name="autoRepeat">
-               <bool>false</bool>
-              </property>
-              <property name="autoExclusive">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
        </layout>
       </widget>
      </item>
@@ -267,7 +130,7 @@
       </widget>
      </item>
      <item row="0" column="0" colspan="2">
-      <widget class="QGroupBox" name="CoolGroupBox">
+      <widget class="ClientSettingForm" name="CoolGroupBox">
        <property name="title">
         <string>COOL</string>
        </property>
@@ -293,134 +156,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="spacing">
-           <number>6</number>
-          </property>
-          <item>
-           <layout class="QFormLayout" name="formLayout">
-            <property name="fieldGrowthPolicy">
-             <enum>QFormLayout::FieldsStayAtSizeHint</enum>
-            </property>
-            <property name="verticalSpacing">
-             <number>2</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>状態：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="CoolStateLabel">
-              <property name="text">
-               <string>非接続</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>ポート番号：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="1">
-             <widget class="QSpinBox" name="CoolPortSpinBox">
-              <property name="minimum">
-               <number>1024</number>
-              </property>
-              <property name="maximum">
-               <number>65535</number>
-              </property>
-              <property name="value">
-               <number>2009</number>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_13">
-              <property name="text">
-               <string>接続名：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="CoolNameLabel">
-              <property name="text">
-               <string>不明</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>IP：</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="CoolIPLabel">
-              <property name="text">
-               <string>不明</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QComboBox" name="CoolComboBox">
-              <item>
-               <property name="text">
-                <string>TCPユーザー</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>自動くん</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>ManualClient</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="CoolConnectButton">
-              <property name="text">
-               <string>待機開始</string>
-              </property>
-              <property name="checkable">
-               <bool>true</bool>
-              </property>
-              <property name="autoDefault">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
        </layout>
       </widget>
      </item>
@@ -524,72 +259,16 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ClientSettingForm</class>
+   <extends>QGroupBox</extends>
+   <header>ClientSettingForm.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>CoolConnectButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>StartupDialog</receiver>
-   <slot>CoolConnectionToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>268</x>
-     <y>151</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>82</x>
-     <y>19</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HotConnectButton</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>StartupDialog</receiver>
-   <slot>HotConnectionToggled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>512</x>
-     <y>145</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>421</x>
-     <y>35</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>CoolComboBox</sender>
-   <signal>currentTextChanged(QString)</signal>
-   <receiver>StartupDialog</receiver>
-   <slot>CoolComboBoxChenged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>115</x>
-     <y>127</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>84</x>
-     <y>40</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>HotComboBox</sender>
-   <signal>currentTextChanged(QString)</signal>
-   <receiver>StartupDialog</receiver>
-   <slot>HotComboBoxChenged(QString)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>425</x>
-     <y>147</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>344</x>
-     <y>17</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>ServerStartButton</sender>
    <signal>clicked()</signal>

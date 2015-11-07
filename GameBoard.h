@@ -6,6 +6,8 @@
 #include <QPainter>
 #include <QResizeEvent>
 #include <QDebug>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsView>
 #include "GameSystem.h"
 
 namespace Ui {
@@ -16,32 +18,43 @@ class GameBoard : public QWidget
 {
     Q_OBJECT
 private:
-    int map_width;
-    int map_height;
+    int map_width;  //全体高さ
+    int map_height; //全体幅
 
-    GameSystem::Texture texture;
-    QImage team_resource[2];
-    QImage field_resource[4];
-    QImage overray_resource[4];
+    //Animations
+    bool animation    = false; //アニメーション有効
+    bool animationing = false; //アニメーション中
+
+    GameSystem::Texture texture; //使用テクスチャタイプ
+    QImage team_resource[TEAM_COUNT];   //チーム画像
+    QImage field_resource[4];  //フィールド画像
+    QImage overray_resource[4];//オーバーレイ画像
+
+public:
+    GameSystem::Map field; //フィールド状態
+    Field<GameSystem::MAP_OVERLAY> overlay;//オーバーレイ状態
+
+    QSize image_part; //単体画像サイズ
+    QPoint team_pos[TEAM_COUNT]; //チーム位置
+
+    GameSystem::Method past_method;//前回のログ
 
 protected:
-public:
-    void paintEvent(QPaintEvent *event);         //ペイントイベント
+    void paintEvent (QPaintEvent *event);   //ペイントイベント
     void resizeEvent(QResizeEvent *event); //リサイズイベント
 
-    float image_part_width;
-    float image_part_height;
-    QPoint cool_pos;
-    QPoint hot_pos;
-    GameSystem::Map field;
-    Field<GameSystem::MAP_OVERLAY> overlay;
+public:
+    //テクスチャパス取得
+    static QString GetTexturePath(GameSystem::Texture tex);
 
+public:
     //フィールドへアクセスする
-    GameSystem::MAP_OBJECT FieldAccess(GameSystem::TEAM team, const QPoint& pos, GameSystem::Method::ACTION action);
+    GameSystem::MAP_OBJECT FieldAccess(GameSystem::Method method, const QPoint& pos);
     //周辺情報を取得する
-    GameSystem::AroundData FieldAccessAround(GameSystem::TEAM team, const QPoint& center, GameSystem::Method::ACTION action);
+    GameSystem::AroundData FieldAccessAround(GameSystem::TEAM team);
+    GameSystem::AroundData FieldAccessAround(GameSystem::Method method, const QPoint& center);
     //メソッドで周辺情報を取得する
-    GameSystem::AroundData FieldAccessMethod(GameSystem::TEAM team,GameSystem::Method method,QPoint& pos);
+    GameSystem::AroundData FieldAccessMethod(GameSystem::Method method);
 
     //マップを設定する
     void setMap(const GameSystem::Map &map);
@@ -49,7 +62,8 @@ public:
     //オーバーレイを全て削除する
     void RefreshOverlay();
 
-    static QString GetTexturePath(GameSystem::Texture tex);
+    //アニメーション開始
+    void PlayAnimation(GameSystem::Method method);
 
     explicit GameBoard(QWidget *parent = 0);
     ~GameBoard();
@@ -57,7 +71,12 @@ public:
 private:
     Ui::GameBoard *ui;
 
+signals:
+    //アニメーション終了
+    void FinishAnimations();
+
 public slots:
+    //テクスチャ読み込み
     void ReloadTexture(GameSystem::Texture tex);
 };
 

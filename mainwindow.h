@@ -18,25 +18,16 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 private:
-    enum TURN{
-        COOL_GETREADY,
-        COOL_ACTION,
-        HOT_GETREADY,
-        HOT_ACTION,
-    };
 
-    int FRAME_RATE = 150;
+    int player;      //次ターン行動プレイヤー
+    int team_score[TEAM_COUNT]; //スコア
 
-    TURN process;
-    int hot_score;
-    int cool_score;
-    //std::ofstream log;
+    int FRAME_RATE = 150;   //ゲームフレームレート
+    QTimer* clock;          //ゲームクロック
+    StartupDialog* startup; //スタートアップダイアログ
 
-    QTimer* clock;
-    StartupDialog* startup;
-
-    QFile* file;
-    QTextStream log;
+    QFile* file;    //ログファイル
+    QTextStream log;//ログストリーム
 
 protected:
     void keyPressEvent(QKeyEvent* event);
@@ -51,7 +42,7 @@ private slots:
     //ゲーム進行
     void StepGame();
     //アイテム取得の判定
-    void PickItem(GameSystem::TEAM team,GameSystem::Method method,QPoint& pos);
+    void PickItem(GameSystem::Method method);
     //決着判定
     GameSystem::WINNER Judge();
     //決着

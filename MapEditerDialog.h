@@ -18,7 +18,6 @@ public:
     static const int IMAGE_PART_SIZE = 25;
     QString filepath;
 
-
     GameSystem::Map GetMap();
     explicit MapEditerDialog(GameSystem::Map map,QWidget *parent = 0);
     ~MapEditerDialog();
