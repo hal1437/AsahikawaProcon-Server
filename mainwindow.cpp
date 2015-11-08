@@ -27,8 +27,8 @@ void MainWindow::keyPressEvent(QKeyEvent * event){
     if(event->key()==Qt::Key_F){
         int left_margin=0,right_margin=0;
         this->ui->centralWidget->layout()->getContentsMargins(&left_margin,nullptr,&right_margin,nullptr);
-        //this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/ui->Field->field.size.y())*ui->Field->field.size.x(),this->ui->Field->size().height());
-        //this->resize(QSize(this->ui->Field->width() + left_margin + right_margin,this->size().height()));
+        this->ui->Field->resize((static_cast<float>(this->ui->Field->size().height())/ui->Field->field.size.y())*ui->Field->field.size.x(),this->ui->Field->size().height());
+        this->resize(QSize(this->ui->Field->width() + left_margin + right_margin,this->size().height()));
     }
 }
 
@@ -83,6 +83,7 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         exit(0);
     }
+    player = 0;
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
@@ -98,6 +99,7 @@ void MainWindow::StepGame(){
     static GameSystem::Method team_mehod[TEAM_COUNT];
     this->ui->Field->RefreshOverlay();
     static int turn_count;
+    static bool getready_flag;
 
 
     //ターンログ出力
@@ -105,38 +107,42 @@ void MainWindow::StepGame(){
        turn_count = ui->TimeBar->value();
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\n";
     }
+    if(getready_flag){
+        // GetReady
+        if(!startup->team_client[player]->client->WaitGetReady()){
+            log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\n";
+        }
+        team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                                                                                    GameSystem::Method::ACTION::GETREADY,
+                                                                                                                                    GameSystem::Method::ROTE::UNKNOWN},
+                                                                                                                 ui->Field->team_pos[player]));
+        team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
+    }else{
+        // Method
 
-    // GetReady
-    if(!startup->team_client[player]->WaitGetReady()){
-        log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\n";
+        startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]));
+        PickItem(team_mehod[player]);
+
+        if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY)log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\n";
+        if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN) log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\n";
+        if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN)   log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\n";
+
+        log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
+
+
+        //refresh
+        ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
+        this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+        repaint();
+
+        //End
+        GameSystem::WINNER win = Judge();
+        if(win != GameSystem::WINNER::CONTINUE)Finish(win);
+        player++;
+        player %= TEAM_COUNT;
     }
-
-    team_mehod[player] = startup->team_client[player]->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
-                                                                                                                        GameSystem::Method::ACTION::GETREADY,
-                                                                                                                        GameSystem::Method::ROTE::UNKNOWN},
-                                                                                                     ui->Field->team_pos[player]));
-    team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
-
-    // Method
-    startup->team_client[player]->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]));
-    PickItem(team_mehod[player]);
-
-    if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY)log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\n";
-    if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN) log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\n";
-    if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN)   log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\n";
-
-    log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
-
-
-    //refresh
-    ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
-    this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
-    repaint();
-
-    //End
-    GameSystem::WINNER win = Judge();
-    if(win != GameSystem::WINNER::CONTINUE)Finish(win);
-
+    ui->Field->repaint();
+    getready_flag = !getready_flag;
 }
 
 void MainWindow::PickItem(GameSystem::Method method){
@@ -160,7 +166,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
 
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
-        if(startup->team_client[i]->disconnected_flag){
+        if(startup->team_client[i]->client->disconnected_flag){
             append_str.append("[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\n";
         }
@@ -205,7 +211,7 @@ GameSystem::WINNER MainWindow::Judge(){
         }
 
         //切断死
-        if(startup->team_client[i]->disconnected_flag){
+        if(startup->team_client[i]->client->disconnected_flag){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "通信切断死" << "\n";
             team_lose[i]=true;
         }

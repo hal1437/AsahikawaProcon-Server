@@ -20,14 +20,12 @@ ClientSettingForm::~ClientSettingForm()
 
 
 void ClientSettingForm::SetStandby (){
-    this->standby = true;
-
     this->ui->NameLabel ->setText(this->client->Name == "" ? "Hot" : this->client->Name);
     this->ui->IPLabel   ->setText(this->client->IP);
     this->ui->StateLabel->setText("準備完了");
     this->ui->ConnectButton->setText("　切断　");
 
-    emit Standby(client,this->standby);
+    emit Standby(this,true);
     //this->ui->ServerStartButton->setEnabled  (hot_standby && cool_standby && map_standby);
 }
 
@@ -37,7 +35,6 @@ void ClientSettingForm::Connected  (){
     this->ui->ConnectButton->setText("　切断　");
 }
 void ClientSettingForm::DisConnected(){
-    this->standby = false;
     this->ui->NameLabel ->setText("不明");
     this->ui->IPLabel   ->setText("不明");
     this->ui->StateLabel->setText("未接続");
@@ -61,7 +58,7 @@ void ClientSettingForm::ConnectionToggled(bool state){
         this->ui->NameLabel->setText("不明");
         this->ui->IPLabel->setText("不明");
         this->ui->PortSpinBox->setEnabled(true);
-        this->standby = false;
+        emit Standby(this,false);
     }
 }
 
@@ -80,13 +77,10 @@ void ClientSettingForm::ComboBoxChenged(QString text){
         if(text=="ManualClient")this->client = new ManualClient(this);
     }
 
+    emit Standby(this,false);
     //再connectしクライアントの接続を待つ
-    this->standby = false;
     connect(this->client,SIGNAL(Connected())   ,this,SLOT(Connected()));
     connect(this->client,SIGNAL(Ready())       ,this,SLOT(SetStandby()));
     connect(this->client,SIGNAL(Disconnected()),this,SLOT(DisConnected()));
     this->client->Startup();
-
-    emit Standby(client,this->standby);
-    //this->ui->ServerStartButton->setEnabled(hot_standby && cool_standby && map_standby);
 }

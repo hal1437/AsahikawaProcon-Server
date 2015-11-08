@@ -47,7 +47,7 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
                 //空白の描画
                 if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
-                    painter.drawImage(j * image_part.width(),
+                          painter.drawImage(j * image_part.width(),
                                       i * image_part.height(),
                                       field_resource[static_cast<int>(field.field[i][j])]);
                 }
@@ -120,7 +120,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
                (team_pos[static_cast<int>(method.team)] + method.GetRoteVector()).x() < field.size.x()){
                 QPoint get_pos = team_pos[static_cast<int>(method.team)] + method.GetRoteVector();
                 this->field.field[get_pos.y()][get_pos.x()] = GameSystem::MAP_OBJECT::BLOCK;
-            }
+                 }
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)]);
         case GameSystem::Method::ACTION::LOOK:
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * 2);

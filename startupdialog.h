@@ -9,6 +9,7 @@
 #include "ComClient.h"
 #include "ManualClient.h"
 #include "SettingDialog.h"
+#include "ClientSettingForm.h"
 
 namespace Ui {
 class StartupDialog;
@@ -26,7 +27,7 @@ private:
 public:
     GameSystem::Map map;
 
-    BaseClient* team_client[TEAM_COUNT];
+    ClientSettingForm* team_client[TEAM_COUNT];
 
 public:
     bool MapRead(const QString& dir);
@@ -36,10 +37,11 @@ public:
 
 public slots:
 
+    void CheckStandby();
     void ShowMapEditDialog();
     void PushedMapSelect();
 
-    void ClientStandby(BaseClient* client,bool complate);
+    void ClientStandby(ClientSettingForm* client,bool complate);
     void SetMapStandby (bool state);
 
     void ChangedTexture(QString text);

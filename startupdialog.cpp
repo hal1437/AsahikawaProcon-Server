@@ -14,8 +14,11 @@ StartupDialog::StartupDialog(QWidget *parent) :
     ui->setupUi(this);
 
     //クライアント初期化
-    this->team_client[static_cast<int>(GameSystem::TEAM::COOL)] = ui->CoolGroupBox->client;
-    this->team_client[static_cast<int>(GameSystem::TEAM::HOT )] = ui->HotGroupBox ->client;
+    this->team_client[static_cast<int>(GameSystem::TEAM::COOL)] = ui->CoolGroupBox;
+    this->team_client[static_cast<int>(GameSystem::TEAM::HOT )] = ui->HotGroupBox ;
+
+    connect(ui->CoolGroupBox,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));
+    connect(ui->HotGroupBox ,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));
 
     //ローカルIPの探索
     foreach (const QHostAddress &address, QNetworkInterface::allAddresses()) {
@@ -33,6 +36,14 @@ StartupDialog::~StartupDialog()
     delete ui;
 }
 
+
+void StartupDialog::CheckStandby(){
+    bool all_of = true;
+    for(int i=0;i<TEAM_COUNT;i++){
+        if(!team_standby[i])all_of = false;
+    }
+    this->ui->ServerStartButton->setEnabled(all_of && map_standby);
+}
 
 void StartupDialog::ShowMapEditDialog(){
     MapEditerDialog diag(map);
@@ -53,6 +64,7 @@ bool StartupDialog::MapRead(const QString& dir){
     //ファイルからマップを読み込む
     this->map.Import(dir);
     map.size.setY(map.field.size());
+    return true;
 }
 void StartupDialog::PushedMapSelect(){
     QString folder = QDir::currentPath();
@@ -64,17 +76,19 @@ void StartupDialog::PushedMapSelect(){
     SetMapStandby(MapRead(filePath));
 }
 
-void StartupDialog::ClientStandby(BaseClient* client,bool complate){
-    team_standby[qFind(team_client,team_client+TEAM_COUNT,client) - team_client] = complate;
+void StartupDialog::ClientStandby(ClientSettingForm* client,bool complate){
+    for(int i=0;i<TEAM_COUNT;i++){
+        if(team_client[i] == client){
+            team_standby[i] = complate;
+            CheckStandby();
+            return;
+        }
+    }
 }
 
 void StartupDialog::SetMapStandby (bool state){
     map_standby = state;
-    bool all_of = true;
-    for(int i=0;i<TEAM_COUNT;i++){
-        if(!team_standby[i])all_of = false;
-    }
-    this->ui->ServerStartButton->setEnabled(all_of && map_standby);
+    CheckStandby();
 }
 
 void StartupDialog::ChangedTexture(QString text){

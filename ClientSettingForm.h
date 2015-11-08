@@ -17,7 +17,6 @@ class ClientSettingForm : public QGroupBox
 
 public:
     BaseClient* client;
-    bool standby=false;
 
     explicit ClientSettingForm(QWidget *parent = 0);
     ~ClientSettingForm();
@@ -31,7 +30,7 @@ public slots:
     void ComboBoxChenged(QString text);
 
 signals:
-    void Standby(BaseClient* client,bool complate);//準備完了
+    void Standby(ClientSettingForm* client,bool complate);//準備完了
 private:
     Ui::ClientSettingForm *ui;
 };
