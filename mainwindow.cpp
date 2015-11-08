@@ -99,7 +99,7 @@ void MainWindow::StepGame(){
     static GameSystem::Method team_mehod[TEAM_COUNT];
     this->ui->Field->RefreshOverlay();
     static int turn_count;
-    static bool getready_flag;
+    static bool getready_flag=true;
 
 
     //ターンログ出力
@@ -119,7 +119,6 @@ void MainWindow::StepGame(){
         team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
     }else{
         // Method
-
         startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]));
         PickItem(team_mehod[player]);
 
