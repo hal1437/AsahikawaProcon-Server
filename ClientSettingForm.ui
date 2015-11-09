@@ -161,15 +161,15 @@
    <sender>ConnectButton</sender>
    <signal>clicked(bool)</signal>
    <receiver>ClientSettingForm</receiver>
-   <slot>setChecked(bool)</slot>
+   <slot>ConnectionToggled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>195</x>
-     <y>111</y>
+     <x>229</x>
+     <y>101</y>
     </hint>
     <hint type="destinationlabel">
-     <x>239</x>
-     <y>94</y>
+     <x>208</x>
+     <y>46</y>
     </hint>
    </hints>
   </connection>
@@ -192,5 +192,6 @@
  </connections>
  <slots>
   <slot>ComboBoxChenged(QString)</slot>
+  <slot>ConnectionToggled(bool)</slot>
  </slots>
 </ui>

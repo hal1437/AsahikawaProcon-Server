@@ -25,6 +25,7 @@ private:
     bool map_standby;
 
 public:
+    QString music_text;
     GameSystem::Map map;
 
     ClientSettingForm* team_client[TEAM_COUNT];
@@ -37,6 +38,7 @@ public:
 
 public slots:
 
+    void ChangeMusicCombo(QString text);
     void CheckStandby();
     void ShowMapEditDialog();
     void PushedMapSelect();

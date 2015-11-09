@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT       += network
+QT       += multimedia
 QMAKE_CXXFLAGS += -std=c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -50,4 +51,4 @@ FORMS    += mainwindow.ui \
     ClientSettingForm.ui
 
 RESOURCES += \
-    texture.qrc
+    Resource.qrc

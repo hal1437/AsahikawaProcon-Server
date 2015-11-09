@@ -1,5 +1,6 @@
 #include "GameBoard.h"
 #include "ui_GameBoard.h"
+#include <QThread>
 
 QString GameBoard::GetTexturePath(GameSystem::Texture tex){
     if(tex == GameSystem::Texture::Light)return ":/Light/Texture/Light";
@@ -31,9 +32,6 @@ void GameBoard::paintEvent(QPaintEvent *event){
         //空白の描画
         for(int i = 0;i < field.size.y();i++){
             for(int j = 0;j < field.size.x();j++){
-                painter.drawImage(j * image_part.width(),
-                                  i * image_part.height(),
-                                  field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
             }
         }
 
@@ -44,12 +42,17 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
         for(int i = 0;i < field.size.y();i++){
             for(int j = 0;j < field.size.x();j++){
-
-                //空白の描画
+                //物体の描画
                 if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
-                          painter.drawImage(j * image_part.width(),
+                    painter.drawImage(j * image_part.width(),
                                       i * image_part.height(),
                                       field_resource[static_cast<int>(field.field[i][j])]);
+                }else{
+                    //空白の描画
+                    painter.drawImage(j * image_part.width(),
+                                      i * image_part.height(),
+                                      field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
+
                 }
                 //オーバーレイの描画
                 if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
@@ -64,7 +67,6 @@ void GameBoard::paintEvent(QPaintEvent *event){
         //const std::pair<GameSystem::TEAM,GameSystem::Method>& process = past_log;
         //アニメーション
     }
-
 }
 void GameBoard::RefreshOverlay(){
     //すべてNOTINGにする

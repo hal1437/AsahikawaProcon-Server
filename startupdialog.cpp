@@ -12,6 +12,7 @@ StartupDialog::StartupDialog(QWidget *parent) :
 {
     //UI初期化
     ui->setupUi(this);
+    music_text = ui->GameMusicCombo->currentText();
 
     //クライアント初期化
     this->team_client[static_cast<int>(GameSystem::TEAM::COOL)] = ui->CoolGroupBox;
@@ -36,6 +37,10 @@ StartupDialog::~StartupDialog()
     delete ui;
 }
 
+
+void StartupDialog::ChangeMusicCombo(QString text){
+    music_text = text;
+}
 
 void StartupDialog::CheckStandby(){
     bool all_of = true;

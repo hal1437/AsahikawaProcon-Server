@@ -8,7 +8,10 @@
 #include <fstream>
 #include <QDateTime>
 #include <QFile>
+#include <QSound>
 #include <QDataStream>
+#include <QMediaPlayer>
+#include <QThread>
 
 namespace Ui {
 class MainWindow;
@@ -25,6 +28,8 @@ private:
     int FRAME_RATE = 150;   //ゲームフレームレート
     QTimer* clock;          //ゲームクロック
     StartupDialog* startup; //スタートアップダイアログ
+    QSound* music; //音楽
+    bool silent;
 
     QFile* file;    //ログファイル
     QTextStream log;//ログストリーム

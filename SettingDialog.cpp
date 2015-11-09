@@ -12,7 +12,6 @@ SettingDialog::SettingDialog(QWidget *parent) :
     mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
     ui->setupUi(this);
 
-
     QVariant v = mSettings->value( "LogFilepath" );
     if (v.type() != QVariant::Invalid)
     {
@@ -28,6 +27,11 @@ SettingDialog::SettingDialog(QWidget *parent) :
     {
         ui->Gamespeed->setValue(v.toInt());
     }
+    v = mSettings->value( "Silent" );
+    if (v.type() != QVariant::Invalid)
+    {
+        ui->SilentCheck->setChecked(v.toBool());
+    }
 }
 
 void SettingDialog::Export(){
@@ -39,12 +43,13 @@ void SettingDialog::Export(){
     mSettings->setValue( "LogFilepath", ui->Log->text() );
     mSettings->setValue( "Timeout", ui->Timeout->value() );
     mSettings->setValue( "Gamespeed", ui->Gamespeed->value());
+    mSettings->setValue( "Silent", ui->SilentCheck->isChecked());
+    QMessageBox::information(this, tr("警告"), tr("設定は再起動後有効になります。"));
 }
 
 void SettingDialog::openDirectory(){
     ui->Log->setText(QFileDialog::getExistingDirectory(this, tr("ログファイル保存先を選択")));
 }
-
 
 SettingDialog::~SettingDialog()
 {

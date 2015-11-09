@@ -51,6 +51,10 @@ MainWindow::MainWindow(QWidget *parent) :
     if (v.type() != QVariant::Invalid)path = v.toString();
     v = mSettings->value( "Gamespeed" );
     if (v.type() != QVariant::Invalid)FRAME_RATE = v.toInt();
+    v = mSettings->value( "Silent" );
+    if (v.type() != QVariant::Invalid)silent = v.toBool();
+    else silent = true;
+
 
     //ログファイルオープン
     file = new QFile(QString(path + "/log" + getTime() + ".txt"),this);
@@ -83,7 +87,12 @@ MainWindow::MainWindow(QWidget *parent) :
     }else{
         exit(0);
     }
+
     player = 0;
+
+
+    music = new QSound(QString(":/Music/Music/") + this->startup->music_text + ".wav");
+    if(!silent)music->play();
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
@@ -92,8 +101,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-
 void MainWindow::StepGame(){
     //ゲーム進行
     static GameSystem::Method team_mehod[TEAM_COUNT];
@@ -101,16 +108,17 @@ void MainWindow::StepGame(){
     static int turn_count;
     static bool getready_flag=true;
 
-
     //ターンログ出力
+
     if(ui->TimeBar->value() != turn_count){
        turn_count = ui->TimeBar->value();
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\n";
     }
+
     if(getready_flag){
         // GetReady
         if(!startup->team_client[player]->client->WaitGetReady()){
-            log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\n";
+            //log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\n";
         }
         team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
                                                                                                                                     GameSystem::Method::ACTION::GETREADY,
@@ -126,17 +134,17 @@ void MainWindow::StepGame(){
         if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN) log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\n";
         if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN)   log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\n";
 
-        log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
+        //log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
 
 
         //refresh
         ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
         this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
-        repaint();
 
         //End
         GameSystem::WINNER win = Judge();
         if(win != GameSystem::WINNER::CONTINUE)Finish(win);
+
         player++;
         player %= TEAM_COUNT;
     }
@@ -171,6 +179,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         }
     }
     log << this->ui->WinnerLabel->text() << "\n";
+    music->stop();
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);

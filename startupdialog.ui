@@ -6,43 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>567</width>
-    <height>350</height>
+    <width>498</width>
+    <height>302</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_5">
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="2" colspan="2">
-      <widget class="ClientSettingForm" name="HotGroupBox">
-       <property name="title">
-        <string>HOT</string>
-       </property>
-       <property name="checkable">
-        <bool>false</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-       </layout>
-      </widget>
-     </item>
      <item row="1" column="2" colspan="2">
       <widget class="QGroupBox" name="groupBox">
        <property name="title">
@@ -113,6 +86,33 @@
        </layout>
       </widget>
      </item>
+     <item row="0" column="2" colspan="2">
+      <widget class="ClientSettingForm" name="HotGroupBox">
+       <property name="title">
+        <string>HOT</string>
+       </property>
+       <property name="checkable">
+        <bool>false</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+       </layout>
+      </widget>
+     </item>
      <item row="2" column="2" colspan="2">
       <widget class="QPushButton" name="ServerStartButton">
        <property name="enabled">
@@ -178,19 +178,6 @@
          <number>0</number>
         </property>
         <item>
-         <spacer name="verticalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="2" column="1">
            <widget class="QLabel" name="GrobalIPLabel">
@@ -246,6 +233,31 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>GameMusic：</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="GameMusicCombo">
+            <item>
+             <property name="text">
+              <string>TwinBeeNew</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Necromancer</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QPushButton" name="pushButton">
           <property name="text">
            <string>ServerSetting</string>
@@ -276,8 +288,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>554</x>
-     <y>337</y>
+     <x>485</x>
+     <y>289</y>
     </hint>
     <hint type="destinationlabel">
      <x>421</x>
@@ -292,8 +304,8 @@
    <slot>PushedMapSelect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>545</x>
-     <y>209</y>
+     <x>476</x>
+     <y>166</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -308,8 +320,8 @@
    <slot>ShowMapEditDialog()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>545</x>
-     <y>244</y>
+     <x>476</x>
+     <y>201</y>
     </hint>
     <hint type="destinationlabel">
      <x>473</x>
@@ -324,8 +336,8 @@
    <slot>ChangedTexture(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>539</x>
-     <y>284</y>
+     <x>470</x>
+     <y>238</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -340,12 +352,28 @@
    <slot>Setting()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>186</x>
-     <y>310</y>
+     <x>202</x>
+     <y>278</y>
     </hint>
     <hint type="destinationlabel">
      <x>250</x>
      <y>341</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>GameMusicCombo</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>ChangeMusicCombo(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>218</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>269</x>
+     <y>130</y>
     </hint>
    </hints>
   </connection>
@@ -359,5 +387,6 @@
   <slot>ShowMapEditDialog()</slot>
   <slot>ChangedTexture(QString)</slot>
   <slot>Setting()</slot>
+  <slot>ChangeMusicCombo(QString)</slot>
  </slots>
 </ui>
