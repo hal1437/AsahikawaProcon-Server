@@ -20,6 +20,7 @@ public:
 
 
 protected:
+    void closeEvent(QCloseEvent* ce);
     void keyPressEvent(QKeyEvent* event);
 
 private:
@@ -31,6 +32,8 @@ private:
 signals:
     //関数決定シグナル
     void ReadyAction();
+
+    void CloseWindow();
 
 private slots:
     //各スロット

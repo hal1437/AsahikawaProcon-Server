@@ -125,6 +125,9 @@
            <italic>true</italic>
           </font>
          </property>
+         <property name="frameShadow">
+          <enum>QFrame::Plain</enum>
+         </property>
          <property name="text">
           <string>ManualClient</string>
          </property>

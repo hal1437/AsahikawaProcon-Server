@@ -2,6 +2,11 @@
 #include "ui_ManualClientDialog.h"
 
 
+
+void ManualClientDialog::closeEvent(QCloseEvent* ce){
+    emit CloseWindow();
+    ce->accept();
+}
 void ManualClientDialog::keyPressEvent(QKeyEvent * event){
     if(event->key()==Qt::Key_W)UPButtonClicked();
     if(event->key()==Qt::Key_S)DOWNButtonClicked();

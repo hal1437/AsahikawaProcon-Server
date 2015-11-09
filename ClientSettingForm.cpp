@@ -64,6 +64,7 @@ void ClientSettingForm::ConnectionToggled(bool state){
 
 void ClientSettingForm::ComboBoxChenged(QString text){
     //接続初期化
+    delete client;
     if(text=="TCPユーザー"){
         this->client = new TCPClient(this);
         this->ui->StateLabel->setText("非接続");
