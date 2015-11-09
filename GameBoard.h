@@ -26,9 +26,9 @@ private:
     bool animationing = false; //アニメーション中
 
     GameSystem::Texture texture; //使用テクスチャタイプ
-    QImage team_resource[TEAM_COUNT];   //チーム画像
-    QImage field_resource[4];  //フィールド画像
-    QImage overray_resource[4];//オーバーレイ画像
+    QPixmap team_resource[TEAM_COUNT];   //チーム画像
+    QPixmap field_resource[4];  //フィールド画像
+    QPixmap overray_resource[4];//オーバーレイ画像
 
 public:
     GameSystem::Map field; //フィールド状態
