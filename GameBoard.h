@@ -71,13 +71,14 @@ public:
 private:
     Ui::GameBoard *ui;
 
-signals:
+         signals:
     //アニメーション終了
     void FinishAnimations();
 
 public slots:
     //テクスチャ読み込み
     void ReloadTexture(GameSystem::Texture tex);
+
 };
 
 #endif // GRAPHICFIELD_H

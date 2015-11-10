@@ -27,8 +27,11 @@ private:
 
     int FRAME_RATE = 150;   //ゲームフレームレート
     QTimer* clock;          //ゲームクロック
+    QTimer* startup_anime;  //開始アニメーション
+    QTimer* teamshow_anime;  //チーム表示アニメーション
     StartupDialog* startup; //スタートアップダイアログ
-    QSound* music; //音楽
+    QSound* music;          //音楽
+
     bool silent;
 
     QFile* file;    //ログファイル
@@ -52,6 +55,9 @@ private slots:
     GameSystem::WINNER Judge();
     //決着
     void Finish(GameSystem::WINNER win);
+
+    void StartAnimation();
+    void ShowTeamAnimation();
 };
 
 #endif // MAINWINDOW_H

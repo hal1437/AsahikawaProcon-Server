@@ -77,6 +77,7 @@ public:
         LOOK,
         SEACH,
         GETREADY,
+        ERASE,
     };
     //ゲーム盤
     struct Map{
@@ -96,7 +97,6 @@ public:
         bool Import(QString Filename);
         bool Export(QString Filename);
     };
-
 
     //クライアントの行動
     struct Method{

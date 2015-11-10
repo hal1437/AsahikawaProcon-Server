@@ -80,19 +80,24 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->HotScoreLabel ->setText("Hot : 0");
         this->ui->CoolScoreLabel->setText("Cool : 0");
 
-        //タイマー開始
-        this->clock = new QTimer();
-        connect(this->clock,SIGNAL(timeout()),this,SLOT(StepGame()));
-        this->clock->start(FRAME_RATE);
     }else{
         exit(0);
     }
 
     player = 0;
 
+    startup_anime = new QTimer();
+    connect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
+    startup_anime->start(4000.0 / (startup->map.size.x()*startup->map.size.y()));
 
     music = new QSound(QString(":/Music/Music/") + this->startup->music_text + ".wav");
     if(!silent)music->play();
+
+
+    for(int i=0;i<TEAM_COUNT;i++){
+        ui->Field->team_pos[i].setX(-1);
+        ui->Field->team_pos[i].setY(-1);
+    }
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
@@ -136,7 +141,6 @@ void MainWindow::StepGame(){
 
         //log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\n";
 
-
         //refresh
         ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
         this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
@@ -148,6 +152,7 @@ void MainWindow::StepGame(){
         player++;
         player %= TEAM_COUNT;
     }
+
     ui->Field->repaint();
     getready_flag = !getready_flag;
 }
@@ -179,7 +184,8 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         }
     }
     log << this->ui->WinnerLabel->text() << "\n";
-    music->stop();
+    if(!silent)music->stop();
+    QSound::play(":/Music/Music/ji_023.wav");
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
@@ -253,3 +259,70 @@ GameSystem::WINNER MainWindow::Judge(){
     else if(team_lose[1])return GameSystem::WINNER::COOL;
     else return GameSystem::WINNER::CONTINUE;
 }
+
+
+void MainWindow::StartAnimation(){
+    static int timer = 1;
+    static Field<GameSystem::MAP_OVERLAY> f(this->startup->map.size.y(),
+                                            QVector<GameSystem::MAP_OVERLAY>(this->startup->map.size.x(),GameSystem::MAP_OVERLAY::ERASE));
+    static int ANIMATION_SIZE = 2;
+    static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
+    int count = 0;
+
+    ui->Field->RefreshOverlay();
+
+    if(ANIMATION_TYPE == 1){
+        //ランダム
+        QPoint pos;
+        do{
+            pos.setX(qrand() % this->startup->map.size.x());
+            pos.setY(qrand() % this->startup->map.size.y());
+        }while(f[pos.y()][pos.x()] != GameSystem::MAP_OVERLAY::ERASE);
+        f[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::NOTHING;
+
+        for(int i=0;i<this->startup->map.size.y();i++){
+            for(int j=0;j<this->startup->map.size.x();j++){
+                this->ui->Field->overlay[i][j] = f[i][j];
+            }
+        }
+    }else if(ANIMATION_TYPE == 0){
+        //ランダム
+        QPoint pos;
+
+        for(int i=0;i<this->startup->map.size.y();i++){
+            for(int j=0;j<this->startup->map.size.x();j++){
+                if(count > timer){
+                    this->ui->Field->overlay[i][j] = f[i][j];
+                }
+                count++;
+            }
+        }
+    }
+
+    if(timer == startup->map.size.x() * startup->map.size.y()){
+        teamshow_anime = new QTimer();
+        connect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        teamshow_anime->start(1500.0/TEAM_COUNT);
+        disconnect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
+    }else{
+        repaint();
+        timer++;
+    }
+}
+
+
+void MainWindow::ShowTeamAnimation(){
+    static int team_count;
+
+    ui->Field->team_pos[team_count] = this->startup->map.team_first_point[team_count];
+
+    if(team_count == TEAM_COUNT){
+        clock = new QTimer();
+        connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
+        clock->start(FRAME_RATE);
+        disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+    }
+    repaint();
+    team_count++;
+}
+

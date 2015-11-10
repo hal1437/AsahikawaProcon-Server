@@ -22,51 +22,48 @@ void GameBoard::paintEvent(QPaintEvent *event){
     image_part.setHeight(static_cast<float>(size().height()) / field.size.y());
     ReloadTexture(texture);
 */
-
     QPainter painter(this);
     painter.setRenderHints( painter.renderHints() | QPainter::Antialiasing );
     painter.fillRect(QRect(0,0,width(),height()),Qt::white);
 
 
     if(!animation){
-        //空白の描画
-        for(int i = 0;i < field.size.y();i++){
-            for(int j = 0;j < field.size.x();j++){
-            }
-        }
 
         //プレイヤーの描画
         for(int i=0;i<TEAM_COUNT;i++){
-            painter.drawPixmap(team_pos[i].x() * image_part.width(),team_pos[i].y() * image_part.height(),team_resource[i]);
+            if(0 <= team_pos[i].x() && team_pos[i].x() < field.size.x() &&
+               0 <= team_pos[i].y() && team_pos[i].y() < field.size.y()){
+                painter.drawPixmap(team_pos[i].x() * image_part.width(),team_pos[i].y() * image_part.height(),team_resource[i]);
+            }
         }
 
         for(int i = 0;i < field.size.y();i++){
             for(int j = 0;j < field.size.x();j++){
                 //物体の描画
-                if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
-                    painter.drawPixmap(j * image_part.width(),
-                                        i * image_part.height(),
-                                        field_resource[static_cast<int>(field.field[i][j])]);
-                }else{
-                    //空白の描画
-                    painter.drawPixmap(j * image_part.width(),
-                                        i * image_part.height(),
-                                        field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
+                if(overlay[i][j] != GameSystem::MAP_OVERLAY::ERASE){
+                    if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
+                        painter.drawPixmap(j * image_part.width(),
+                                            i * image_part.height(),
+                                            field_resource[static_cast<int>(field.field[i][j])]);
+                    }else{
+                        //空白の描画
+                        painter.drawPixmap(j * image_part.width(),
+                                            i * image_part.height(),
+                                            field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
 
-                }
-                //オーバーレイの描画
-                if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
-                    painter.drawPixmap(j * image_part.width(),
-                                        i * image_part.height(),
-                                        overray_resource[static_cast<int>(overlay[i][j])]);
+                    }
+                    //オーバーレイの描画
+                    if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
+                        painter.drawPixmap(j * image_part.width(),
+                                            i * image_part.height(),
+                                            overray_resource[static_cast<int>(overlay[i][j])]);
+                    }
                 }
             }
         }
 
-    }else{
-        //const std::pair<GameSystem::TEAM,GameSystem::Method>& process = past_log;
-        //アニメーション
     }
+
 }
 void GameBoard::RefreshOverlay(){
     //すべてNOTINGにする
@@ -207,3 +204,4 @@ void GameBoard::ReloadTexture(GameSystem::Texture tex){
         if(!img.isNull())img = img.scaled(image_part.width(),image_part.height(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);
     }
 }
+
