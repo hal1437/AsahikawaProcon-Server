@@ -85,3 +85,7 @@ void ClientSettingForm::ComboBoxChenged(QString text){
     connect(this->client,SIGNAL(Disconnected()),this,SLOT(DisConnected()));
     this->client->Startup();
 }
+void ClientSettingForm::SetPortSpin(int num){
+    ui->PortSpinBox->setValue(num);
+}
+

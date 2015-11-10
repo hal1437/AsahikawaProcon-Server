@@ -13,6 +13,8 @@ StartupDialog::StartupDialog(QWidget *parent) :
     //UI初期化
     ui->setupUi(this);
     music_text = ui->GameMusicCombo->currentText();
+    ui->CoolGroupBox->SetPortSpin(2009);
+    ui->HotGroupBox ->SetPortSpin(2010);
 
     //クライアント初期化
     this->team_client[static_cast<int>(GameSystem::TEAM::COOL)] = ui->CoolGroupBox;

@@ -28,6 +28,7 @@ public slots:
     void DisConnected();
     void ConnectionToggled(bool state);
     void ComboBoxChenged(QString text);
+    void SetPortSpin(int num);
 
 signals:
     void Standby(ClientSettingForm* client,bool complate);//準備完了
