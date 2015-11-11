@@ -32,6 +32,7 @@ private:
     StartupDialog* startup; //スタートアップダイアログ
     QSound* music;          //音楽
 
+    int leave_items=0;
     bool silent;
 
     QFile* file;    //ログファイル

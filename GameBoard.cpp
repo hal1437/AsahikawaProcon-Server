@@ -1,6 +1,7 @@
 #include "GameBoard.h"
 #include "ui_GameBoard.h"
 #include <QThread>
+#include <QtAlgorithms>
 
 QString GameBoard::GetTexturePath(GameSystem::Texture tex){
     if(tex == GameSystem::Texture::Light)return ":/Light/Texture/Light";
@@ -9,9 +10,19 @@ QString GameBoard::GetTexturePath(GameSystem::Texture tex){
 
 void GameBoard::resizeEvent(QResizeEvent *event){
 
-    //常に同じアスペクト比になるようにするとか？
+    //常に同じアスペクト比になるようにする
+    /*
+    if(event->oldSize().width()  != event->size().width() &&
+       event->oldSize().height() != event->size().height()){
 
-    image_part.setWidth(static_cast<float>(event->size().width ()) / field.size.x());
+        this->resize();
+    }else
+   */
+    event->ignore();
+    resize(event->size().height(),event->size().height());
+    this->setMinimumSize(event->size().height(),event->size().height());
+
+    image_part.setWidth (static_cast<float>(event->size().height()) / field.size.x());
     image_part.setHeight(static_cast<float>(event->size().height()) / field.size.y());
 
     ReloadTexture(texture);

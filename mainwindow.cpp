@@ -75,10 +75,10 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->TimeBar->setMaximum(this->startup->map.turn);
         this->ui->TimeBar->setValue  (this->startup->map.turn);
         this->ui->TurnLabel     ->setText("Turn : " + QString::number(this->ui->TimeBar->value()));
-        //this->ui->HotNameLabel  ->setText(this->startup->hot_client ->Name == "" ? "Hot"  : this->startup->hot_client ->Name);
-        //this->ui->CoolNameLabel ->setText(this->startup->cool_client->Name == "" ? "Cool" : this->startup->cool_client->Name);
-        this->ui->HotScoreLabel ->setText("Hot : 0");
-        this->ui->CoolScoreLabel->setText("Cool : 0");
+        this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
+        this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
+        this->ui->HotScoreLabel ->setText("0");
+        this->ui->CoolScoreLabel->setText("0");
 
     }else{
         exit(0);
@@ -93,11 +93,19 @@ MainWindow::MainWindow(QWidget *parent) :
     music = new QSound(QString(":/Music/Music/") + this->startup->music_text + ".wav");
     if(!silent)music->play();
 
-
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
         ui->Field->team_pos[i].setY(-1);
     }
+    
+    //アイテム数ラベルセット
+    for(int i=0;i<startup->map.size.y();i++){
+       for(int j=0;j<startup->map.size.x();j++){
+            if(startup->map.field[i][j] == GameSystem::MAP_OBJECT::ITEM)leave_items++;
+       }
+    }
+    ui->ItemLeaveLabel->setText(QString::number(leave_items));
+
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
@@ -114,7 +122,6 @@ void MainWindow::StepGame(){
     static bool getready_flag=true;
 
     //ターンログ出力
-
     if(ui->TimeBar->value() != turn_count){
        turn_count = ui->TimeBar->value();
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\n";
@@ -166,9 +173,11 @@ void MainWindow::PickItem(GameSystem::Method method){
         ui->Field->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
 
         team_score[static_cast<int>(method.team)]++;
+        leave_items--;
+        ui->ItemLeaveLabel->setText(QString::number(leave_items));
         log << getTime() + "[取得]" + GameSystem::TEAM_PROPERTY::getTeamName(method.team) + "がアイテムを取得しました。" << "\n";
-        ui->CoolScoreLabel->setText("Cool : " + QString::number(team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
-        ui->HotScoreLabel ->setText("Hot : "  + QString::number(team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
+        ui->CoolScoreLabel->setText(QString::number(team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
+        ui->HotScoreLabel ->setText(QString::number(team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
     }
 
 }
