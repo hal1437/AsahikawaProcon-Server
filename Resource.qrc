@@ -19,9 +19,4 @@
         <file>Texture/Heavy/Look.png</file>
         <file>Texture/Heavy/Search.png</file>
     </qresource>
-    <qresource prefix="/Music">
-        <file>Music/TwinBeeNew.wav</file>
-        <file>Music/Necromancer.wav</file>
-        <file>Music/ji_023.wav</file>
-    </qresource>
 </RCC>

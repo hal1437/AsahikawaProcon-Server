@@ -233,6 +233,8 @@ void MainWindow::Finish(GameSystem::WINNER winner){
 }
 GameSystem::WINNER MainWindow::Judge(){
     bool team_lose[TEAM_COUNT];
+
+    for(int i=0;i<TEAM_COUNT;i++)team_lose[i] = false;
     GameBoard*& board = this->ui->Field;
 
     for(int i=0;i<TEAM_COUNT;i++){
