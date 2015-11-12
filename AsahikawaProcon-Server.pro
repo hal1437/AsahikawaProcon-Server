@@ -51,4 +51,5 @@ FORMS    += mainwindow.ui \
     ClientSettingForm.ui
 
 RESOURCES += \
-    Resource.qrc
+    Resource.qrc \
+    Music.qrc

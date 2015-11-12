@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/Music">
-        <file>Masic/Necromancer.wav</file>
+        <file>Music/ji_023.wav</file>
+        <file>Music/Necromancer.wav</file>
         <file>Music/TwinBeeNew.wav</file>
     </qresource>
 </RCC>
