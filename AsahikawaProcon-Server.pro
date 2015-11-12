@@ -40,7 +40,8 @@ HEADERS  += mainwindow.h \
     ManualClient.h \
     MapEditerDialog.h \
     SettingDialog.h \
-    ClientSettingForm.h
+    ClientSettingForm.h \
+    Definition.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
@@ -51,5 +52,10 @@ FORMS    += mainwindow.ui \
     ClientSettingForm.ui
 
 RESOURCES += \
-    Resource.qrc \
-    Music.qrc
+    Resource.qrc
+
+win32:DEFINES += OS_WIN32
+mac:{
+    DEFINES += OS_MACOSX
+    RESOURCES += Music.qrc
+}

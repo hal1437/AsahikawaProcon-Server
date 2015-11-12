@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
+#include "Definition.h"
 
 QString getTime(){
     return QString("[") + QDateTime::currentDateTime().toString("yyyyMMddhhmmss") + QString("]");
@@ -53,7 +54,15 @@ MainWindow::MainWindow(QWidget *parent) :
     if (v.type() != QVariant::Invalid)FRAME_RATE = v.toInt();
     v = mSettings->value( "Silent" );
     if (v.type() != QVariant::Invalid)silent = v.toBool();
-    else silent = true;
+    else silent = false;
+
+    //AnimationTime読み込み
+    mSettings = new QSettings( "./AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    v = mSettings->value( "Map" );
+    if (v.type() != QVariant::Invalid)anime_map_time = v.toInt();
+    v = mSettings->value( "Team" );
+    if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
+
 
 
     //ログファイルオープン
@@ -88,9 +97,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     startup_anime = new QTimer();
     connect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
-    startup_anime->start(4000.0 / (startup->map.size.x()*startup->map.size.y()));
+    startup_anime->start(anime_map_time / (startup->map.size.x()*startup->map.size.y()));
 
-    music = new QSound(QString(":/Music/Music/") + this->startup->music_text + ".wav");
+    music = new QSound(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav");
     if(!silent)music->play();
 
     for(int i=0;i<TEAM_COUNT;i++){
@@ -116,6 +125,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+
+    QSettings* mSettings;
+    mSettings = new QSettings( "./AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+
+    mSettings->setValue( "Map" , anime_map_time );
+    mSettings->setValue( "Team", anime_team_time );
     delete ui;
 }
 
@@ -199,7 +215,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     }
     log << this->ui->WinnerLabel->text() << "\r\n";
     if(!silent)music->stop();
-    QSound::play(":/Music/Music/ji_023.wav");
+    QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
@@ -332,7 +348,7 @@ void MainWindow::StartAnimation(){
     if(timer >= startup->map.size.x() * startup->map.size.y()){
         teamshow_anime = new QTimer();
         connect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
-        teamshow_anime->start(2000.0/TEAM_COUNT);
+        teamshow_anime->start(anime_team_time/TEAM_COUNT);
         disconnect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
     }
     timer += 2;

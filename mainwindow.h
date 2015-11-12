@@ -37,6 +37,8 @@ private:
 
     QFile* file;    //ログファイル
     QTextStream log;//ログストリーム
+    int anime_map_time  = 6000;//マップ構築アニメーション時間
+    int anime_team_time = 2000;//チーム配置アニメーション時間
 
 protected:
     void keyPressEvent(QKeyEvent* event);
