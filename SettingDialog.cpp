@@ -32,6 +32,11 @@ SettingDialog::SettingDialog(QWidget *parent) :
     {
         ui->SilentCheck->setChecked(v.toBool());
     }
+    v = mSettings->value( "Maximum" );
+    if (v.type() != QVariant::Invalid)
+    {
+        ui->MaximumCheck->setChecked(v.toBool());
+    }
 }
 
 void SettingDialog::Export(){
@@ -41,9 +46,10 @@ void SettingDialog::Export(){
     mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
 
     mSettings->setValue( "LogFilepath", ui->Log->text() );
-    mSettings->setValue( "Timeout", ui->Timeout->value() );
-    mSettings->setValue( "Gamespeed", ui->Gamespeed->value());
-    mSettings->setValue( "Silent", ui->SilentCheck->isChecked());
+    mSettings->setValue( "Timeout"    , ui->Timeout->value() );
+    mSettings->setValue( "Gamespeed"  , ui->Gamespeed->value());
+    mSettings->setValue( "Silent"     , ui->SilentCheck->isChecked());
+    mSettings->setValue( "Maximum"    , ui->MaximumCheck->isChecked());
     QMessageBox::information(this, tr("警告"), tr("設定は再起動後有効になります。"));
 }
 

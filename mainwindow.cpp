@@ -106,6 +106,11 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     ui->ItemLeaveLabel->setText(QString::number(leave_items));
 
+    v = mSettings->value( "Maximum" );
+    if (v.type() != QVariant::Invalid && v.toBool()){
+        this->setWindowState(Qt::WindowMaximized);
+    }
+
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
@@ -245,7 +250,7 @@ GameSystem::WINNER MainWindow::Judge(){
         log << getTime() + "[情報]相打ちまたは、タイムアップのためアイテム判定を行います" + "\r\n";
         log << getTime() + "[得点]";
         for(int i=0;i<TEAM_COUNT;i++){
-            log << GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_score[i] + "  ";
+            log << GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + QString::number(team_score[i]) + "  ";
             team_lose[i] = false;
         }
         log << "\r\n";
@@ -274,49 +279,64 @@ void MainWindow::StartAnimation(){
     static int timer = 1;
     static Field<GameSystem::MAP_OVERLAY> f(this->startup->map.size.y(),
                                             QVector<GameSystem::MAP_OVERLAY>(this->startup->map.size.x(),GameSystem::MAP_OVERLAY::ERASE));
-    static int ANIMATION_SIZE = 2;
+    static int ANIMATION_SIZE = 3;
     static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
     int count = 0;
 
     ui->Field->RefreshOverlay();
 
-    if(ANIMATION_TYPE == 1){
-        //ランダム
-        QPoint pos;
-        do{
-            pos.setX(qrand() % this->startup->map.size.x());
-            pos.setY(qrand() % this->startup->map.size.y());
-        }while(f[pos.y()][pos.x()] != GameSystem::MAP_OVERLAY::ERASE);
-        f[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::NOTHING;
+    QPoint pos[2];
+    ANIMATION_TYPE = 2;
+    if(ANIMATION_TYPE == 0){
+        //ランダムにワサッて
+        for(int i=0;i<2;i++){
+            do{
+                pos[i].setX(qrand() % this->startup->map.size.x());
+                pos[i].setY(qrand() % this->startup->map.size.y());
+            }while(timer < startup->map.size.x() * startup->map.size.y() && f[pos[i].y()][pos[i].x()] != GameSystem::MAP_OVERLAY::ERASE);
+            f[pos[i].y()][pos[i].x()] = GameSystem::MAP_OVERLAY::NOTHING;
+        }
+        for(int i=0;i<this->startup->map.size.y();i++){
+            for(int j=0;j<this->startup->map.size.x();j++){
+                this->ui->Field->overlay[i][j] = f[i][j];
+            }
+        }
+    }else if(ANIMATION_TYPE == 1){
+        //上からガーって
+        for(int j=0;j<this->startup->map.size.y();j++){
+            for(int k=0;k<this->startup->map.size.x();k++){
+                if(count >= timer){
+                    this->ui->Field->overlay[j][k] = f[j][k];
+                }
+                count++;
+            }
+        }
+    }else if(ANIMATION_TYPE == 2){
+        //なんかはさみ込む感じで
+        for(int j=0;j<this->startup->map.size.y();j++){
+            for(int k=0;k<this->startup->map.size.x();k++){
+                if(count*2 < timer){
+                    f[startup->map.size.y() - j - 1][startup->map.size.x() - k - 1] = GameSystem::MAP_OVERLAY::NOTHING;
+                    f[j][k] = GameSystem::MAP_OVERLAY::NOTHING;
+                }
+                count++;
+            }
+        }
 
         for(int i=0;i<this->startup->map.size.y();i++){
             for(int j=0;j<this->startup->map.size.x();j++){
                 this->ui->Field->overlay[i][j] = f[i][j];
             }
         }
-    }else if(ANIMATION_TYPE == 0){
-        //ランダム
-        QPoint pos;
-
-        for(int i=0;i<this->startup->map.size.y();i++){
-            for(int j=0;j<this->startup->map.size.x();j++){
-                if(count > timer){
-                    this->ui->Field->overlay[i][j] = f[i][j];
-                }
-                count++;
-            }
-        }
     }
-
-    if(timer == startup->map.size.x() * startup->map.size.y()){
+    if(timer >= startup->map.size.x() * startup->map.size.y()){
         teamshow_anime = new QTimer();
         connect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
-        teamshow_anime->start(1500.0/TEAM_COUNT);
+        teamshow_anime->start(2000.0/TEAM_COUNT);
         disconnect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
-    }else{
-        repaint();
-        timer++;
     }
+    timer += 2;
+    repaint();
 }
 
 

@@ -52,13 +52,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="Log">
-       <property name="text">
-        <string>./</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="1">
       <widget class="QSpinBox" name="Gamespeed">
        <property name="minimum">
@@ -89,7 +82,7 @@
        </property>
       </widget>
      </item>
-     <item row="4" column="0" colspan="3">
+     <item row="5" column="0" colspan="3">
       <spacer name="verticalSpacer">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -120,6 +113,20 @@
       <widget class="QCheckBox" name="SilentCheck">
        <property name="text">
         <string>消音</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="Log">
+       <property name="text">
+        <string>./</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0" colspan="3">
+      <widget class="QCheckBox" name="MaximumCheck">
+       <property name="text">
+        <string>ゲーム開始時に最大化</string>
        </property>
       </widget>
      </item>

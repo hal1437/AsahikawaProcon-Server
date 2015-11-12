@@ -29,11 +29,7 @@ void GameBoard::resizeEvent(QResizeEvent *event){
     ReloadTexture(texture);
 }
 void GameBoard::paintEvent(QPaintEvent *event){
-/*
-    image_part.setWidth (static_cast<float>(size().width ()) / field.size.x());
-    image_part.setHeight(static_cast<float>(size().height()) / field.size.y());
-    ReloadTexture(texture);
-*/
+
     QPainter painter(this);
     painter.setRenderHints( painter.renderHints() | QPainter::Antialiasing );
     painter.fillRect(QRect(0,0,width(),height()),Qt::white);
@@ -60,20 +56,19 @@ void GameBoard::paintEvent(QPaintEvent *event){
                     }else{
                         //空白の描画
                         painter.drawPixmap(j * image_part.width(),
-                                            i * image_part.height(),
-                                            field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
+                                           i * image_part.height(),
+                                           field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
 
                     }
                     //オーバーレイの描画
                     if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
-                        painter.drawPixmap(j * image_part.width(),
-                                            i * image_part.height(),
-                                            overray_resource[static_cast<int>(overlay[i][j])]);
+                        painter.drawPixmap(j * image_part.width() ,
+                                           i * image_part.height(),
+                                           overray_resource[static_cast<int>(overlay[i][j])]);
                     }
                 }
             }
         }
-
     }
 
 }
