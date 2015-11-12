@@ -37,6 +37,20 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
     if(!animation){
 
+        //空白の描画
+        for(int i = 0;i < field.size.y();i++){
+            for(int j = 0;j < field.size.x();j++){
+                if(overlay[i][j] != GameSystem::MAP_OVERLAY::ERASE){
+                    if(field.field[i][j] == GameSystem::MAP_OBJECT::NOTHING){
+                        painter.drawPixmap(j * image_part.width(),
+                                           i * image_part.height(),
+                                           field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
+
+                    }
+                }
+            }
+        }
+
         //プレイヤーの描画
         for(int i=0;i<TEAM_COUNT;i++){
             if(0 <= team_pos[i].x() && team_pos[i].x() < field.size.x() &&
@@ -53,12 +67,6 @@ void GameBoard::paintEvent(QPaintEvent *event){
                         painter.drawPixmap(j * image_part.width(),
                                             i * image_part.height(),
                                             field_resource[static_cast<int>(field.field[i][j])]);
-                    }else{
-                        //空白の描画
-                        painter.drawPixmap(j * image_part.width(),
-                                           i * image_part.height(),
-                                           field_resource[static_cast<int>(GameSystem::MAP_OBJECT::NOTHING)]);
-
                     }
                     //オーバーレイの描画
                     if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
@@ -200,7 +208,7 @@ void GameBoard::ReloadTexture(GameSystem::Texture tex){
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::NOTHING)]  = QPixmap();
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QPixmap(path + "/Look.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QPixmap(path + "/Getready.png");
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QPixmap(path + "/Seach.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QPixmap(path + "/Search.png");
 
     //変形
     for(QPixmap& img:team_resource )img = img.scaled(image_part.width(),image_part.height(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);

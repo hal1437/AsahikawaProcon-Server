@@ -7,7 +7,7 @@
         <file>Texture/Light/Hot.png</file>
         <file>Texture/Light/Item.png</file>
         <file>Texture/Light/Look.png</file>
-        <file>Texture/Light/Seach.png</file>
+        <file>Texture/Light/Search.png</file>
     </qresource>
     <qresource prefix="/Heavy">
         <file>Texture/Heavy/Block.png</file>

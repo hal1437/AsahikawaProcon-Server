@@ -57,13 +57,21 @@ MainWindow::MainWindow(QWidget *parent) :
     else silent = false;
 
     //AnimationTime読み込み
-    mSettings = new QSettings( "./AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
     v = mSettings->value( "Map" );
     if (v.type() != QVariant::Invalid)anime_map_time = v.toInt();
+    else{
+
+        QSettings* mSettings;
+        mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+        mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+
+        mSettings->setValue( "Map" , anime_map_time );
+        mSettings->setValue( "Team", anime_team_time );
+
+    }
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
-
-
 
     //ログファイルオープン
     file = new QFile(QString(path + "/log" + getTime() + ".txt"),this);
@@ -126,12 +134,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 
-    QSettings* mSettings;
-    mSettings = new QSettings( "./AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
-    mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
-
-    mSettings->setValue( "Map" , anime_map_time );
-    mSettings->setValue( "Team", anime_team_time );
     delete ui;
 }
 
