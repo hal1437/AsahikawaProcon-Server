@@ -128,7 +128,8 @@ bool GameSystem::Map::Export(QString Filename){
                     << QString::number(team_first_point[i] .x())
                     << ","
                     << QString::number(team_first_point[i] .y());
-            if(i == TEAM_COUNT-1)stream << "\n";
+            //if(i == TEAM_COUNT-1)
+            stream << "\n";
         }
         file.close();
         return true;

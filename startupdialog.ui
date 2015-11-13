@@ -304,8 +304,8 @@
    <slot>PushedMapSelect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>476</x>
-     <y>166</y>
+     <x>423</x>
+     <y>145</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>

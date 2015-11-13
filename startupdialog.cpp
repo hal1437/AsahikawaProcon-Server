@@ -58,8 +58,7 @@ void StartupDialog::ShowMapEditDialog(){
         if(diag.filepath == ""){
             this->ui->MapDirEdit->setText("[CUSTOM MAP]");
             map = diag.GetMap();
-        }
-        else{
+        }else{
             //再読み込み
             if(MapRead(diag.filepath))this->ui->MapDirEdit->setText(diag.filepath);
         }

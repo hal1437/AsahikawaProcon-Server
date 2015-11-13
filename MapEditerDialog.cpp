@@ -15,6 +15,7 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     //マウス追跡を有効化
     setMouseTracking(true);
 
+    ComboChanged("決戦(15x17)");
     ui->widget->setMap(map);
     ui->listWidget->addItem(new QListWidgetItem("Nothing"));
     ui->listWidget->addItem(new QListWidgetItem("Target"));
@@ -29,7 +30,6 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
     ui->listWidget->setCurrentRow(0);
-    ComboChanged("決戦(15x17)");
 }
 
 MapEditerDialog::~MapEditerDialog()
