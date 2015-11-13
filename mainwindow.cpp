@@ -56,20 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     if (v.type() != QVariant::Invalid)silent = v.toBool();
     else silent = false;
 
-    //AnimationTime読み込み
-    mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
-    v = mSettings->value( "Map" );
-    if (v.type() != QVariant::Invalid)anime_map_time = v.toInt();
-    else{
-
-        QSettings* mSettings;
-        mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
-        mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
-
-        mSettings->setValue( "Map" , anime_map_time );
-        mSettings->setValue( "Team", anime_team_time );
-
-    }
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
@@ -125,9 +111,24 @@ MainWindow::MainWindow(QWidget *parent) :
 
     v = mSettings->value( "Maximum" );
     if (v.type() != QVariant::Invalid && v.toBool()){
-        this->setWindowState(Qt::WindowMaximized);
+        setWindowState(Qt::WindowMaximized);
     }
 
+
+    //AnimationTime読み込み
+    mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    v = mSettings->value( "Map" );
+    if (v.type() != QVariant::Invalid)anime_map_time = v.toInt();
+    else{
+
+        QSettings* mSettings;
+        mSettings = new QSettings( "AnimationTime.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+        mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+
+        mSettings->setValue( "Map" , anime_map_time );
+        mSettings->setValue( "Team", anime_team_time );
+
+    }
     log << getTime() + "セットアップ完了　ゲームを開始します。\n";
 }
 
