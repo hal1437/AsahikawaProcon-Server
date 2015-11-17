@@ -50,6 +50,8 @@ private:
     Ui::MainWindow *ui;
 
 private slots:
+    void SaveFile();
+
     //ゲーム進行
     void StepGame();
     //アイテム取得の判定

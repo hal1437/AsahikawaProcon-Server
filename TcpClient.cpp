@@ -21,6 +21,7 @@ QString TCPClient::WaitResponce(){
             QString response = "";
 
             //自動結合
+            bool f = false;
             do{
                 response += client->readLine();
             }while(*(response.end()-1) != '\n' && this->client->waitForReadyRead(this->TIMEOUT));
@@ -33,7 +34,7 @@ QString TCPClient::WaitResponce(){
                 continue;
             }
             //不正文字列：改行なし
-            if(*(response.end()-1) != '\n'){
+            if(response.size() > 0 && *(response.end()-1) != '\n'){
                 disconnected_flag = true;
                 qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting \\n";
                 return QString();
@@ -43,12 +44,12 @@ QString TCPClient::WaitResponce(){
         }else{
             //レスポンスなし
             disconnected_flag = true;
-            qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting responce";
+            //qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting responce";
             return QString();
         }
     }
     disconnected_flag=true;
-    qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Too many invald responce";
+    //qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Too many invald responce";
     return QString();
 }
 

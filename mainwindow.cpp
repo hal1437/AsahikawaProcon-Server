@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *parent) :
     this->startup = new StartupDialog(this);
 
     for(int i=0;i<TEAM_COUNT;i++)team_score[i] = 0;
+    connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
 
     //ServerSetting読み込み
     QString path;
@@ -134,8 +135,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-
     delete ui;
+}
+
+void MainWindow::SaveFile(){
+    file->close();
 }
 
 void MainWindow::StepGame(){
@@ -173,9 +177,10 @@ void MainWindow::StepGame(){
         log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
 
         //refresh
-        ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
-        this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
-
+        if(player ==  TEAM_COUNT-1){
+            ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
+            this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+        }
         //End
         GameSystem::WINNER win = Judge();
         if(win != GameSystem::WINNER::CONTINUE)Finish(win);
@@ -307,7 +312,6 @@ void MainWindow::StartAnimation(){
     ui->Field->RefreshOverlay();
 
     QPoint pos[2];
-    ANIMATION_TYPE = 2;
     if(ANIMATION_TYPE == 0){
         //ランダムにワサッて
         for(int i=0;i<2;i++){
