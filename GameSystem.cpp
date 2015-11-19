@@ -122,7 +122,7 @@ bool GameSystem::Map::Export(QString Filename){
             }
             stream << "\n";
         }
-        for(int i=0;i<TEAM_COUNT;i++){
+        for(int i=TEAM_COUNT;i>0;i--){
             stream << GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i))[0]
                     << ":"
                     << QString::number(team_first_point[i] .x())
