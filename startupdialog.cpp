@@ -19,6 +19,9 @@ StartupDialog::StartupDialog(QWidget *parent) :
     //クライアント初期化
     this->team_client[static_cast<int>(GameSystem::TEAM::COOL)] = ui->CoolGroupBox;
     this->team_client[static_cast<int>(GameSystem::TEAM::HOT )] = ui->HotGroupBox ;
+    for(int i=0;i<TEAM_COUNT;i++){
+        team_standby[i] = false;
+    }
 
     connect(ui->CoolGroupBox,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));
     connect(ui->HotGroupBox ,SIGNAL(Standby(ClientSettingForm*,bool)),this,SLOT(ClientStandby(ClientSettingForm*,bool)));

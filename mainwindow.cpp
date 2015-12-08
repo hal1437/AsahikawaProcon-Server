@@ -61,9 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
     //ログファイルオープン
-    file = new QFile(QString(path + "/log" + getTime() + ".txt"),this);
-    file->open(QIODevice::WriteOnly);
-    log.setDevice(file);
+    log = StableLog(path + "/log" + getTime() + ".txt");
 
     //スタートアップダイアログ開始
     if(this->startup->exec()){
@@ -159,27 +157,45 @@ void MainWindow::StepGame(){
         // GetReady
         if(!startup->team_client[player]->client->WaitGetReady()){
             log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
+            startup->team_client[player]->client->disconnected_flag = true;
+        }else{
+            team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                                                                                        GameSystem::Method::ACTION::GETREADY,
+                                                                                                                                        GameSystem::Method::ROTE::UNKNOWN},
+                                                                                                                     ui->Field->team_pos[player]));
+            if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY){
+                log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が二度GetReadyを行いました!" << "\r\n";
+                startup->team_client[player]->client->disconnected_flag = true;
+            }
+            team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
         }
-        team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
-                                                                                                                                    GameSystem::Method::ACTION::GETREADY,
-                                                                                                                                    GameSystem::Method::ROTE::UNKNOWN},
-                                                                                                                 ui->Field->team_pos[player]));
-        team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
+        //End
+        GameSystem::WINNER win = Judge();
+        if(win != GameSystem::WINNER::CONTINUE)Finish(win);
+
     }else{
         // Method
-        startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]));
-        PickItem(team_mehod[player]);
+        if(startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]))){
+            PickItem(team_mehod[player]);
 
-        if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY)log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が行動メソッドを呼ぶべき位置にGetReadyを呼んでいます！" << "\r\n";
-        if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN) log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\r\n";
-        if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN)   log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\r\n";
+            if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN){
+                log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\r\n";
+                startup->team_client[player]->client->disconnected_flag = true;
+            }
+            if(team_mehod[player].rote   == GameSystem::Method::ROTE::UNKNOWN){
+                log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\r\n";
+                startup->team_client[player]->client->disconnected_flag = true;
+            }
+            log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
 
-        log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
-
-        //refresh
-        if(player ==  TEAM_COUNT-1){
-            ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
-            this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+            //refresh
+            if(player ==  TEAM_COUNT-1){
+                ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
+                this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+            }
+        }else{
+            log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
+            startup->team_client[player]->client->disconnected_flag = true;
         }
         //End
         GameSystem::WINNER win = Judge();
@@ -217,7 +233,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
         if(startup->team_client[i]->client->disconnected_flag){
-            append_str.append("[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
+            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\r\n";
         }
     }

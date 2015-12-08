@@ -27,7 +27,8 @@ SOURCES += main.cpp\
     ManualClient.cpp \
     MapEditerDialog.cpp \
     SettingDialog.cpp \
-    ClientSettingForm.cpp
+    ClientSettingForm.cpp \
+    StableLog.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -41,7 +42,8 @@ HEADERS  += mainwindow.h \
     MapEditerDialog.h \
     SettingDialog.h \
     ClientSettingForm.h \
-    Definition.h
+    Definition.h \
+    StableLog.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \

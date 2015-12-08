@@ -12,6 +12,7 @@
 #include <QDataStream>
 #include <QMediaPlayer>
 #include <QThread>
+#include "StableLog.h"
 
 namespace Ui {
 class MainWindow;
@@ -36,7 +37,7 @@ private:
     bool silent;
 
     QFile* file;    //ログファイル
-    QTextStream log;//ログストリーム
+    StableLog log;//ログストリーム
     int anime_map_time  = 6000;//マップ構築アニメーション時間
     int anime_team_time = 2000;//チーム配置アニメーション時間
 
