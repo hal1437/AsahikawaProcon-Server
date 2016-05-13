@@ -8,6 +8,7 @@
         <file>Texture/Light/Item.png</file>
         <file>Texture/Light/Look.png</file>
         <file>Texture/Light/Search.png</file>
+        <file>Texture/Light/Blind.png</file>
     </qresource>
     <qresource prefix="/Heavy">
         <file>Texture/Heavy/Block.png</file>
@@ -18,5 +19,6 @@
         <file>Texture/Heavy/Item.png</file>
         <file>Texture/Heavy/Look.png</file>
         <file>Texture/Heavy/Search.png</file>
+        <file>Texture/Heavy/Blind.png</file>
     </qresource>
 </RCC>

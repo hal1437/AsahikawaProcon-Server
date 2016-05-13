@@ -29,7 +29,8 @@ private:
     int FRAME_RATE = 150;   //ゲームフレームレート
     QTimer* clock;          //ゲームクロック
     QTimer* startup_anime;  //開始アニメーション
-    QTimer* teamshow_anime;  //チーム表示アニメーション
+    QTimer* teamshow_anime; //チーム表示アニメーション
+    QTimer* blind_anime;    //まっくらアニメーション
     StartupDialog* startup; //スタートアップダイアログ
     QSound* music;          //音楽
 
@@ -40,6 +41,7 @@ private:
     StableLog log;//ログストリーム
     int anime_map_time  = 6000;//マップ構築アニメーション時間
     int anime_team_time = 2000;//チーム配置アニメーション時間
+    int anime_blind_time = 1000;//まっくらアニメーション時間
 
 protected:
     void keyPressEvent(QKeyEvent* event);
@@ -64,6 +66,7 @@ private slots:
 
     void StartAnimation();
     void ShowTeamAnimation();
+    void BlindAnimation();
 };
 
 #endif // MAINWINDOW_H

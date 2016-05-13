@@ -56,6 +56,7 @@ void GameBoard::paintEvent(QPaintEvent *event){
             if(0 <= team_pos[i].x() && team_pos[i].x() < field.size.x() &&
                0 <= team_pos[i].y() && team_pos[i].y() < field.size.y()){
                 painter.drawPixmap(team_pos[i].x() * image_part.width(),team_pos[i].y() * image_part.height(),team_resource[i]);
+
             }
         }
 
@@ -63,11 +64,22 @@ void GameBoard::paintEvent(QPaintEvent *event){
             for(int j = 0;j < field.size.x();j++){
                 //物体の描画
                 if(overlay[i][j] != GameSystem::MAP_OVERLAY::ERASE){
+                    //物体の描画
                     if(field.field[i][j] != GameSystem::MAP_OBJECT::NOTHING){
                         painter.drawPixmap(j * image_part.width(),
                                             i * image_part.height(),
                                             field_resource[static_cast<int>(field.field[i][j])]);
                     }
+
+                    //暗闇の描画
+                    if(field.discover[i][j] == GameSystem::Discoverer::Unknown){
+                        painter.drawPixmap(j * image_part.width() ,
+                                           i * image_part.height(),
+                                           overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::BLIND)]);
+                    }else{
+                        int gomi = 0;
+                    }
+
                     //オーバーレイの描画
                     if(overlay[i][j] != GameSystem::MAP_OVERLAY::NOTHING){
                         painter.drawPixmap(j * image_part.width() ,
@@ -81,7 +93,7 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
 }
 void GameBoard::RefreshOverlay(){
-    //すべてNOTINGにする
+    //すべてNOTHINGにする
     for(int i = 0;i < field.size.y();i++){
         for(int j = 0;j < field.size.x();j++){
             overlay[i][j] = GameSystem::MAP_OVERLAY::NOTHING;
@@ -93,6 +105,9 @@ GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::Method method, const Q
     //場外
     if(pos.x() <  0              || pos.y() <  0)             return GameSystem::MAP_OBJECT::BLOCK;
     if(pos.x() >= field.size.x() || pos.y() >= field.size.y())return GameSystem::MAP_OBJECT::BLOCK;
+
+    //未開拓の場合は開拓済みフラグをつける
+    field.discover[pos.y()][pos.x()] = GameSystem::Discoverer::Cool;
 
     //オーバーレイ描画
     if(method.action == GameSystem::Method::ACTION::LOOK    )overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
@@ -146,7 +161,9 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
             //接続状態
             around.connect = GameSystem::CONNECTING_STATUS::CONTINUE;
             //情報取得
-            for(int i=1;i<10;i++)around.data[i-1] = FieldAccess(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * i);
+            for(int i=1;i<10;i++){
+                around.data[i-1] = FieldAccess(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * i);
+            }
             return around;
         default:
             return GameSystem::AroundData();
@@ -166,7 +183,8 @@ void GameBoard::setMap(const GameSystem::Map& map){
     //オーバーレイ初期化
     overlay.resize(map_height);
     for(auto& v : overlay)v = QVector<GameSystem::MAP_OVERLAY>(map_width,GameSystem::MAP_OVERLAY::NOTHING);
-
+    field.discover.resize(map_height);
+    for(auto& v : field.discover)v = QVector<GameSystem::Discoverer>(map_width,GameSystem::Discoverer::Cool);
 }
 
 
@@ -209,6 +227,7 @@ void GameBoard::ReloadTexture(GameSystem::Texture tex){
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QPixmap(path + "/Look.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QPixmap(path + "/Getready.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QPixmap(path + "/Search.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::BLIND)]    = QPixmap(path + "/Blind.png");
 
     //変形
     for(QPixmap& img:team_resource )img = img.scaled(image_part.width(),image_part.height(),Qt::IgnoreAspectRatio,Qt::SmoothTransformation);

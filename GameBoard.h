@@ -28,7 +28,7 @@ private:
     GameSystem::Texture texture; //使用テクスチャタイプ
     QPixmap team_resource[TEAM_COUNT];   //チーム画像
     QPixmap field_resource[4];  //フィールド画像
-    QPixmap overray_resource[4];//オーバーレイ画像
+    QPixmap overray_resource[5];//オーバーレイ画像
 
 public:
     GameSystem::Map field; //フィールド状態

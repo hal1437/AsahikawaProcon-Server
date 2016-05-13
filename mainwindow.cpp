@@ -71,7 +71,6 @@ MainWindow::MainWindow(QWidget *parent) :
             qDebug() << this->ui->Field->team_pos[i];
         }
         this->ui->Field->setMap(this->startup->map);
-
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
         this->ui->TimeBar->setMaximum(this->startup->map.turn);
@@ -81,6 +80,11 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
         this->ui->HotScoreLabel ->setText("0");
         this->ui->CoolScoreLabel->setText("0");
+
+        /*
+        for(auto& v : this->ui->Field->field.discover)v = QVector<GameSystem::Discoverer>
+                (this->ui->Field->field.size.x(),GameSystem::Discoverer::Unknown);
+        */
 
     }else{
         exit(0);
@@ -186,6 +190,7 @@ void MainWindow::StepGame(){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\r\n";
                 startup->team_client[player]->client->disconnected_flag = true;
             }
+
             log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
 
             //refresh
@@ -321,7 +326,7 @@ void MainWindow::StartAnimation(){
     static int timer = 1;
     static Field<GameSystem::MAP_OVERLAY> f(this->startup->map.size.y(),
                                             QVector<GameSystem::MAP_OVERLAY>(this->startup->map.size.x(),GameSystem::MAP_OVERLAY::ERASE));
-    static int ANIMATION_SIZE = 3;
+    static int ANIMATION_SIZE = 4;
     static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
     int count = 0;
 
@@ -369,6 +374,16 @@ void MainWindow::StartAnimation(){
                 this->ui->Field->overlay[i][j] = f[i][j];
             }
         }
+    }else if(ANIMATION_TYPE == 3){
+        //下からガーって
+        for(int j=this->startup->map.size.y()-1;j>=0;j--){
+            for(int k=this->startup->map.size.x()-1;k>=0;k--){
+                if(count >= timer){
+                    this->ui->Field->overlay[j][k] = f[j][k];
+                }
+                count++;
+            }
+        }
     }
     if(timer >= startup->map.size.x() * startup->map.size.y()){
         teamshow_anime = new QTimer();
@@ -387,12 +402,46 @@ void MainWindow::ShowTeamAnimation(){
     ui->Field->team_pos[team_count] = this->startup->map.team_first_point[team_count];
 
     if(team_count == TEAM_COUNT){
-        clock = new QTimer();
-        connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
-        clock->start(FRAME_RATE);
+        blind_anime = new QTimer();
+        connect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
+        blind_anime->start(anime_blind_time / (startup->map.size.x()*startup->map.size.y()));
         disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+    }else{
+        ui->Field->field.discover[ui->Field->team_pos[team_count].y()]
+                [ui->Field->team_pos[team_count].x()] = GameSystem::Discoverer::Cool;
     }
     repaint();
     team_count++;
 }
 
+void MainWindow::BlindAnimation(){
+    static int timer = 1;
+    static int ANIMATION_SIZE = 1;
+    static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
+
+    ui->Field->RefreshOverlay();
+
+    QPoint pos[2];
+    if(ANIMATION_TYPE == 0){
+        //ランダムにワサッて
+        for(int i=0;i<2;i++){
+            do{
+                pos[i].setX(qrand() % this->startup->map.size.x());
+                pos[i].setY(qrand() % this->startup->map.size.y());
+            }while(timer < startup->map.size.x() * startup->map.size.y() &&
+                   ui->Field->field.discover[pos[i].y()][pos[i].x()] == GameSystem::Discoverer::Unknown);
+            ui->Field->field.discover[pos[i].y()][pos[i].x()] = GameSystem::Discoverer::Unknown;
+        }
+    }
+
+    if(timer >= startup->map.size.x() * startup->map.size.y()){
+        for(auto& v : this->ui->Field->field.discover)v = QVector<GameSystem::Discoverer>
+                (this->ui->Field->field.size.x(),GameSystem::Discoverer::Unknown);
+        clock = new QTimer();
+        connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
+        clock->start(FRAME_RATE);
+        disconnect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
+    }
+    timer += 2;
+    repaint();
+}

@@ -65,6 +65,13 @@ public:
         ITEM    = 3,
     };
 
+    //探索済みかの判定
+    enum class Discoverer{
+        Unknown = 0,
+        Hot     = 1,
+        Cool    = 2,
+    };
+
     //テクスチャ
     enum class Texture{
         Light = 0, //あっさり
@@ -77,11 +84,13 @@ public:
         LOOK,
         SEACH,
         GETREADY,
+        BLIND,
         ERASE,
     };
     //ゲーム盤
     struct Map{
         Field<GameSystem::MAP_OBJECT> field;
+        Field<GameSystem::Discoverer> discover;
         int turn;                       //ターン
         QString name;                   //ステージ名
         QPoint size;                    //マップサイズ
