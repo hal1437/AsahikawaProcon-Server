@@ -1,6 +1,7 @@
 #include "startupdialog.h"
 #include "ui_startupdialog.h"
 #include "MapEditerDialog.h"
+#include "DesignDialog.h"
 #include <QNetworkInterface>
 #include <QDesktopServices>
 #include <QHostInfo>
@@ -104,6 +105,7 @@ void StartupDialog::ChangedTexture(QString text){
     if(text == "あっさり")this->map.texture = GameSystem::Texture::Light;
     if(text == "こってり")this->map.texture = GameSystem::Texture::Heavy;
 }
+
 void StartupDialog::Setting(){
     SettingDialog* diag;
     diag = new SettingDialog;
@@ -113,4 +115,12 @@ void StartupDialog::Setting(){
     }
 }
 
+void StartupDialog::ShowDesignDialog(){
+    DesignDialog* diag;
+    diag = new DesignDialog;
+    if(diag->exec() == QDialog::Accepted){
+        //設定を保存
+        //diag->Export();
+    }
+}
 

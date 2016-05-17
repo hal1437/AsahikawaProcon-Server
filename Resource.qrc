@@ -21,4 +21,5 @@
         <file>Texture/Heavy/Search.png</file>
         <file>Texture/Heavy/Blind.png</file>
     </qresource>
+    <qresource prefix="/Common"/>
 </RCC>

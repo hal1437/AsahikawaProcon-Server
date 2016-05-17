@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>StartupDialog</class>
  <widget class="QDialog" name="StartupDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -54,20 +57,20 @@
         <item row="2" column="0" colspan="2">
          <widget class="QPushButton" name="MapEditButton">
           <property name="text">
-           <string>MapEdit</string>
+           <string>マップの編集</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Texture：</string>
+             <string>テクスチャ：</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
            <widget class="QComboBox" name="comboBox">
             <item>
              <property name="text">
@@ -77,6 +80,27 @@
             <item>
              <property name="text">
               <string>こってり</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>BGM：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="GameMusicCombo">
+            <item>
+             <property name="text">
+              <string>TwinBeeNew</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Necromancer</string>
              </property>
             </item>
            </widget>
@@ -159,25 +183,13 @@
        </layout>
       </widget>
      </item>
-     <item row="1" column="0" rowspan="2" colspan="2">
+     <item row="1" column="0" colspan="2">
       <widget class="QGroupBox" name="ServerGroup">
        <property name="title">
         <string>SERVER</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
            <widget class="QLabel" name="HostName">
@@ -213,58 +225,23 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="GrobalIPLabel">
-            <property name="text">
-             <string>不明</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>グローバルIP：</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
          </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>GameMusic：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="GameMusicCombo">
-            <item>
-             <property name="text">
-              <string>TwinBeeNew</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Necromancer</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>ServerSetting</string>
-          </property>
-         </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="DesignButton">
+       <property name="text">
+        <string>デザイン設定</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>サーバー設定</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -304,8 +281,8 @@
    <slot>PushedMapSelect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>423</x>
-     <y>145</y>
+     <x>524</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -336,8 +313,8 @@
    <slot>ChangedTexture(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>470</x>
-     <y>238</y>
+     <x>523</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -368,12 +345,28 @@
    <slot>ChangeMusicCombo(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>218</y>
+     <x>523</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
      <x>269</x>
      <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DesignButton</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>ShowDesignDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>77</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>548</y>
     </hint>
    </hints>
   </connection>
@@ -388,5 +381,6 @@
   <slot>ChangedTexture(QString)</slot>
   <slot>Setting()</slot>
   <slot>ChangeMusicCombo(QString)</slot>
+  <slot>ShowDesignDialog()</slot>
  </slots>
 </ui>

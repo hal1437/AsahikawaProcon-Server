@@ -42,6 +42,7 @@ public slots:
     void CheckStandby();
     void ShowMapEditDialog();
     void PushedMapSelect();
+    void ShowDesignDialog();
 
     void ClientStandby(ClientSettingForm* client,bool complate);
     void SetMapStandby (bool state);

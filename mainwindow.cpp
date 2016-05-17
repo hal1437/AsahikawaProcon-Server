@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
+#include <QFileInfo>
 #include "Definition.h"
 
 QString getTime(){
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->startup = new StartupDialog(this);
+    this->startup = new StartupDialog();
 
     for(int i=0;i<TEAM_COUNT;i++)team_score[i] = 0;
     connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
@@ -81,11 +82,6 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->HotScoreLabel ->setText("0");
         this->ui->CoolScoreLabel->setText("0");
 
-        /*
-        for(auto& v : this->ui->Field->field.discover)v = QVector<GameSystem::Discoverer>
-                (this->ui->Field->field.size.x(),GameSystem::Discoverer::Unknown);
-        */
-
     }else{
         exit(0);
     }
@@ -97,7 +93,10 @@ MainWindow::MainWindow(QWidget *parent) :
     startup_anime->start(anime_map_time / (startup->map.size.x()*startup->map.size.y()));
 
     music = new QSound(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav");
+
     if(!silent)music->play();
+
+    log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
