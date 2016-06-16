@@ -120,7 +120,7 @@ void StartupDialog::ShowDesignDialog(){
     diag = new DesignDialog;
     if(diag->exec() == QDialog::Accepted){
         //設定を保存
-        //diag->Export();
+        diag->Export();
     }
 }
 

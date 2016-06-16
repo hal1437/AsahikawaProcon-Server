@@ -61,6 +61,15 @@ MainWindow::MainWindow(QWidget *parent) :
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
+    QSettings* dSettings;
+    QVariant v2;
+    dSettings = new QSettings( "design.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    dSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+    v2 = dSettings->value( "Dark" );
+    if (v2.type() != QVariant::Invalid)dark = v2.toBool();
+    else dark = false;
+    if(dark == true)this->anime_map_time -= this->anime_blind_time;
+
     //ログファイルオープン
     log = StableLog(path + "/log" + getTime() + ".txt");
 
@@ -401,10 +410,17 @@ void MainWindow::ShowTeamAnimation(){
     ui->Field->team_pos[team_count] = this->startup->map.team_first_point[team_count];
 
     if(team_count == TEAM_COUNT){
-        blind_anime = new QTimer();
-        connect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
-        blind_anime->start(anime_blind_time / (startup->map.size.x()*startup->map.size.y()));
-        disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        if(dark == true){
+            blind_anime = new QTimer();
+            connect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
+            blind_anime->start(anime_blind_time / (startup->map.size.x()*startup->map.size.y()));
+            disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        }else{
+            clock = new QTimer();
+            connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
+            clock->start(FRAME_RATE);
+            disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        }
     }else{
         ui->Field->field.discover[ui->Field->team_pos[team_count].y()]
                 [ui->Field->team_pos[team_count].x()] = GameSystem::Discoverer::Cool;

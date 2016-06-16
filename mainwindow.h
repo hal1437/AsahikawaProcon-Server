@@ -37,6 +37,8 @@ private:
     int leave_items=0;
     bool silent;
 
+    bool dark;              //暗転処理
+
     QFile* file;    //ログファイル
     StableLog log;//ログストリーム
     int anime_map_time  = 6000;//マップ構築アニメーション時間

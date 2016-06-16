@@ -28,7 +28,7 @@
         <property name="title">
          <string>演出</string>
         </property>
-        <widget class="QCheckBox" name="checkBox">
+        <widget class="QCheckBox" name="DarkBox">
          <property name="geometry">
           <rect>
            <x>10</x>

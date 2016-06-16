@@ -13,6 +13,10 @@ class DesignDialog : public QDialog
 
 public:
     explicit DesignDialog(QWidget *parent = 0);
+
+    bool GetCheckDark() const;
+    void Export();
+
     ~DesignDialog();
 
 private:
