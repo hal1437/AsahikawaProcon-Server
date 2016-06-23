@@ -35,6 +35,9 @@
        <property name="enabled">
         <bool>true</bool>
        </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲーム中、通信対象が切断したとみなすまでの待機時間です。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="wrapping">
         <bool>false</bool>
        </property>
@@ -54,6 +57,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QSpinBox" name="Gamespeed">
+       <property name="whatsThis">
+        <string>ゲームの進行速度です。</string>
+       </property>
        <property name="minimum">
         <number>0</number>
        </property>
@@ -111,6 +117,9 @@
      </item>
      <item row="3" column="0" colspan="3">
       <widget class="QCheckBox" name="SilentCheck">
+       <property name="whatsThis">
+        <string>チェックを入れた場合、BGMは鳴りません。</string>
+       </property>
        <property name="text">
         <string>消音</string>
        </property>
@@ -118,6 +127,9 @@
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="Log">
+       <property name="whatsThis">
+        <string>ログの保存場所のパスを設定します。</string>
+       </property>
        <property name="text">
         <string>./</string>
        </property>
@@ -125,6 +137,9 @@
      </item>
      <item row="4" column="0" colspan="3">
       <widget class="QCheckBox" name="MaximumCheck">
+       <property name="whatsThis">
+        <string>ゲーム開始時にウィンドウを最大化した状態で始めるかを設定できます。</string>
+       </property>
        <property name="text">
         <string>ゲーム開始時に最大化</string>
        </property>

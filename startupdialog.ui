@@ -39,6 +39,9 @@
         </property>
         <item row="1" column="0">
          <widget class="QLineEdit" name="MapDirEdit">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;使用するマップファイルのパスです。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -49,6 +52,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="pushButton_4">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;使用するマップをファイルから選択します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -56,6 +62,9 @@
         </item>
         <item row="2" column="0" colspan="2">
          <widget class="QPushButton" name="MapEditButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;マップエディターを開き、マップを編集します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>マップの編集</string>
           </property>
@@ -72,6 +81,9 @@
           </item>
           <item row="0" column="1">
            <widget class="QComboBox" name="comboBox">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームのテクスチャを設定します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string>あっさり</string>
@@ -93,6 +105,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="GameMusicCombo">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームのBGMを設定します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string>TwinBeeNew</string>
@@ -148,6 +163,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームを開始します。&lt;/p&gt;&lt;p&gt;COOLとHOTが両方とも接続されている、&lt;/p&gt;&lt;p&gt;または「自動くん」「ManualClient」に設定されている必要があります。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>ゲーム開始</string>
        </property>
@@ -193,6 +211,9 @@
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
            <widget class="QLabel" name="HostName">
+            <property name="whatsThis">
+             <string>サーバーのホスト名です。</string>
+            </property>
             <property name="text">
              <string>不明</string>
             </property>
@@ -220,6 +241,9 @@
           </item>
           <item row="1" column="1">
            <widget class="QLabel" name="LocalIPLabel">
+            <property name="whatsThis">
+             <string>ローカルIPです。</string>
+            </property>
             <property name="text">
              <string>192.168.1.1</string>
             </property>
@@ -232,6 +256,9 @@
      </item>
      <item row="2" column="0">
       <widget class="QPushButton" name="DesignButton">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームの演出を設定します。&lt;/p&gt;&lt;p&gt;(機能は再起動後有効になります)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>デザイン設定</string>
        </property>
@@ -239,6 +266,9 @@
      </item>
      <item row="2" column="1">
       <widget class="QPushButton" name="pushButton">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ログ出力先、待機時間といったサーバーの設定を行います。&lt;/p&gt;&lt;p&gt;(機能は再起動後有効になります)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>サーバー設定</string>
        </property>

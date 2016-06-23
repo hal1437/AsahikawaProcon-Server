@@ -46,6 +46,9 @@
        <height>16777215</height>
       </size>
      </property>
+     <property name="whatsThis">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;マップを作成する画面です。クリックおよびドラッグで配置することができます。&lt;/p&gt;&lt;p&gt;COOLとHOTは各１つのみ配置できます。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
     </widget>
    </item>
    <item>
@@ -76,6 +79,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;マップに使用する部品を選択します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
       </widget>
      </item>
      <item>
@@ -94,6 +100,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;マップエディタを完了し、閉じます。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
          <property name="text">
           <string>完了</string>
          </property>
@@ -106,6 +115,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>全てのアイテム、ブロックを取り除きます。</string>
          </property>
          <property name="text">
           <string>全消し</string>
@@ -120,6 +132,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>マップを書き出します。</string>
+         </property>
          <property name="text">
           <string>書き出し</string>
          </property>
@@ -132,6 +147,9 @@
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
+         </property>
+         <property name="whatsThis">
+          <string>マップのターン数です。</string>
          </property>
          <property name="minimum">
           <number>100</number>
@@ -162,6 +180,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="whatsThis">
+          <string>チェックを入れた場合、マップは点対称になります。</string>
+         </property>
          <property name="text">
           <string>対称</string>
          </property>
@@ -172,6 +193,9 @@
        </item>
        <item row="2" column="0" colspan="2">
         <widget class="QComboBox" name="comboBox">
+         <property name="whatsThis">
+          <string>マップの大きさを設定します。</string>
+         </property>
          <item>
           <property name="text">
            <string>決戦(15x17)</string>
