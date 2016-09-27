@@ -165,6 +165,7 @@ void MainWindow::StepGame(){
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
     }
 
+    //GetReadyの取得
     if(getready_flag){
         // GetReady
         if(!startup->team_client[player]->client->WaitGetReady()){
@@ -190,6 +191,7 @@ void MainWindow::StepGame(){
         if(startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]))){
             PickItem(team_mehod[player]);
 
+            //不正行動をはじく
             if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\r\n";
                 startup->team_client[player]->client->disconnected_flag = true;
@@ -199,6 +201,7 @@ void MainWindow::StepGame(){
                 startup->team_client[player]->client->disconnected_flag = true;
             }
 
+            //行動ログの出力
             log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
 
             //refresh
@@ -239,6 +242,8 @@ void MainWindow::PickItem(GameSystem::Method method){
     }
 
 }
+
+//終了処理
 void MainWindow::Finish(GameSystem::WINNER winner){
     this->clock->stop();
     QString append_str = "";
@@ -266,6 +271,19 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         this->ui->WinnerLabel->setText("DRAW");
         log << getTime() + "[決着]引き分けです。" << "\r\n";
     }
+    GameBoard*& board = this->ui->Field;
+    for(int i=0;i<TEAM_COUNT;i++){
+        startup->team_client[player]->client->WaitGetReady();
+        startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                                            GameSystem::Method::ACTION::GETREADY,
+                                                                                            GameSystem::Method::ROTE::UNKNOWN},
+                                                                                            ui->Field->team_pos[player]));
+        startup->team_client[player]->client->WaitEndSharp(board->FinishConnecting(static_cast<GameSystem::TEAM>(i)));
+        player ++;
+        player %= TEAM_COUNT;
+
+        qDebug() << board->FinishConnecting(static_cast<GameSystem::TEAM>(i)).toString();
+    }
     //log.close();
 }
 GameSystem::WINNER MainWindow::Judge(){
@@ -277,10 +295,12 @@ GameSystem::WINNER MainWindow::Judge(){
     for(int i=0;i<TEAM_COUNT;i++){
 
         GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(i));
+        log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_around.toString() << "\r\n";
 
         //ブロック置かれ死
         if(team_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック下敷き" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
 
@@ -290,12 +310,14 @@ GameSystem::WINNER MainWindow::Judge(){
            team_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
            team_around.data[7] == GameSystem::MAP_OBJECT::BLOCK){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック囲まれ" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
 
         //切断死
         if(startup->team_client[i]->client->disconnected_flag){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "通信切断" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
     }
@@ -324,6 +346,7 @@ GameSystem::WINNER MainWindow::Judge(){
         //勝者判定
         return static_cast<GameSystem::WINNER>(index);
     }
+
     if(team_lose[0])return GameSystem::WINNER::HOT;
     else if(team_lose[1])return GameSystem::WINNER::COOL;
     else return GameSystem::WINNER::CONTINUE;

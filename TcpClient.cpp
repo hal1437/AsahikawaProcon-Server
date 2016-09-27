@@ -80,7 +80,7 @@ bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
 
     //周辺情報文字列
     client->write(QString(data.toString() + "\r\n").toUtf8());
-
+    qDebug() << data.toString();
     //レスポンス待ち
     return(WaitResponce() == "#\r\n");
 }

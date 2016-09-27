@@ -139,6 +139,7 @@ public:
         MAP_OBJECT data[9];
 
         QString toString();      //文字列変換
+        void finish();
     };
 };
 

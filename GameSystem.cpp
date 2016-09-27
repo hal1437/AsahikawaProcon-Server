@@ -2,7 +2,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QMessageBox>
-
+#include <QDebug>
 
 
 
@@ -180,6 +180,10 @@ void GameSystem::Map::CreateRandomMap(){
             continue;
         }
     }
+}
+
+void GameSystem::AroundData::finish(){
+    this->connect = GameSystem::CONNECTING_STATUS::FINISHED;
 }
 
 QString GameSystem::AroundData::toString(){

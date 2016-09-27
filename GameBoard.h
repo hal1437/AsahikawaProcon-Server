@@ -56,6 +56,9 @@ public:
     //メソッドで周辺情報を取得する
     GameSystem::AroundData FieldAccessMethod(GameSystem::Method method);
 
+    //
+    GameSystem::AroundData FinishConnecting(GameSystem::TEAM team);
+
     //マップを設定する
     void setMap(const GameSystem::Map &map);
 

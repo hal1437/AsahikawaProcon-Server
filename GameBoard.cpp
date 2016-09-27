@@ -124,6 +124,13 @@ GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::Method method, const Q
     return this->field.field[pos.y()][pos.x()];
 }
 
+GameSystem::AroundData GameBoard::FinishConnecting(GameSystem::TEAM team){
+    GameSystem::AroundData around = FieldAccessAround(GameSystem::Method{team,GameSystem::Method::ACTION::UNKNOWN,GameSystem::Method::ROTE::UNKNOWN},
+                                                     team_pos[static_cast<int>(team)]);
+    around.finish();
+    return around;
+}
+
 GameSystem::AroundData GameBoard::FieldAccessAround(GameSystem::TEAM team){
     return FieldAccessAround(GameSystem::Method{team,GameSystem::Method::ACTION::UNKNOWN,GameSystem::Method::ROTE::UNKNOWN},
                              team_pos[static_cast<int>(team)]);
