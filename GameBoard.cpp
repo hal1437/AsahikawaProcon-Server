@@ -9,6 +9,7 @@
 QString GameBoard::GetTexturePath(GameSystem::Texture tex){
     if(tex == GameSystem::Texture::Light)return ":/Light/Texture/Light";
     if(tex == GameSystem::Texture::Heavy)return ":/Heavy/Texture/Heavy";
+    if(tex == GameSystem::Texture::Jewel)return ":/Jewel/Texture/Jewel";
 }
 
 void GameBoard::resizeEvent(QResizeEvent *event){

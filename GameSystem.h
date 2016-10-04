@@ -76,6 +76,7 @@ public:
     enum class Texture{
         Light = 0, //あっさり
         Heavy = 1, //こってり
+        Jewel = 2, //ほうせき
     };
 
     //マップ上に描画する非物体

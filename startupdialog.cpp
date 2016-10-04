@@ -104,6 +104,7 @@ void StartupDialog::SetMapStandby (bool state){
 void StartupDialog::ChangedTexture(QString text){
     if(text == "あっさり")this->map.texture = GameSystem::Texture::Light;
     if(text == "こってり")this->map.texture = GameSystem::Texture::Heavy;
+    if(text == "ほうせき")this->map.texture = GameSystem::Texture::Jewel;
 }
 
 void StartupDialog::Setting(){
