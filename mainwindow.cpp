@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QSettings>
+#include <QFileInfo>
 #include "Definition.h"
 
 QString getTime(){
@@ -38,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->startup = new StartupDialog(this);
+    this->startup = new StartupDialog();
 
     for(int i=0;i<TEAM_COUNT;i++)team_score[i] = 0;
     connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
@@ -60,6 +61,15 @@ MainWindow::MainWindow(QWidget *parent) :
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
+    QSettings* dSettings;
+    QVariant v2;
+    dSettings = new QSettings( "design.ini", QSettings::IniFormat ); // iniファイルで設定を保存
+    dSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
+    v2 = dSettings->value( "Dark" );
+    if (v2.type() != QVariant::Invalid)dark = v2.toBool();
+    else dark = false;
+    if(dark == true)this->anime_map_time -= this->anime_blind_time;
+
     //ログファイルオープン
     log = StableLog(path + "/log" + getTime() + ".txt");
 
@@ -71,7 +81,6 @@ MainWindow::MainWindow(QWidget *parent) :
             qDebug() << this->ui->Field->team_pos[i];
         }
         this->ui->Field->setMap(this->startup->map);
-
         //ui初期化
         this->ui->Field  ->setMap(this->startup->map);
         this->ui->TimeBar->setMaximum(this->startup->map.turn);
@@ -93,7 +102,10 @@ MainWindow::MainWindow(QWidget *parent) :
     startup_anime->start(anime_map_time / (startup->map.size.x()*startup->map.size.y()));
 
     music = new QSound(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav");
+
     if(!silent)music->play();
+
+    log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
@@ -153,12 +165,14 @@ void MainWindow::StepGame(){
        log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
     }
 
+    //GetReadyの取得
     if(getready_flag){
         // GetReady
         if(!startup->team_client[player]->client->WaitGetReady()){
             log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
             startup->team_client[player]->client->disconnected_flag = true;
         }else{
+            //log << getTime() + "GetReady" + "\r\n";
             team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
                                                                                                                                         GameSystem::Method::ACTION::GETREADY,
                                                                                                                                         GameSystem::Method::ROTE::UNKNOWN},
@@ -176,8 +190,9 @@ void MainWindow::StepGame(){
     }else{
         // Method
         if(startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]))){
+            //アイテムの回収
             PickItem(team_mehod[player]);
-
+            //不正行動をはじく
             if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\r\n";
                 startup->team_client[player]->client->disconnected_flag = true;
@@ -186,7 +201,13 @@ void MainWindow::StepGame(){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "の行動メソッドが不正な方向を示しています！" << "\r\n";
                 startup->team_client[player]->client->disconnected_flag = true;
             }
+
+            //行動ログの出力
             log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
+
+            GameBoard*& board = this->ui->Field;
+            GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(player));
+            log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + ":" + team_around.toString() << "\r\n";
 
             //refresh
             if(player ==  TEAM_COUNT-1){
@@ -226,20 +247,21 @@ void MainWindow::PickItem(GameSystem::Method method){
     }
 
 }
+
+//終了処理
 void MainWindow::Finish(GameSystem::WINNER winner){
     this->clock->stop();
     QString append_str = "";
-
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
         if(startup->team_client[i]->client->disconnected_flag){
-            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
+            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\r\n";
         }
     }
     log << this->ui->WinnerLabel->text() << "\r\n";
     if(!silent)music->stop();
-    QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
+    if(!silent)QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
@@ -253,6 +275,19 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         this->ui->WinnerLabel->setText("DRAW");
         log << getTime() + "[決着]引き分けです。" << "\r\n";
     }
+    GameBoard*& board = this->ui->Field;
+    for(int i=0;i<TEAM_COUNT;i++){
+        startup->team_client[player]->client->WaitGetReady();
+        startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                                            GameSystem::Method::ACTION::GETREADY,
+                                                                                            GameSystem::Method::ROTE::UNKNOWN},
+                                                                                            ui->Field->team_pos[player]));
+        startup->team_client[player]->client->WaitEndSharp(board->FinishConnecting(static_cast<GameSystem::TEAM>(player)));
+        player ++;
+        player %= TEAM_COUNT;
+
+        qDebug() << board->FinishConnecting(static_cast<GameSystem::TEAM>(i)).toString();
+    }
     //log.close();
 }
 GameSystem::WINNER MainWindow::Judge(){
@@ -264,10 +299,12 @@ GameSystem::WINNER MainWindow::Judge(){
     for(int i=0;i<TEAM_COUNT;i++){
 
         GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(i));
+        //log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_around.toString() << "\r\n";
 
         //ブロック置かれ死
         if(team_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック下敷き" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
 
@@ -277,12 +314,14 @@ GameSystem::WINNER MainWindow::Judge(){
            team_around.data[5] == GameSystem::MAP_OBJECT::BLOCK &&
            team_around.data[7] == GameSystem::MAP_OBJECT::BLOCK){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "ブロック囲まれ" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
 
         //切断死
         if(startup->team_client[i]->client->disconnected_flag){
             log << getTime() + "[死因]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "通信切断" << "\r\n";
+            team_around.finish();
             team_lose[i]=true;
         }
     }
@@ -311,6 +350,7 @@ GameSystem::WINNER MainWindow::Judge(){
         //勝者判定
         return static_cast<GameSystem::WINNER>(index);
     }
+
     if(team_lose[0])return GameSystem::WINNER::HOT;
     else if(team_lose[1])return GameSystem::WINNER::COOL;
     else return GameSystem::WINNER::CONTINUE;
@@ -321,7 +361,7 @@ void MainWindow::StartAnimation(){
     static int timer = 1;
     static Field<GameSystem::MAP_OVERLAY> f(this->startup->map.size.y(),
                                             QVector<GameSystem::MAP_OVERLAY>(this->startup->map.size.x(),GameSystem::MAP_OVERLAY::ERASE));
-    static int ANIMATION_SIZE = 3;
+    static int ANIMATION_SIZE = 4;
     static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
     int count = 0;
 
@@ -369,6 +409,16 @@ void MainWindow::StartAnimation(){
                 this->ui->Field->overlay[i][j] = f[i][j];
             }
         }
+    }else if(ANIMATION_TYPE == 3){
+        //下からガーって
+        for(int j=this->startup->map.size.y()-1;j>=0;j--){
+            for(int k=this->startup->map.size.x()-1;k>=0;k--){
+                if(count >= timer){
+                    this->ui->Field->overlay[j][k] = f[j][k];
+                }
+                count++;
+            }
+        }
     }
     if(timer >= startup->map.size.x() * startup->map.size.y()){
         teamshow_anime = new QTimer();
@@ -387,12 +437,53 @@ void MainWindow::ShowTeamAnimation(){
     ui->Field->team_pos[team_count] = this->startup->map.team_first_point[team_count];
 
     if(team_count == TEAM_COUNT){
-        clock = new QTimer();
-        connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
-        clock->start(FRAME_RATE);
-        disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        if(dark == true){
+            blind_anime = new QTimer();
+            connect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
+            blind_anime->start(anime_blind_time / (startup->map.size.x()*startup->map.size.y()));
+            disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        }else{
+            clock = new QTimer();
+            connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
+            clock->start(FRAME_RATE);
+            disconnect(teamshow_anime,SIGNAL(timeout()),this,SLOT(ShowTeamAnimation()));
+        }
+    }else{
+        ui->Field->field.discover[ui->Field->team_pos[team_count].y()]
+                [ui->Field->team_pos[team_count].x()] = GameSystem::Discoverer::Cool;
     }
     repaint();
     team_count++;
 }
 
+void MainWindow::BlindAnimation(){
+    static int timer = 1;
+    static int ANIMATION_SIZE = 1;
+    static int ANIMATION_TYPE = qrand() % ANIMATION_SIZE;
+
+    ui->Field->RefreshOverlay();
+
+    QPoint pos[2];
+    if(ANIMATION_TYPE == 0){
+        //ランダムにワサッて
+        for(int i=0;i<2;i++){
+            do{
+                pos[i].setX(qrand() % this->startup->map.size.x());
+                pos[i].setY(qrand() % this->startup->map.size.y());
+            }while(timer < startup->map.size.x() * startup->map.size.y() &&
+                   ui->Field->field.discover[pos[i].y()][pos[i].x()] == GameSystem::Discoverer::Unknown);
+            ui->Field->field.discover[pos[i].y()][pos[i].x()] = GameSystem::Discoverer::Unknown;
+        }
+    }
+
+    if(timer >= startup->map.size.x() * startup->map.size.y()){
+        for(auto& v : this->ui->Field->field.discover)v = QVector<GameSystem::Discoverer>
+                (this->ui->Field->field.size.x(),GameSystem::Discoverer::Unknown);
+        clock = new QTimer();
+        connect(clock,SIGNAL(timeout()),this,SLOT(StepGame()));
+        clock->start(FRAME_RATE);
+        disconnect(blind_anime,SIGNAL(timeout()),this,SLOT(BlindAnimation()));
+    }
+    timer += 2;
+    repaint();
+}

@@ -28,7 +28,8 @@ SOURCES += main.cpp\
     MapEditerDialog.cpp \
     SettingDialog.cpp \
     ClientSettingForm.cpp \
-    StableLog.cpp
+    StableLog.cpp \
+    DesignDialog.cpp
 
 HEADERS  += mainwindow.h \
     startupdialog.h \
@@ -43,7 +44,8 @@ HEADERS  += mainwindow.h \
     SettingDialog.h \
     ClientSettingForm.h \
     Definition.h \
-    StableLog.h
+    StableLog.h \
+    DesignDialog.h
 
 FORMS    += mainwindow.ui \
     startupdialog.ui \
@@ -51,12 +53,16 @@ FORMS    += mainwindow.ui \
     ManualClientDialog.ui \
     MapEditerDialog.ui \
     SettingDialog.ui \
-    ClientSettingForm.ui
+    ClientSettingForm.ui \
+    DesignDialog.ui
 
 RESOURCES += \
     Resource.qrc
 
-win32:DEFINES += OS_WIN32
+win32:{
+    DEFINES += OS_WIN32
+    RC_FILE += icons.rc
+}
 mac:{
     DEFINES += OS_MACOSX
     RESOURCES += Music.qrc

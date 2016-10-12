@@ -23,6 +23,7 @@ void ClientSettingForm::SetStandby (){
     this->ui->NameLabel ->setText(this->client->Name == "" ? "Hot" : this->client->Name);
     this->ui->IPLabel   ->setText(this->client->IP);
     this->ui->StateLabel->setText("準備完了");
+    //if(this->ui->ComboBox->currentText() != "TCPユーザー");
     this->ui->ConnectButton->setText("　切断　");
 
     emit Standby(this,true);
@@ -35,12 +36,37 @@ void ClientSettingForm::Connected  (){
     this->ui->ConnectButton->setText("　切断　");
 }
 void ClientSettingForm::DisConnected(){
+    /*
+    this->client = new TCPClient(this);
     this->ui->NameLabel ->setText("不明");
     this->ui->IPLabel   ->setText("不明");
     this->ui->StateLabel->setText("未接続");
+    this->ui->ConnectButton->setText("接続開始");
+
+    */
+    disconnect(this->client,SIGNAL( Disconnected()),this,SLOT(DisConnected()));
+    //TCP待機やめ
+    if(dynamic_cast<TCPClient*>(this->client)!=nullptr){
+        dynamic_cast<TCPClient*>(this->client)->CloseSocket();
+        this->client = new TCPClient(this);
+    }
+
+    //再connectしクライアントの接続を待つ
+    connect(this->client,SIGNAL(Connected())   ,this,SLOT(Connected()));
+    connect(this->client,SIGNAL(Ready())       ,this,SLOT(SetStandby()));
+    connect(this->client,SIGNAL(Disconnected()),this,SLOT(DisConnected()));
+    this->client->Startup();
+
+    this->ui->ConnectButton->setText("接続開始");
+    this->ui->StateLabel->setText("非接続");
+    this->ui->NameLabel->setText("不明");
+    this->ui->IPLabel->setText("不明");
+    this->ui->PortSpinBox->setEnabled(true);
 
     //状態解除
     if(this->ui->ConnectButton->isChecked())this->ui->ConnectButton->toggle();
+
+    emit Standby(this,false);
 }
 
 void ClientSettingForm::ConnectionToggled(bool state){
@@ -53,6 +79,14 @@ void ClientSettingForm::ConnectionToggled(bool state){
     }else{
         //TCP待機やめ
         dynamic_cast<TCPClient*>(this->client)->CloseSocket();
+        this->client = new TCPClient(this);
+
+        //再connectしクライアントの接続を待つ
+        connect(this->client,SIGNAL(Connected())   ,this,SLOT(Connected()));
+        connect(this->client,SIGNAL(Ready())       ,this,SLOT(SetStandby()));
+        connect(this->client,SIGNAL(Disconnected()),this,SLOT(DisConnected()));
+        this->client->Startup();
+
         this->ui->ConnectButton->setText("接続開始");
         this->ui->StateLabel->setText("非接続");
         this->ui->NameLabel->setText("不明");
@@ -69,12 +103,13 @@ void ClientSettingForm::ComboBoxChenged(QString text){
         this->client = new TCPClient(this);
         this->ui->StateLabel->setText("非接続");
         this->ui->NameLabel->setText("不明");
+        this->ui->ConnectButton->setText("接続開始");
         this->ui->PortSpinBox->setEnabled(true);
         this->ui->ConnectButton->setEnabled(true);
     }else {
         this->ui->PortSpinBox->setEnabled(false);
         this->ui->ConnectButton->setEnabled(false);
-        if(text=="自動くん")     this->client = new ComClient(this);
+        if(text=="自動くん")this->client = new ComClient(this);
         if(text=="ManualClient")this->client = new ManualClient(this);
     }
 

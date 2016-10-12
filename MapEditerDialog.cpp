@@ -23,7 +23,7 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     ui->listWidget->addItem(new QListWidgetItem("Item"));
     ui->listWidget->setIconSize(QSize(32,32));
     ui->listWidget->item(0)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Floor.png"));
-    ui->listWidget->item(1)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Hot.png"));
+    ui->listWidget->item(1)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Cool.png"));
     ui->listWidget->item(2)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Block.png"));
     ui->listWidget->item(3)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Item.png"));
 

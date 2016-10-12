@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>StartupDialog</class>
  <widget class="QDialog" name="StartupDialog">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -36,6 +39,9 @@
         </property>
         <item row="1" column="0">
          <widget class="QLineEdit" name="MapDirEdit">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;使用するマップファイルのパスです。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -46,6 +52,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="pushButton_4">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;使用するマップをファイルから選択します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>...</string>
           </property>
@@ -53,22 +62,28 @@
         </item>
         <item row="2" column="0" colspan="2">
          <widget class="QPushButton" name="MapEditButton">
+          <property name="whatsThis">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;マップエディターを開き、マップを編集します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
-           <string>MapEdit</string>
+           <string>マップの編集</string>
           </property>
          </widget>
         </item>
         <item row="3" column="0" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_4">
-          <item>
+         <layout class="QGridLayout" name="gridLayout_7">
+          <item row="0" column="0">
            <widget class="QLabel" name="label_6">
             <property name="text">
-             <string>Texture：</string>
+             <string>テクスチャ：</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
            <widget class="QComboBox" name="comboBox">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームのテクスチャを設定します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <item>
              <property name="text">
               <string>あっさり</string>
@@ -77,6 +92,35 @@
             <item>
              <property name="text">
               <string>こってり</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ほうせき</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label">
+            <property name="text">
+             <string>BGM：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="GameMusicCombo">
+            <property name="whatsThis">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームのBGMを設定します。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>TwinBeeNew</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Necromancer</string>
              </property>
             </item>
            </widget>
@@ -124,6 +168,9 @@
          <height>0</height>
         </size>
        </property>
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームを開始します。&lt;/p&gt;&lt;p&gt;COOLとHOTが両方とも接続されている、&lt;/p&gt;&lt;p&gt;または「自動くん」「ManualClient」に設定されている必要があります。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>ゲーム開始</string>
        </property>
@@ -159,28 +206,19 @@
        </layout>
       </widget>
      </item>
-     <item row="1" column="0" rowspan="2" colspan="2">
+     <item row="1" column="0" colspan="2">
       <widget class="QGroupBox" name="ServerGroup">
        <property name="title">
         <string>SERVER</string>
        </property>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="0" column="0">
          <layout class="QGridLayout" name="gridLayout_2">
           <item row="0" column="1">
            <widget class="QLabel" name="HostName">
+            <property name="whatsThis">
+             <string>サーバーのホスト名です。</string>
+            </property>
             <property name="text">
              <string>不明</string>
             </property>
@@ -208,63 +246,37 @@
           </item>
           <item row="1" column="1">
            <widget class="QLabel" name="LocalIPLabel">
+            <property name="whatsThis">
+             <string>ローカルIPです。</string>
+            </property>
             <property name="text">
              <string>192.168.1.1</string>
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
-           <widget class="QLabel" name="GrobalIPLabel">
-            <property name="text">
-             <string>不明</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_9">
-            <property name="text">
-             <string>グローバルIP：</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
          </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <item>
-           <widget class="QLabel" name="label">
-            <property name="text">
-             <string>GameMusic：</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QComboBox" name="GameMusicCombo">
-            <item>
-             <property name="text">
-              <string>TwinBeeNew</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>Necromancer</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>ServerSetting</string>
-          </property>
-         </widget>
         </item>
        </layout>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="DesignButton">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ゲームの演出を設定します。&lt;/p&gt;&lt;p&gt;(機能は再起動後有効になります)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>デザイン設定</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPushButton" name="pushButton">
+       <property name="whatsThis">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;ログ出力先、待機時間といったサーバーの設定を行います。&lt;/p&gt;&lt;p&gt;(機能は再起動後有効になります)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>サーバー設定</string>
+       </property>
       </widget>
      </item>
     </layout>
@@ -304,8 +316,8 @@
    <slot>PushedMapSelect()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>423</x>
-     <y>145</y>
+     <x>524</x>
+     <y>179</y>
     </hint>
     <hint type="destinationlabel">
      <x>330</x>
@@ -336,8 +348,8 @@
    <slot>ChangedTexture(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>470</x>
-     <y>238</y>
+     <x>523</x>
+     <y>237</y>
     </hint>
     <hint type="destinationlabel">
      <x>302</x>
@@ -368,12 +380,28 @@
    <slot>ChangeMusicCombo(QString)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>218</y>
+     <x>523</x>
+     <y>265</y>
     </hint>
     <hint type="destinationlabel">
      <x>269</x>
      <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DesignButton</sender>
+   <signal>clicked()</signal>
+   <receiver>StartupDialog</receiver>
+   <slot>ShowDesignDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>77</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>102</x>
+     <y>548</y>
     </hint>
    </hints>
   </connection>
@@ -388,5 +416,6 @@
   <slot>ChangedTexture(QString)</slot>
   <slot>Setting()</slot>
   <slot>ChangeMusicCombo(QString)</slot>
+  <slot>ShowDesignDialog()</slot>
  </slots>
 </ui>

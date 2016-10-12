@@ -28,7 +28,7 @@ private:
     GameSystem::Texture texture; //使用テクスチャタイプ
     QPixmap team_resource[TEAM_COUNT];   //チーム画像
     QPixmap field_resource[4];  //フィールド画像
-    QPixmap overray_resource[4];//オーバーレイ画像
+    QPixmap overray_resource[5];//オーバーレイ画像
 
 public:
     GameSystem::Map field; //フィールド状態
@@ -55,6 +55,9 @@ public:
     GameSystem::AroundData FieldAccessAround(GameSystem::Method method, const QPoint& center);
     //メソッドで周辺情報を取得する
     GameSystem::AroundData FieldAccessMethod(GameSystem::Method method);
+
+    //
+    GameSystem::AroundData FinishConnecting(GameSystem::TEAM team);
 
     //マップを設定する
     void setMap(const GameSystem::Map &map);
