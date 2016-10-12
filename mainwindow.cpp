@@ -172,6 +172,7 @@ void MainWindow::StepGame(){
             log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
             startup->team_client[player]->client->disconnected_flag = true;
         }else{
+            //log << getTime() + "GetReady" + "\r\n";
             team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
                                                                                                                                         GameSystem::Method::ACTION::GETREADY,
                                                                                                                                         GameSystem::Method::ROTE::UNKNOWN},
@@ -189,8 +190,8 @@ void MainWindow::StepGame(){
     }else{
         // Method
         if(startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]))){
+            //アイテムの回収
             PickItem(team_mehod[player]);
-
             //不正行動をはじく
             if(team_mehod[player].action == GameSystem::Method::ACTION::UNKNOWN){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が不正なメソッドを呼んでいます！" << "\r\n";
@@ -203,6 +204,10 @@ void MainWindow::StepGame(){
 
             //行動ログの出力
             log << getTime() + "[行動]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が" + convertString(team_mehod[player]) + "を行いました。" << "\r\n";
+
+            GameBoard*& board = this->ui->Field;
+            GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(player));
+            log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + ":" + team_around.toString() << "\r\n";
 
             //refresh
             if(player ==  TEAM_COUNT-1){
@@ -247,17 +252,16 @@ void MainWindow::PickItem(GameSystem::Method method){
 void MainWindow::Finish(GameSystem::WINNER winner){
     this->clock->stop();
     QString append_str = "";
-
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
         if(startup->team_client[i]->client->disconnected_flag){
-            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " Disconnected...]");
+            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\r\n";
         }
     }
     log << this->ui->WinnerLabel->text() << "\r\n";
     if(!silent)music->stop();
-    QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
+    if(!silent)QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
@@ -278,7 +282,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
                                                                                             GameSystem::Method::ACTION::GETREADY,
                                                                                             GameSystem::Method::ROTE::UNKNOWN},
                                                                                             ui->Field->team_pos[player]));
-        startup->team_client[player]->client->WaitEndSharp(board->FinishConnecting(static_cast<GameSystem::TEAM>(i)));
+        startup->team_client[player]->client->WaitEndSharp(board->FinishConnecting(static_cast<GameSystem::TEAM>(player)));
         player ++;
         player %= TEAM_COUNT;
 
@@ -295,7 +299,7 @@ GameSystem::WINNER MainWindow::Judge(){
     for(int i=0;i<TEAM_COUNT;i++){
 
         GameSystem::AroundData team_around = board->FieldAccessAround(static_cast<GameSystem::TEAM>(i));
-        log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_around.toString() << "\r\n";
+        //log << getTime() + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + ":" + team_around.toString() << "\r\n";
 
         //ブロック置かれ死
         if(team_around.data[4] == GameSystem::MAP_OBJECT::BLOCK){

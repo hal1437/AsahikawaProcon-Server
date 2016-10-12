@@ -46,8 +46,10 @@ void ClientSettingForm::DisConnected(){
     */
     disconnect(this->client,SIGNAL( Disconnected()),this,SLOT(DisConnected()));
     //TCP待機やめ
-    dynamic_cast<TCPClient*>(this->client)->CloseSocket();
-    this->client = new TCPClient(this);
+    if(dynamic_cast<TCPClient*>(this->client)!=nullptr){
+        dynamic_cast<TCPClient*>(this->client)->CloseSocket();
+        this->client = new TCPClient(this);
+    }
 
     //再connectしクライアントの接続を待つ
     connect(this->client,SIGNAL(Connected())   ,this,SLOT(Connected()));

@@ -13,11 +13,12 @@ QString TCPClient::VisibilityString(QString str){
 
 QString TCPClient::WaitResponce(){
     int ignore = 0;
-
     while(ignore != this->IGNORE_INVALD){
         //レスポンス待ち
+        qDebug() << "WaitStart:";
         if(this->client->waitForReadyRead(this->TIMEOUT)){
             //レスポンスあり
+
             QString response = "";
 
             //自動結合
@@ -31,15 +32,18 @@ QString TCPClient::WaitResponce(){
             //不正文字列：空
             if(response == "" || response == "\n" || response == "\r" || response == "\r\n"){
                 ignore++;
+
                 continue;
             }
             //不正文字列：改行なし
             if(response.size() > 0 && *(response.end()-1) != '\n'){
                 disconnected_flag = true;
                 qDebug() << QString("[Port") + QString::number(this->client->localPort()) +"]:Noting \\n";
+
                 return QString();
             }
 
+            qDebug()<<"test:"+response;
             return response;
         }else{
             //レスポンスなし
@@ -56,18 +60,24 @@ QString TCPClient::WaitResponce(){
 bool TCPClient::WaitGetReady(){
     if(disconnected_flag)return false;
     //ターン開始文字列
+    if(client == nullptr)return false;
     client->write(QString("@\r\n").toUtf8());
 
     //レスポンス待ち
     QString response = WaitResponce();
+    qDebug() << "res:"+response;
     qDebug() << (response == "gr\r\n");
     return (response == "gr\r\n");
 }
 GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
     if(disconnected_flag)return GameSystem::Method();
     //周辺情報文字列
+    if(client == nullptr)return GameSystem::Method{GameSystem::TEAM::UNKNOWN,
+                GameSystem::Method::ACTION::UNKNOWN,
+                GameSystem::Method::ROTE::UNKNOWN};
     client->write(QString(data.toString() + "\r\n").toUtf8());
-
+    qDebug() << "WRM";
+    qDebug() << data.toString();
     //レスポンス待ち
     QString response = WaitResponce();
     if(response != QString())return GameSystem::Method::fromString(response);
@@ -78,8 +88,10 @@ GameSystem::Method TCPClient::WaitReturnMethod(GameSystem::AroundData data){
 bool TCPClient::WaitEndSharp(GameSystem::AroundData data){
     if(disconnected_flag)return false;
 
+    if(client == nullptr)return false;
     //周辺情報文字列
     client->write(QString(data.toString() + "\r\n").toUtf8());
+    qDebug() << "WES";
     qDebug() << data.toString();
     //レスポンス待ち
     return(WaitResponce() == "#\r\n");
