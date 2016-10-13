@@ -40,6 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     this->startup = new StartupDialog();
+    this->win = GameSystem::WINNER::CONTINUE;
 
     for(int i=0;i<TEAM_COUNT;i++)team_score[i] = 0;
     connect(this,SIGNAL(destroyed()),this,SLOT(SaveFile()));
@@ -173,10 +174,11 @@ void MainWindow::StepGame(){
             startup->team_client[player]->client->disconnected_flag = true;
         }else{
             //log << getTime() + "GetReady" + "\r\n";
-            team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
-                                                                                                                                        GameSystem::Method::ACTION::GETREADY,
-                                                                                                                                        GameSystem::Method::ROTE::UNKNOWN},
-                                                                                                                     ui->Field->team_pos[player]));
+            GameSystem::AroundData buffer = ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                         GameSystem::Method::ACTION::GETREADY,
+                                                                         GameSystem::Method::ROTE::UNKNOWN},
+                                                                         ui->Field->team_pos[player]);
+            team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(buffer);
             if(team_mehod[player].action == GameSystem::Method::ACTION::GETREADY){
                 log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が二度GetReadyを行いました!" << "\r\n";
                 startup->team_client[player]->client->disconnected_flag = true;
@@ -184,12 +186,32 @@ void MainWindow::StepGame(){
             team_mehod[player].team = static_cast<GameSystem::TEAM>(player);
         }
         //End
-        GameSystem::WINNER win = Judge();
-        if(win != GameSystem::WINNER::CONTINUE)Finish(win);
+        this->win = Judge();
+
+        if(win != GameSystem::WINNER::CONTINUE){
+
+            player++;
+            player %= TEAM_COUNT;
+
+            startup->team_client[player]->client->WaitGetReady();
+            GameSystem::AroundData buffer = ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                         GameSystem::Method::ACTION::GETREADY,
+                                                                         GameSystem::Method::ROTE::UNKNOWN},
+                                                                         ui->Field->team_pos[player]);
+            buffer.connect = GameSystem::CONNECTING_STATUS::FINISHED;
+            team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(buffer);
+            Finish(win);
+        }
 
     }else{
         // Method
-        if(startup->team_client[player]->client->WaitEndSharp(ui->Field->FieldAccessMethod(team_mehod[player]))){
+        GameSystem::AroundData around = ui->Field->FieldAccessMethod(team_mehod[player]);
+        this->win = Judge();
+        if(this->win != GameSystem::WINNER::CONTINUE){
+            around.connect = GameSystem::CONNECTING_STATUS::FINISHED;
+        }
+
+        if(startup->team_client[player]->client->WaitEndSharp(around)){
             //アイテムの回収
             PickItem(team_mehod[player]);
             //不正行動をはじく
@@ -219,11 +241,21 @@ void MainWindow::StepGame(){
             startup->team_client[player]->client->disconnected_flag = true;
         }
         //End
-        GameSystem::WINNER win = Judge();
-        if(win != GameSystem::WINNER::CONTINUE)Finish(win);
 
         player++;
         player %= TEAM_COUNT;
+
+        if(win != GameSystem::WINNER::CONTINUE){
+            startup->team_client[player]->client->WaitGetReady();
+            GameSystem::AroundData buffer = ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
+                                                                         GameSystem::Method::ACTION::GETREADY,
+                                                                         GameSystem::Method::ROTE::UNKNOWN},
+                                                                         ui->Field->team_pos[player]);
+            buffer.connect = GameSystem::CONNECTING_STATUS::FINISHED;
+            team_mehod[player] = startup->team_client[player]->client->WaitReturnMethod(buffer);
+            Finish(win);
+        }
+
     }
 
     ui->Field->repaint();
@@ -276,6 +308,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         log << getTime() + "[決着]引き分けです。" << "\r\n";
     }
     GameBoard*& board = this->ui->Field;
+    /*
     for(int i=0;i<TEAM_COUNT;i++){
         startup->team_client[player]->client->WaitGetReady();
         startup->team_client[player]->client->WaitReturnMethod(ui->Field->FieldAccessAround(GameSystem::Method{static_cast<GameSystem::TEAM>(player),
@@ -288,6 +321,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
 
         qDebug() << board->FinishConnecting(static_cast<GameSystem::TEAM>(i)).toString();
     }
+    */
     //log.close();
 }
 GameSystem::WINNER MainWindow::Judge(){

@@ -45,6 +45,7 @@ private:
     int anime_team_time = 2000;//チーム配置アニメーション時間
     int anime_blind_time = 1000;//まっくらアニメーション時間
 
+    GameSystem::WINNER win;
 protected:
     void keyPressEvent(QKeyEvent* event);
 public:
