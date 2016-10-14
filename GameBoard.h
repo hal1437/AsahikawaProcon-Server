@@ -39,6 +39,8 @@ public:
 
     GameSystem::Method past_method;//前回のログ
 
+    int leave_items;             //残りアイテム
+    int team_score[TEAM_COUNT];  //チームのスコア
 protected:
     void paintEvent (QPaintEvent *event);   //ペイントイベント
     void resizeEvent(QResizeEvent *event); //リサイズイベント
@@ -69,6 +71,10 @@ public:
     void PlayAnimation(GameSystem::Method method);
 
     explicit GameBoard(QWidget *parent = 0);
+
+    //アイテム回収
+    void PickItem(GameSystem::Method method);
+
     ~GameBoard();
 
 private:
