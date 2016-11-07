@@ -183,6 +183,7 @@ void GameSystem::Map::CreateRandomMap(){
 }
 
 void GameSystem::AroundData::finish(){
+    this->data[0] = static_cast<GameSystem::MAP_OBJECT>(GameSystem::CONNECTING_STATUS::FINISHED);
     this->connect = GameSystem::CONNECTING_STATUS::FINISHED;
 }
 

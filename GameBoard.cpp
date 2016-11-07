@@ -6,6 +6,22 @@
 #define MIN(x,y) ((x < y)? x : y)
 #define MAX(x,y) ((x > y)? x : y)
 
+void GameBoard::PickItem(GameSystem::Method method){
+
+    //移動先がアイテムの場合は壁を置く
+    QPoint pos = this->team_pos[static_cast<int>(method.team)];
+    if(this->FieldAccess(method,pos) == GameSystem::MAP_OBJECT::ITEM){
+        this->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
+        this->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
+
+
+        this->team_score[static_cast<int>(method.team)]++;
+        this->leave_items--;
+    }
+
+}
+
+
 QString GameBoard::GetTexturePath(GameSystem::Texture tex){
     if(tex == GameSystem::Texture::Light)return ":/Light/Texture/Light";
     if(tex == GameSystem::Texture::Heavy)return ":/Heavy/Texture/Heavy";
@@ -163,6 +179,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * 2);
         case GameSystem::Method::ACTION::WALK:
             team_pos[static_cast<int>(method.team)] += method.GetRoteVector();
+            this->PickItem(method);
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)]);
         case GameSystem::Method::ACTION::SEACH:
             GameSystem::AroundData around;
@@ -210,7 +227,10 @@ GameBoard::GameBoard(QWidget *parent) :
     //画像読み込み
     ReloadTexture(GameSystem::Texture::Light);
     ui->setupUi(this);
-
+    for(int i = 0; i < TEAM_COUNT; i++){
+        this->team_score[i] = 0;
+    }
+    leave_items = 0;
 }
 
 GameBoard::~GameBoard()

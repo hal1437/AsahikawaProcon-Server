@@ -24,7 +24,6 @@ class MainWindow : public QMainWindow
 private:
 
     int player;      //次ターン行動プレイヤー
-    int team_score[TEAM_COUNT]; //スコア
 
     int FRAME_RATE = 150;   //ゲームフレームレート
     QTimer* clock;          //ゲームクロック
@@ -34,7 +33,6 @@ private:
     StartupDialog* startup; //スタートアップダイアログ
     QSound* music;          //音楽
 
-    int leave_items=0;
     bool silent;
 
     bool dark;              //暗転処理
@@ -45,6 +43,7 @@ private:
     int anime_team_time = 2000;//チーム配置アニメーション時間
     int anime_blind_time = 1000;//まっくらアニメーション時間
 
+    GameSystem::WINNER win;
 protected:
     void keyPressEvent(QKeyEvent* event);
 public:
@@ -60,7 +59,7 @@ private slots:
     //ゲーム進行
     void StepGame();
     //アイテム取得の判定
-    void PickItem(GameSystem::Method method);
+    void RefreshItem(GameSystem::Method method);
     //決着判定
     GameSystem::WINNER Judge();
     //決着
