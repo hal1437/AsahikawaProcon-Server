@@ -71,6 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     if(dark == true)this->anime_map_time -= this->anime_blind_time;
 
     //ログファイルオープン
+    if(path == "")path = ".";
     log = StableLog(path + "/log" + getTime() + ".txt");
 
     //スタートアップダイアログ開始

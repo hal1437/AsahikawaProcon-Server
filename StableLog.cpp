@@ -29,14 +29,13 @@ StableLog::StableLog()
 StableLog::StableLog(QString filename) : filename(filename){
 
     QFile* file = new QFile(filename);
+
     QTextStream log;
     file->open(QIODevice::WriteOnly);
     log.setDevice(file);
     //ログファイルオープン
     log.setDevice(file);
     log << "--Stable Log--\n";
-
-    delete file;
 }
 
 StableLog::~StableLog()
