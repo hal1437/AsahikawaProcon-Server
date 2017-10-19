@@ -53,6 +53,9 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    //音楽
+    QMediaPlayer *bgm;
+
 private slots:
     void SaveFile();
 

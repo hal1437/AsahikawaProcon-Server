@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QSettings>
 #include <QFileInfo>
+#include <QMediaPlayer>
 #include "Definition.h"
 
 QString getTime(){
@@ -101,11 +102,23 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
     startup_anime->start(anime_map_time / (startup->map.size.x()*startup->map.size.y()));
 
+    /*
     music = new QSound(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav");
 
     if(!silent)music->play();
+    */
 
-    log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
+    if(!silent){
+        bgm = new QMediaPlayer;
+        connect(bgm, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+        bgm->setMedia(QUrl::fromLocalFile(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav"));
+        bgm->setVolume(50);
+        bgm->play();
+    }
+
+    log << "音楽ディレクトリ" + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav" + "\n";
+
+    //log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
@@ -292,8 +305,21 @@ void MainWindow::Finish(GameSystem::WINNER winner){
         }
     }
     log << this->ui->WinnerLabel->text() << "\r\n";
+
+    /*
     if(!silent)music->stop();
     if(!silent)QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
+    */
+
+    if(!silent)bgm->stop();
+
+    if(!silent){
+        bgm = new QMediaPlayer;
+        connect(bgm, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+        bgm->setMedia(QUrl::fromLocalFile(MUSIC_DIRECTORY + "/Music/ji_023.wav"));
+        bgm->setVolume(50);
+        bgm->play();
+    }
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
