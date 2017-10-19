@@ -430,7 +430,10 @@ void MainWindow::StartAnimation(){
     QPoint pos[2];
     if(ANIMATION_TYPE == 0){
         //ランダムにワサッて
-        for(int i=0;i<2;i++){
+        //一度に2マス表示させるのですわ
+        int i_max = 2;
+        if(timer == 1)i_max ++;
+        for(int i=0;i<i_max;i++){
             do{
                 pos[i].setX(qrand() % this->startup->map.size.x());
                 pos[i].setY(qrand() % this->startup->map.size.y());
