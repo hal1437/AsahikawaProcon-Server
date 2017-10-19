@@ -172,8 +172,12 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
                (team_pos[static_cast<int>(method.team)] + method.GetRoteVector()).y() < field.size.y() &&
                (team_pos[static_cast<int>(method.team)] + method.GetRoteVector()).x() < field.size.x()){
                 QPoint get_pos = team_pos[static_cast<int>(method.team)] + method.GetRoteVector();
+                //put先にアイテムがある場合、残りアイテム数の数の表示を1減らさなければならない
+                if(this->field.field[get_pos.y()][get_pos.x()] == GameSystem::MAP_OBJECT::ITEM){
+                    this->leave_items --;
+                }
                 this->field.field[get_pos.y()][get_pos.x()] = GameSystem::MAP_OBJECT::BLOCK;
-                 }
+            }
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)]);
         case GameSystem::Method::ACTION::LOOK:
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * 2);
