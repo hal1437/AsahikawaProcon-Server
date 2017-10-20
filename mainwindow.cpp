@@ -116,7 +116,9 @@ MainWindow::MainWindow(QWidget *parent) :
         bgm->play();
     }
 
-    log << "音楽ディレクトリ" + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav" + "\n";
+    //log << "[ Music : " + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav ]" + "\r\n";
+    log << "[ Music : " + this->startup->music_text + " ]" + "\r\n";
+
 
     //log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
@@ -153,7 +155,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mSettings->setValue( "Team", anime_team_time );
 
     }
-    log << getTime() + "セットアップ完了　ゲームを開始します。\n";
+    log << getTime() + "セットアップ完了　ゲームを開始します。\r\n";
 }
 
 MainWindow::~MainWindow()
@@ -175,7 +177,7 @@ void MainWindow::StepGame(){
     //ターンログ出力
     if(ui->TimeBar->value() != turn_count){
        turn_count = ui->TimeBar->value();
-       log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
+       log << QString("-----残") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
     }
 
     //GetReadyの取得
@@ -300,7 +302,7 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
         if(startup->team_client[i]->client->disconnected_flag){
-            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
+            append_str.append("\r\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\r\n";
         }
     }

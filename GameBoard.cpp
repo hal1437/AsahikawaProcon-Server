@@ -90,11 +90,10 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
                     //暗闇の描画
                     if(field.discover[i][j] == GameSystem::Discoverer::Unknown){
+
                         painter.drawPixmap(j * image_part.width() ,
                                            i * image_part.height(),
                                            overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::BLIND)]);
-                    }else{
-                        int gomi = 0;
                     }
 
                     //オーバーレイの描画
