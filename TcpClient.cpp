@@ -130,7 +130,8 @@ void TCPClient::DisConnect(){
 
 QString TCPClient::GetTeamName(){
     if(this->Name == ""){
-        this->Name = client->readAll();
+        //Qstring::fromLocal8bitで文字化け対策しています
+        this->Name = QString::fromLocal8Bit(client->readAll());
         disconnect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
         emit WriteTeamName();
         emit Ready();
