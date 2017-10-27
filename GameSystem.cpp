@@ -41,10 +41,11 @@ GameSystem::Method GameSystem::Method::fromString(const QString& str){
 
 
 GameSystem::Map::Map():
+    //デフォルトの設定
     turn(100),
     name("[DEFAULT MAP]"),
     size(DEFAULT_MAP_WIDTH,DEFAULT_MAP_HEIGHT),
-    texture(GameSystem::Texture::Light){
+    texture(GameSystem::Texture::Jewel){
 }
 void GameSystem::Map::SetSize(QPoint size){
     this->size = size;

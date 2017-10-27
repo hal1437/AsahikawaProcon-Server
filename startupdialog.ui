@@ -86,17 +86,17 @@
             </property>
             <item>
              <property name="text">
+              <string>ほうせき</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>あっさり</string>
              </property>
             </item>
             <item>
              <property name="text">
               <string>こってり</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>ほうせき</string>
              </property>
             </item>
            </widget>
