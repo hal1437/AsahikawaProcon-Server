@@ -62,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
+    //デザイン設定を書き換え
     QSettings* dSettings;
     QVariant v2;
     dSettings = new QSettings( "design.ini", QSettings::IniFormat ); // iniファイルで設定を保存
@@ -69,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent) :
     v2 = dSettings->value( "Dark" );
     if (v2.type() != QVariant::Invalid)dark = v2.toBool();
     else dark = false;
+    v2 = dSettings->value( "Bot" );
+    if (v2.type() != QVariant::Invalid)isbotbattle = v2.toBool();
+    else isbotbattle = false;
     if(dark == true)this->anime_map_time -= this->anime_blind_time;
 
     //ログファイルオープン
@@ -89,8 +93,14 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->TurnLabel     ->setText("Turn : " + QString::number(this->ui->TimeBar->value()));
         this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
         this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
-        this->ui->HotScoreLabel ->setText("0");
-        this->ui->CoolScoreLabel->setText("0");
+
+        if(this->isbotbattle){
+            this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn));
+            this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn));
+        }else{
+            this->ui->HotScoreLabel ->setText("0");
+            this->ui->CoolScoreLabel->setText("0");
+        }
 
     }else{
         exit(0);
@@ -253,6 +263,11 @@ void MainWindow::StepGame(){
             if(player ==  TEAM_COUNT-1){
                 ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
                 this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+
+                if(this->isbotbattle){
+                    ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)] * 3));
+                    ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)] * 3));
+                }
             }
         }else{
             log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
@@ -287,8 +302,13 @@ void MainWindow::RefreshItem(GameSystem::Method method){
     if(this->ui->Field->leave_items != leave_item){
         ui->ItemLeaveLabel->setText(QString::number(this->ui->Field->leave_items));
         log << getTime() + "[取得]" + GameSystem::TEAM_PROPERTY::getTeamName(method.team) + "がアイテムを取得しました。" << "\r\n";
-        ui->CoolScoreLabel->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
-        ui->HotScoreLabel ->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
+        if(this->isbotbattle){
+            ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)] * 3));
+            ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)] * 3));
+        }else{
+            ui->CoolScoreLabel->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
+            ui->HotScoreLabel ->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
+        }
         leave_item = this->ui->Field->leave_items;
     }
 

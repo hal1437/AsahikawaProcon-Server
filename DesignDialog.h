@@ -15,6 +15,7 @@ public:
     explicit DesignDialog(QWidget *parent = 0);
 
     bool GetCheckDark() const;
+    bool GetCheckBot() const;
     void Export();
 
     ~DesignDialog();

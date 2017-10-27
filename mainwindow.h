@@ -36,6 +36,7 @@ private:
     bool silent;
 
     bool dark;              //暗転処理
+    bool isbotbattle;       //ボット戦モード
 
     QFile* file;    //ログファイル
     StableLog log;//ログストリーム

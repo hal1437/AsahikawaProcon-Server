@@ -14,8 +14,9 @@ void GameBoard::PickItem(GameSystem::Method method){
         this->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         this->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
 
-
+        //点数を１増やす
         this->team_score[static_cast<int>(method.team)]++;
+
         this->leave_items--;
     }
 
