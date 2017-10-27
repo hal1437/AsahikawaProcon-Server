@@ -30,6 +30,8 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
     ui->listWidget->setCurrentRow(0);
+
+    ui->TurnSpin->setValue(ui->widget->field.turn);
 }
 
 MapEditerDialog::~MapEditerDialog()
