@@ -27,6 +27,18 @@ MapEditerDialog::MapEditerDialog(GameSystem::Map map,QWidget *parent) :
     ui->listWidget->item(2)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Block.png"));
     ui->listWidget->item(3)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Item.png"));
 
+    //ブロックの数をカウントして表示
+    int counter = 0;
+    counter = ui->widget->GetMapObjectCount(GameSystem::MAP_OBJECT::BLOCK);
+    ui->ObjectCounter->addItem(new QListWidgetItem("×" + QString(QString::number(counter))));
+    //アイテムの数をカウントして表示
+    counter = ui->widget->GetMapObjectCount(GameSystem::MAP_OBJECT::ITEM);
+    ui->ObjectCounter->addItem(new QListWidgetItem("×" + QString(QString::number(counter))));
+    //アイコン
+    ui->ObjectCounter->setIconSize(QSize(32,32));
+    ui->ObjectCounter->item(0)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Block.png"));
+    ui->ObjectCounter->item(1)->setIcon(QIcon(GameBoard::GetTexturePath(map.texture) + "/Item.png"));
+
     connect(ui->listWidget,SIGNAL(currentItemChanged(QListWidgetItem*,QListWidgetItem*)),this,SLOT(SelectItem(QListWidgetItem*,QListWidgetItem*)));
     connect(ui->TurnSpin  ,SIGNAL(valueChanged(int))                                    ,this,SLOT(SpinChanged(int)));
     ui->listWidget->setCurrentRow(0);
@@ -86,6 +98,9 @@ void MapEditerDialog::FillItem(const QPoint& pos){
             this->ui->widget->field.field[r_fill_point.y()][r_fill_point.x()] = obj;
         }
     }
+    //オブジェクト数の表示を変更するよ
+    ReCount();
+
     update();
 }
 
@@ -95,6 +110,9 @@ void MapEditerDialog::Clear(){
             v2 = GameSystem::MAP_OBJECT::NOTHING;
         }
     }
+    //オブジェクト数の表示を変更するよ
+    ReCount();
+
     update();
 }
 void MapEditerDialog::SpinChanged(int value){
@@ -131,4 +149,15 @@ void MapEditerDialog::ComboChanged(QString value){
     paintEvent(nullptr);
     update();
 
+}
+
+//アイテム数えなおし
+void MapEditerDialog::ReCount(){
+    //ブロックの数をカウントして表示
+    int counter = 0;
+    counter = ui->widget->GetMapObjectCount(GameSystem::MAP_OBJECT::BLOCK);
+    ui->ObjectCounter->item(0)->setText("×" + QString(QString::number(counter)));
+    //アイテムの数をカウントして表示
+    counter = ui->widget->GetMapObjectCount(GameSystem::MAP_OBJECT::ITEM);
+    ui->ObjectCounter->item(1)->setText("×" + QString(QString::number(counter)));
 }

@@ -117,6 +117,20 @@ void GameBoard::RefreshOverlay(){
     }
 }
 
+//引数で指定されたオブジェクトの個数を数える関数
+int GameBoard::GetMapObjectCount(GameSystem::MAP_OBJECT mb){
+    int result = 0;
+    for(int i = 0; i < field.size.y(); i++){
+        for(int j = 0; j < field.size.x(); j++){
+            if(field.field[i][j] == mb){
+                result ++;
+            }
+        }
+    }
+
+    return result;
+}
+
 GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::Method method, const QPoint& pos){
     //場外
     if(pos.x() <  0              || pos.y() <  0)             return GameSystem::MAP_OBJECT::BLOCK;
