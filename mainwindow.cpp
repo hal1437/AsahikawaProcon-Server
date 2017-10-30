@@ -94,9 +94,10 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
         this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
 
+        //ボット戦モードならば表記の変更
         if(this->isbotbattle){
-            this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn));
-            this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn));
+            this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
+            this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
         }else{
             this->ui->HotScoreLabel ->setText("0");
             this->ui->CoolScoreLabel->setText("0");
@@ -264,9 +265,13 @@ void MainWindow::StepGame(){
                 ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
                 this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
 
+                //ボット戦モードならば表記のリアルタイム更新
                 if(this->isbotbattle){
-                    ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)] * 3));
-                    ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)] * 3));
+                    int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+                    ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+                    ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+                    ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+
                 }
             }
         }else{
@@ -303,8 +308,10 @@ void MainWindow::RefreshItem(GameSystem::Method method){
         ui->ItemLeaveLabel->setText(QString::number(this->ui->Field->leave_items));
         log << getTime() + "[取得]" + GameSystem::TEAM_PROPERTY::getTeamName(method.team) + "がアイテムを取得しました。" << "\r\n";
         if(this->isbotbattle){
-            ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)] * 3));
-            ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)] * 3));
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+            ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+            ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+            ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
         }else{
             ui->CoolScoreLabel->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
             ui->HotScoreLabel ->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
@@ -346,10 +353,20 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
         log << getTime() + "[決着]COOLが勝利しました。" << "\r\n";
+        //負けチームのスコア更新（ターン数分減らす）
+        if(this->isbotbattle){
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+            ui->HotScoreLabel ->setText(QString::number(ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+        }
     }
     if(winner == GameSystem::WINNER::HOT){
         this->ui->WinnerLabel->setText("HOT WIN!"  + append_str);
         log << getTime() + "[決着]HOTが勝利しました。" << "\r\n";
+        //負けチームのスコア更新（ターン数分減らす）
+        if(this->isbotbattle){
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+            ui->CoolScoreLabel->setText(QString::number(ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+        }
     }
     if(winner == GameSystem::WINNER::DRAW){
         this->ui->WinnerLabel->setText("DRAW");
