@@ -13,7 +13,7 @@ QString convertString(GameSystem::Method method){
     if(method.action == GameSystem::Method::ACTION::GETREADY)str += "GetReady";
     if(method.action == GameSystem::Method::ACTION::LOOK)    str += "Look";
     if(method.action == GameSystem::Method::ACTION::PUT)     str += "Put";
-    if(method.action == GameSystem::Method::ACTION::SEACH)   str += "Seach";
+    if(method.action == GameSystem::Method::ACTION::SEARCH)   str += "Search";
     if(method.action == GameSystem::Method::ACTION::WALK)    str += "Walk";
 
     if(method.rote == GameSystem::Method::ROTE::UP)str += "Up";

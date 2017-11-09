@@ -28,7 +28,7 @@ GameSystem::Method GameSystem::Method::fromString(const QString& str){
     GameSystem::Method answer;
     if     (str[0] == 'w')answer.action = GameSystem::Method::ACTION::WALK;
     else if(str[0] == 'l')answer.action = GameSystem::Method::ACTION::LOOK;
-    else if(str[0] == 's')answer.action = GameSystem::Method::ACTION::SEACH;
+    else if(str[0] == 's')answer.action = GameSystem::Method::ACTION::SEARCH;
     else if(str[0] == 'p')answer.action = GameSystem::Method::ACTION::PUT;
     else                  answer.action = GameSystem::Method::ACTION::UNKNOWN;
     if     (str[1] == 'u')answer.rote   = GameSystem::Method::ROTE::UP;
