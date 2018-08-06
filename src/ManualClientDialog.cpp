@@ -17,7 +17,7 @@ void ManualClientDialog::keyPressEvent(QKeyEvent * event){
 GameSystem::Method::ACTION ManualClientDialog::GetAction(){
     if     (this->ui->WalkRadio->isChecked()) return GameSystem::Method::ACTION::WALK;
     else if(this->ui->PutRadio->isChecked())  return GameSystem::Method::ACTION::PUT;
-    else if(this->ui->SeachRadio->isChecked())return GameSystem::Method::ACTION::SEACH;
+    else if(this->ui->SearchRadio->isChecked())return GameSystem::Method::ACTION::SEARCH;
     else if(this->ui->LookRadio->isChecked()) return GameSystem::Method::ACTION::LOOK;
     else                                      return GameSystem::Method::ACTION::UNKNOWN;
 }

@@ -35,7 +35,8 @@ StableLog::StableLog(QString filename) : filename(filename){
     log.setDevice(file);
     //ログファイルオープン
     log.setDevice(file);
-    log << "--Stable Log--\n";
+    log << "--Stable Log--\r\n";
+    delete file;
 }
 
 StableLog::~StableLog()

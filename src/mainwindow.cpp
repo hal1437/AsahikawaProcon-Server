@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QSettings>
 #include <QFileInfo>
+#include <QMediaPlayer>
 #include "Definition.h"
 
 QString getTime(){
@@ -12,7 +13,7 @@ QString convertString(GameSystem::Method method){
     if(method.action == GameSystem::Method::ACTION::GETREADY)str += "GetReady";
     if(method.action == GameSystem::Method::ACTION::LOOK)    str += "Look";
     if(method.action == GameSystem::Method::ACTION::PUT)     str += "Put";
-    if(method.action == GameSystem::Method::ACTION::SEACH)   str += "Seach";
+    if(method.action == GameSystem::Method::ACTION::SEARCH)   str += "Search";
     if(method.action == GameSystem::Method::ACTION::WALK)    str += "Walk";
 
     if(method.rote == GameSystem::Method::ROTE::UP)str += "Up";
@@ -61,6 +62,7 @@ MainWindow::MainWindow(QWidget *parent) :
     v = mSettings->value( "Team" );
     if (v.type() != QVariant::Invalid)anime_team_time = v.toInt();
 
+    //デザイン設定を書き換え
     QSettings* dSettings;
     QVariant v2;
     dSettings = new QSettings( "design.ini", QSettings::IniFormat ); // iniファイルで設定を保存
@@ -68,6 +70,9 @@ MainWindow::MainWindow(QWidget *parent) :
     v2 = dSettings->value( "Dark" );
     if (v2.type() != QVariant::Invalid)dark = v2.toBool();
     else dark = false;
+    v2 = dSettings->value( "Bot" );
+    if (v2.type() != QVariant::Invalid)isbotbattle = v2.toBool();
+    else isbotbattle = false;
     if(dark == true)this->anime_map_time -= this->anime_blind_time;
 
     //ログファイルオープン
@@ -89,8 +94,15 @@ MainWindow::MainWindow(QWidget *parent) :
         this->ui->TurnLabel     ->setText("Turn : " + QString::number(this->ui->TimeBar->value()));
         this->ui->CoolNameLabel ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name == "" ? "Cool" : this->startup->team_client[static_cast<int>(GameSystem::TEAM::COOL)]->client->Name);
         this->ui->HotNameLabel  ->setText(this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name == "" ? "Hot"  : this->startup->team_client[static_cast<int>(GameSystem::TEAM::HOT )]->client->Name);
-        this->ui->HotScoreLabel ->setText("0");
-        this->ui->CoolScoreLabel->setText("0");
+
+        //ボット戦モードならば表記の変更
+        if(this->isbotbattle){
+            this->ui->HotScoreLabel ->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
+            this->ui->CoolScoreLabel->setText(QString::number(this->startup->map.turn) + "(ITEM:0)");
+        }else{
+            this->ui->HotScoreLabel ->setText("0");
+            this->ui->CoolScoreLabel->setText("0");
+        }
 
     }else{
         exit(0);
@@ -102,11 +114,25 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(startup_anime,SIGNAL(timeout()),this,SLOT(StartAnimation()));
     startup_anime->start(anime_map_time / (startup->map.size.x()*startup->map.size.y()));
 
+    /*
     music = new QSound(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav");
 
     if(!silent)music->play();
+    */
 
-    log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
+    if(!silent){
+        bgm = new QMediaPlayer;
+        connect(bgm, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+        bgm->setMedia(QUrl::fromLocalFile(MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav"));
+        bgm->setVolume(50);
+        bgm->play();
+    }
+
+    //log << "[ Music : " + MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav ]" + "\r\n";
+    log << "[ Music : " + this->startup->music_text + " ]" + "\r\n";
+
+
+    //log << MUSIC_DIRECTORY + "/Music/" + this->startup->music_text + ".wav";
 
     for(int i=0;i<TEAM_COUNT;i++){
         ui->Field->team_pos[i].setX(-1);
@@ -141,7 +167,7 @@ MainWindow::MainWindow(QWidget *parent) :
         mSettings->setValue( "Team", anime_team_time );
 
     }
-    log << getTime() + "セットアップ完了　ゲームを開始します。\n";
+    log << getTime() + "セットアップ完了　ゲームを開始します。\r\n";
 }
 
 MainWindow::~MainWindow()
@@ -163,7 +189,7 @@ void MainWindow::StepGame(){
     //ターンログ出力
     if(ui->TimeBar->value() != turn_count){
        turn_count = ui->TimeBar->value();
-       log << QString("-----第") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
+       log << QString("-----残") + QString::number(ui->TimeBar->value()) + "ターン-----" + "\r\n";
     }
 
     //GetReadyの取得
@@ -239,6 +265,15 @@ void MainWindow::StepGame(){
             if(player ==  TEAM_COUNT-1){
                 ui->TimeBar->setValue(this->ui->TimeBar->value() - 1);
                 this->ui->TurnLabel->setText("Turn : " + QString::number(ui->TimeBar->value()));
+
+                //ボット戦モードならば表記のリアルタイム更新
+                if(this->isbotbattle){
+                    int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+                    ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+                    ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+                    ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+
+                }
             }
         }else{
             log << getTime() + "[停止]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(player)) + "が正常にGetReadyを返しませんでした!" << "\r\n";
@@ -273,8 +308,15 @@ void MainWindow::RefreshItem(GameSystem::Method method){
     if(this->ui->Field->leave_items != leave_item){
         ui->ItemLeaveLabel->setText(QString::number(this->ui->Field->leave_items));
         log << getTime() + "[取得]" + GameSystem::TEAM_PROPERTY::getTeamName(method.team) + "がアイテムを取得しました。" << "\r\n";
-        ui->CoolScoreLabel->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
-        ui->HotScoreLabel ->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
+        if(this->isbotbattle){
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+            ui->CoolScoreLabel->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+            ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+            ui->HotScoreLabel ->setText(QString::number(ui->TimeBar->value() + ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+        }else{
+            ui->CoolScoreLabel->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)]));
+            ui->HotScoreLabel ->setText(QString::number(this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)]));
+        }
         leave_item = this->ui->Field->leave_items;
     }
 
@@ -288,21 +330,44 @@ void MainWindow::Finish(GameSystem::WINNER winner){
     //disconnect
     for(int i=0;i<TEAM_COUNT;i++){
         if(startup->team_client[i]->client->disconnected_flag){
-            append_str.append("\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
+            append_str.append("\r\n[" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + " 切断により]");
             log << getTime() + "[終了]" + GameSystem::TEAM_PROPERTY::getTeamName(static_cast<GameSystem::TEAM>(i)) + "との通信が切断されています。" << "\r\n";
         }
     }
     log << this->ui->WinnerLabel->text() << "\r\n";
+
+    /*
     if(!silent)music->stop();
     if(!silent)QSound::play(MUSIC_DIRECTORY + "/Music/ji_023.wav");
+    */
+
+    if(!silent)bgm->stop();
+
+    if(!silent){
+        bgm = new QMediaPlayer;
+        connect(bgm, SIGNAL(positionChanged(qint64)), this, SLOT(positionChanged(qint64)));
+        bgm->setMedia(QUrl::fromLocalFile(MUSIC_DIRECTORY + "/Music/ji_023.wav"));
+        bgm->setVolume(50);
+        bgm->play();
+    }
 
     if(winner == GameSystem::WINNER::COOL){
         this->ui->WinnerLabel->setText("COOL WIN!" + append_str);
         log << getTime() + "[決着]COOLが勝利しました。" << "\r\n";
+        //負けチームのスコア更新（ターン数分減らす）
+        if(this->isbotbattle){
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::HOT)];
+            ui->HotScoreLabel ->setText(QString::number(ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+        }
     }
     if(winner == GameSystem::WINNER::HOT){
         this->ui->WinnerLabel->setText("HOT WIN!"  + append_str);
         log << getTime() + "[決着]HOTが勝利しました。" << "\r\n";
+        //負けチームのスコア更新（ターン数分減らす）
+        if(this->isbotbattle){
+            int ScoreBuf = this->ui->Field->team_score[static_cast<int>(GameSystem::TEAM::COOL)];
+            ui->CoolScoreLabel->setText(QString::number(ScoreBuf*3) + "(ITEM:" + QString::number(ScoreBuf) + ")");
+        }
     }
     if(winner == GameSystem::WINNER::DRAW){
         this->ui->WinnerLabel->setText("DRAW");
@@ -405,7 +470,10 @@ void MainWindow::StartAnimation(){
     QPoint pos[2];
     if(ANIMATION_TYPE == 0){
         //ランダムにワサッて
-        for(int i=0;i<2;i++){
+        //一度に2マス表示させるのですわ
+        int i_max = 2;
+        if(timer == 1)i_max ++;
+        for(int i=0;i<i_max;i++){
             do{
                 pos[i].setX(qrand() % this->startup->map.size.x());
                 pos[i].setY(qrand() % this->startup->map.size.y());

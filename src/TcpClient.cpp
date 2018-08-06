@@ -130,11 +130,27 @@ void TCPClient::DisConnect(){
 
 QString TCPClient::GetTeamName(){
     if(this->Name == ""){
-        this->Name = client->readAll();
+        //Qstring::fromLocal8bitで文字化け対策しています
+        //this->Name = QString::fromLocal8Bit(client->readAll());
+        QByteArray bytebuf = client->readAll();
+        QString namebuf = bytebuf;
+
+        //ここで0xFFFD(utfへの自動変換の失敗)が観測された場合、変換を行う
+        for(int i = 0; i < namebuf.size(); i++){
+            QChar buffer = namebuf.at(i);
+            //不明な文字が発見された場合、文字コードをUTFに変換
+            if(buffer == 0xFFFD){
+                namebuf = QString::fromLocal8Bit(bytebuf);
+            }
+        }
+
+        this->Name = namebuf;
+
         disconnect(this->client,SIGNAL(readyRead()),this,SLOT(GetTeamName()));
         emit WriteTeamName();
         emit Ready();
         return this->Name;
+
     }
     return this->Name;
 }

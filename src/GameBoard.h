@@ -49,6 +49,9 @@ public:
     //テクスチャパス取得
     static QString GetTexturePath(GameSystem::Texture tex);
 
+    //オブジェクトの数を数える
+    int GetMapObjectCount(GameSystem::MAP_OBJECT mb);
+
 public:
     //フィールドへアクセスする
     GameSystem::MAP_OBJECT FieldAccess(GameSystem::Method method, const QPoint& pos);

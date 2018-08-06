@@ -83,7 +83,7 @@ public:
     enum class MAP_OVERLAY{
         NOTHING,
         LOOK,
-        SEACH,
+        SEARCH,
         GETREADY,
         BLIND,
         ERASE,
@@ -114,7 +114,7 @@ public:
         enum class ACTION{
             WALK,
             LOOK,
-            SEACH,
+            SEARCH,
             PUT,
             GETREADY,
             UNKNOWN,

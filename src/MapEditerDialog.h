@@ -37,6 +37,7 @@ private slots:
     void Clear();                     //全消し
     void SpinChanged(int value);
     void ComboChanged(QString value);
+    void ReCount();
 
 public slots:
     void SelectItem(QListWidgetItem* next, QListWidgetItem* old);

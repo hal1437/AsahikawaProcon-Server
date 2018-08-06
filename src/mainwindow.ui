@@ -225,6 +225,9 @@
            <property name="text">
             <string>NONAME</string>
            </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">

@@ -18,6 +18,10 @@ DesignDialog::DesignDialog(QWidget *parent) :
     {
         ui->DarkBox->setChecked(v.toBool());
     }
+    v = mSettings->value( "Bot" );
+    if(v.type() != QVariant::Invalid){
+        ui->BotBox->setChecked(v.toBool());
+    }
 }
 
 DesignDialog::~DesignDialog()
@@ -29,6 +33,10 @@ bool DesignDialog::GetCheckDark() const {
     return ui->DarkBox->isChecked();
 }
 
+bool DesignDialog::GetCheckBot() const {
+    return ui->BotBox->isChecked();
+}
+
 void DesignDialog::Export(){
 
     QSettings* mSettings;
@@ -36,5 +44,6 @@ void DesignDialog::Export(){
     mSettings->setIniCodec( "UTF-8" ); // iniファイルの文字コード
 
     mSettings->setValue( "Dark"    , GetCheckDark());
+    mSettings->setValue( "Bot"     , GetCheckBot());
     QMessageBox::information(this, tr("警告"), tr("設定は再起動後有効になります。"));
 }

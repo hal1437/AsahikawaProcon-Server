@@ -14,8 +14,9 @@ void GameBoard::PickItem(GameSystem::Method method){
         this->field.field[ pos                        .y()][ pos                        .x()] = GameSystem::MAP_OBJECT::NOTHING;
         this->field.field[(pos-method.GetRoteVector()).y()][(pos-method.GetRoteVector()).x()] = GameSystem::MAP_OBJECT::BLOCK;
 
-
+        //点数を１増やす
         this->team_score[static_cast<int>(method.team)]++;
+
         this->leave_items--;
     }
 
@@ -90,11 +91,10 @@ void GameBoard::paintEvent(QPaintEvent *event){
 
                     //暗闇の描画
                     if(field.discover[i][j] == GameSystem::Discoverer::Unknown){
+
                         painter.drawPixmap(j * image_part.width() ,
                                            i * image_part.height(),
                                            overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::BLIND)]);
-                    }else{
-                        int gomi = 0;
                     }
 
                     //オーバーレイの描画
@@ -118,6 +118,20 @@ void GameBoard::RefreshOverlay(){
     }
 }
 
+//引数で指定されたオブジェクトの個数を数える関数
+int GameBoard::GetMapObjectCount(GameSystem::MAP_OBJECT mb){
+    int result = 0;
+    for(int i = 0; i < field.size.y(); i++){
+        for(int j = 0; j < field.size.x(); j++){
+            if(field.field[i][j] == mb){
+                result ++;
+            }
+        }
+    }
+
+    return result;
+}
+
 GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::Method method, const QPoint& pos){
     //場外
     if(pos.x() <  0              || pos.y() <  0)             return GameSystem::MAP_OBJECT::BLOCK;
@@ -128,7 +142,7 @@ GameSystem::MAP_OBJECT GameBoard::FieldAccess(GameSystem::Method method, const Q
 
     //オーバーレイ描画
     if(method.action == GameSystem::Method::ACTION::LOOK    )overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::LOOK;
-    if(method.action == GameSystem::Method::ACTION::SEACH   )overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::SEACH;
+    if(method.action == GameSystem::Method::ACTION::SEARCH   )overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::SEARCH;
     if(method.action == GameSystem::Method::ACTION::GETREADY)overlay[pos.y()][pos.x()] = GameSystem::MAP_OVERLAY::GETREADY;
 
     //ターゲット位置
@@ -172,8 +186,12 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
                (team_pos[static_cast<int>(method.team)] + method.GetRoteVector()).y() < field.size.y() &&
                (team_pos[static_cast<int>(method.team)] + method.GetRoteVector()).x() < field.size.x()){
                 QPoint get_pos = team_pos[static_cast<int>(method.team)] + method.GetRoteVector();
+                //put先にアイテムがある場合、残りアイテム数の数の表示を1減らさなければならない
+                if(this->field.field[get_pos.y()][get_pos.x()] == GameSystem::MAP_OBJECT::ITEM){
+                    this->leave_items --;
+                }
                 this->field.field[get_pos.y()][get_pos.x()] = GameSystem::MAP_OBJECT::BLOCK;
-                 }
+            }
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)]);
         case GameSystem::Method::ACTION::LOOK:
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)] + method.GetRoteVector() * 2);
@@ -181,7 +199,7 @@ GameSystem::AroundData GameBoard::FieldAccessMethod(GameSystem::Method method){
             team_pos[static_cast<int>(method.team)] += method.GetRoteVector();
             this->PickItem(method);
             return FieldAccessAround(method,team_pos[static_cast<int>(method.team)]);
-        case GameSystem::Method::ACTION::SEACH:
+        case GameSystem::Method::ACTION::SEARCH:
             GameSystem::AroundData around;
             //接続状態
             around.connect = GameSystem::CONNECTING_STATUS::CONTINUE;
@@ -254,7 +272,7 @@ void GameBoard::ReloadTexture(GameSystem::Texture tex){
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::NOTHING)]  = QPixmap();
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::LOOK)]     = QPixmap(path + "/Look.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::GETREADY)] = QPixmap(path + "/Getready.png");
-    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEACH)]    = QPixmap(path + "/Search.png");
+    this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::SEARCH)]    = QPixmap(path + "/Search.png");
     this->overray_resource[static_cast<int>(GameSystem::MAP_OVERLAY::BLIND)]    = QPixmap(path + "/Blind.png");
 
     //変形
